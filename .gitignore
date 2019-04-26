@@ -1,0 +1,10 @@
+# dependencies
+node_modules
+package-lock.json
+.next
+
+# credentials
+config/config.json
+
+# misc
+.DS_Store

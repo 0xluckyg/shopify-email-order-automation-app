@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 437 155">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #fff;
+        font-family: HelveticaNeue-Bold, Helvetica Neue;
+        font-weight: 700;
+      }
+
+      .cls-1 {
+        font-size: 120px;
+      }
+
+      .cls-2 {
+        font-size: 20px;
+      }
+    </style>
+  </defs>
+  <g id="Group_3" data-name="Group 3" transform="translate(-733 -375)">
+    <g id="Group_1" data-name="Group 1">
+      <image id="icons8-comedy-2-filled-100" width="98" height="98" transform="translate(800 400)" xlink:href="data:image/png;base64,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"/>
+      <text id="J_QUR" data-name="J   QUR" class="cls-1" transform="translate(733 492)"><tspan x="0" y="0" xml:space="preserve">J   QUR</tspan></text>
+    </g>
+    <text id="JOQUR_ECOMMERCE_TECH" data-name="JOQUR ECOMMERCE TECH" class="cls-2" transform="translate(897 526)"><tspan x="0" y="0">JOQUR ECOMMERCE TECH</tspan></text>
+  </g>
+</svg>
