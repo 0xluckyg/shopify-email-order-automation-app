@@ -35,10 +35,10 @@ const session = require('koa-session');
 const { verifyRequest } = require('@shopify/koa-shopify-auth');
 const next = require('next');
 
-const {processPayment} = require('./server/payment');
+const {processPayment} = require('./server/auth/shopify-payment');
 const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
-const shopifyAuth = require('./server/shopify-auth');
+const shopifyAuth = require('./server/auth/shopify-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
@@ -56,29 +56,29 @@ app.prepare().then(() => {
     const router = new Router();
     server.keys = [SHOPIFY_API_SECRET_KEY];
 
-    server.use(session(server));
     server.use(bodyParser());      
-    server.use(router.routes());               
+    server.use(session(server));
     server.use(shopifyAuth());
     //Returns a middleware to verify requests before letting the app further in the chain.
     //Everything after this point will require authentication        
     //authRoute: '/foo/auth' (Path to redirect to if verification fails. defaults to '/auth')        
     //fallbackRoute: '/install' (Path to redirect to if verification fails and there is no shop on the query. defaults to '/auth')
-    server.use(verifyRequest());
-    
-    //Lets next.js prepare all the requests on the React side
-    server.use(async (ctx) => {        
-        await handle(ctx.req, ctx.res);
-        ctx.respond = false;
-        ctx.res.statusCode = 200;        
-        return
-    });
+    server.use(verifyRequest());                      
 
     router.get('/', processPayment);    
     router.get('/get-user', getUser);    
     router.post('/contact-us', contactUs)
     //validates webhook and listens for products/create in the store
     router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)
+
+    server.use(router.routes());      
+    //Lets next.js prepare all the requests on the React side
+    server.use(async (ctx) => {        
+        await handle(ctx.req, ctx.res);
+        ctx.respond = false;
+        ctx.res.statusCode = 200;        
+        return
+    });   
 
     server.listen(port, () => {
         console.log(`Running on port: ${port}`);

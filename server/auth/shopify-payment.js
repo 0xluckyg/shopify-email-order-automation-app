@@ -1,4 +1,4 @@
-const {User} = require('./db/user');
+const {User} = require('../db/user');
 const FEE = 9.99;
 const FREE_TRIAL = 7;
 

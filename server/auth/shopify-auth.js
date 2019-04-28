@@ -1,8 +1,8 @@
 //package exposes "shopifyAuth" by default. We're changing that to "createShopifyAuth"
 const { default: createShopifyAuth } = require('@shopify/koa-shopify-auth');
-const {initiatePayment} = require('./payment');
-const {registerAppUninstalled} = require('./webhooks/app-uninstalled');
-const {User} = require('./db/user');
+const {initiatePayment} = require('./shopify-payment');
+const {registerAppUninstalled} = require('../webhooks/app-uninstalled');
+const {User} = require('../db/user');
 //app refers to the Next.js app, which is the react build
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY } = process.env;
 
