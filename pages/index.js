@@ -221,6 +221,6 @@ function mapDispatchToProps(dispatch){
     );
 }
 
-const pageWrapper = { padding: '20px 40px 20px 40px' }
+const pageWrapper = { padding: '30px 40px 40px 40px' }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Index);

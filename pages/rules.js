@@ -2,6 +2,7 @@ import {
     Card,         
     Layout, 
 } from '@shopify/polaris';
+import pageHeader from '../components/page-header'
 
 class Rules extends React.Component {
     constructor(props){
@@ -11,9 +12,10 @@ class Rules extends React.Component {
         return (            
             <Layout>
                 <Layout.Section>
+                    {pageHeader('Rules')}
                     <Card sectioned>
                         
-                    </Card>
+                    </Card>                    
                 </Layout.Section>
             </Layout>
         )

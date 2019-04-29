@@ -9,7 +9,7 @@ import {
     Layout,    
     Badge,
     TextField,
-    Tag
+    Tag,    
 } from '@shopify/polaris';
 import * as PropTypes from 'prop-types';
 import { Redirect } from '@shopify/app-bridge/actions';
@@ -19,6 +19,7 @@ import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import * as keys from '../config/keys'
 import emailValidator from "email-validator";
+import pageHeader from '../components/page-header'
 
 class AddRule extends React.Component {
     isMounted = false
@@ -313,8 +314,9 @@ class AddRule extends React.Component {
 
     render() {
         return (
-            <Layout>
-                <Layout.Section>
+            <Layout>                
+                <Layout.Section>                                    
+                    {pageHeader('Add Email Rule')}
                     {this.showProductSelect()}
                     <br />    
                     {this.renderAddEmails()}

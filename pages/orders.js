@@ -2,6 +2,7 @@ import {
     Card,         
     Layout, 
 } from '@shopify/polaris';
+import pageHeader from '../components/page-header'
 
 class Orders extends React.Component {
     constructor(props){
@@ -9,8 +10,9 @@ class Orders extends React.Component {
     }
     render() {
         return (            
-            <Layout>
+            <Layout>                
                 <Layout.Section>
+                    {pageHeader('Orders')}
                     <Card sectioned>
                         
                     </Card>
