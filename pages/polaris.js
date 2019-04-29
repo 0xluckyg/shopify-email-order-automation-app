@@ -66,10 +66,7 @@ open: true
 render() {
 return (
 <Layout>
-<Layout.AnnotatedSection
-title="These are list of available components"
-description="Available components"
->
+<Layout.Section>
 
 1. https://polaris.shopify.com/components/actions/account-connection#navigation
 <AccountConnection
@@ -949,7 +946,7 @@ panelID: 'prospects-content',
 </Tooltip>
 </Card>
 
-</Layout.AnnotatedSection>
+</Layout.Section>
 </Layout>
 )
 }

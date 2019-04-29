@@ -1,12 +1,10 @@
 import {Toast} from '@shopify/polaris'
-import store from '../redux/store'
-import { showToastAction } from '../redux/actions'
 
 //Black confirmation or error mark that shows and goes. Connected to redux so that it can be used from anywhere
-function ToastMarkup(text) {
+function ToastMarkup(text, showToastAction) {
     return (    
         <Toast
-            onDismiss={() => store.dispatch(showToastAction(false))}
+            onDismiss={() => showToastAction(false)}
             content={text}
         />
     )

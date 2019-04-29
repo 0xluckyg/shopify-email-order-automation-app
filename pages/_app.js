@@ -55,7 +55,7 @@ const theme = {
         },
     },
     logo: {
-        width: 124,
+        width: 100,
         //Shows the logo on the top bar
         topBarSource: keys.LOGO,
         //Where the top bar links to

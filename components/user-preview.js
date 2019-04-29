@@ -1,4 +1,5 @@
 import { TopBar } from '@shopify/polaris';
+import * as keys from '../config/keys';
 
 //Uses store domain for initial and name
 function getInitial(domain) {
@@ -18,11 +19,11 @@ function UserPrevewMarkup(state, toggleState, router, redirect) {
             items: [
                 { 
                     content: 'Contact Us', 
-                    onAction: () => router(2)
+                    onAction: () => router(keys.CONTACT_US_INDEX)
                 },
                 { 
                     content: 'FAQs', 
-                    onAction: () => router(3)
+                    onAction: () => router(keys.FAQ_INDEX)
                 },
                 {
                     content: 'Leave a Review', 

@@ -10,17 +10,31 @@ function NavigationMarkup(router) {
                 title={keys.APP_FULL_NAME}
                 items={[
                     {                        
-                        label: 'Navigation Example 1',
-                        icon: 'home',
+                        label: 'Orders',
+                        // icon: 'home',
                         onClick: () => {
                             router(0);                            
                         }
                     },
                     {                        
-                        label: 'Navigation Example 2',
-                        icon: 'orders',
+                        label: 'Email Rules',
+                        // icon: 'home',
                         onClick: () => {
                             router(1);                            
+                        }
+                    },
+                    {                        
+                        label: 'Add Email Rule',
+                        // icon: 'home',
+                        onClick: () => {
+                            router(2);                            
+                        }
+                    },
+                    {                        
+                        label: 'Settings',
+                        // icon: 'home',
+                        onClick: () => {
+                            router(3);                            
                         }
                     },
                 ]}                

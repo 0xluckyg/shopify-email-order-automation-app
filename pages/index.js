@@ -14,14 +14,16 @@ import Cookies from 'js-cookie';
 import { Redirect } from '@shopify/app-bridge/actions';
 import * as PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
-import {getUserAction, routerAction} from '../redux/actions';
+import {getUserAction, routerAction, showToastAction, isDirtyAction} from '../redux/actions';
 import NavigationMarkup from '../components/navigation';
 import SaveBar from '../components/save-bar';
 import UserPreviewMarkup from '../components/user-preview';
 import Toast from '../components/toast';
 import ReviewModal from "../components/review-modal";
-import Page1 from './page-1';
-import Page2 from './page-2';
+import AddRule from './add-rule';
+import Rules from './rules';
+import Orders from './orders';
+import Settings from './settings';
 import ContactUs from './contact-us';
 import Faq from './faq';
 import * as keys from '../config/keys';
@@ -54,11 +56,11 @@ class Index extends React.Component {
     searchOptions = [
         { 
             content: 'Contact Us', 
-            onAction: () => this.router(2)
+            onAction: () => this.router(keys.CONTACT_US_INDEX)
         },
         { 
             content: 'FAQs', 
-            onAction: () => this.router(3)
+            onAction: () => this.router(keys.FAQ_INDEX)
         },
         {
             content: 'Leave a Review', 
@@ -77,13 +79,15 @@ class Index extends React.Component {
         
     const {        
         searchActive,
-        searchText,        
-        showMobileNavigation,                  
+        searchText,
+        showMobileNavigation,
     } = this.state;
 
     const pages = [
-        <Page1/>,
-        <Page2/>,
+        <Orders/>,
+        <Rules/>,        
+        <AddRule/>,        
+        <Settings/>,
         <ContactUs/>,
         <Faq/>
     ]
@@ -115,8 +119,13 @@ class Index extends React.Component {
     );
 
     const loadingMarkup = this.props.isLoadingReducer ? <Loading /> : null;    
-    const toastMarkup = this.props.showToastReducer.show ? Toast(this.props.showToastReducer.text) : null;
-    const contextualSaveBarMarkup = this.props.isDirtyReducer.isDirty ? SaveBar(this.props.isDirtyReducer.onSave) : null;        
+    const toastMarkup = this.props.showToastReducer.show ? 
+                        Toast(this.props.showToastReducer.text, 
+                        (bool) => { this.props.showToastAction(bool) }) : null;
+    const contextualSaveBarMarkup = this.props.isDirtyReducer.isDirty ? 
+                                    SaveBar(this.props.isDirtyReducer.onSave, 
+                                    (bool, func) => { this.props.isDirtyAction(bool, func) }, 
+                                    (bool, text) => { this.props.showToastAction(bool, text) }) : null;        
     return (
         <Frame
             topBar={topBarMarkup}
@@ -207,7 +216,7 @@ function mapStateToProps({routerReducer, isDirtyReducer, isLoadingReducer, showT
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {getUserAction, routerAction},
+        {getUserAction, routerAction, showToastAction, isDirtyAction},
         dispatch
     );
 }
