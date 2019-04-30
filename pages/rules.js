@@ -19,22 +19,7 @@ class Rules extends React.Component {
         
         this.state = {        
             totalRulesCount: 0,
-            rules: [{    
-                shop: 'miraekomerco.myshopify.com',
-                filters: [ {key: 'vendor', value: 'jaypro'} ],
-                selectedProducts: [],                                
-                emails: ['soigjeg@gmail.com']
-            },{    
-                shop: 'miraekomerco.myshopify.com',
-                filters: [ {key: 'vendor', value: 'fisher'} ],
-                selectedProducts: [],                                
-                emails: ['soigjeg@gmail.com', 'ejgij@gmail.com', 'reohij@gmail.com']
-            },{    
-                shop: 'miraekomerco.myshopify.com',
-                filters: [],
-                selectedProducts: [],                                
-                emails: ['soigjeg@gmail.com', 'ejgij@gmail.com', 'reohij@gmail.com']
-            }],
+            rules: [],
             rulesLoading: true,
             showDetail: false,
             ruleDetail: {},
@@ -50,7 +35,7 @@ class Rules extends React.Component {
     }
 
     fetchEmailRules(params, changePage) {        
-        axios.get(process.env.APP_URL + '/get-email-rules', {
+        axios.get(process.env.APP_URL + '/get-rules', {
             params,
             withCredentials: true
         }).then(res => {
@@ -144,7 +129,16 @@ class Rules extends React.Component {
             <RuleDetailModal 
                 open={this.state.showDetail} 
                 detail={this.state.ruleDetail} 
-                close={() => this.setState({showDetail:false})}
+                close={() => { 
+                    this.setState({showDetail:false})                    
+                 }}
+                 onUpdate={update => {
+                    let rules = this.state.rules                    
+                    const index = rules.findIndex((r => r._id == update._id))
+                    if (index < 0) return
+                    rules[index] = update
+                    this.setState({rules})
+                 }}
             />
             <Layout.Section>       
                 {pageHeader('Rules')}

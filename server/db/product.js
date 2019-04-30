@@ -59,6 +59,6 @@ ProductSchema.index({
 });
 
 //Creating a new user example
-const Products = mongoose.model('Products', ProductSchema);
+const Product = mongoose.model('Product', ProductSchema);
 
-module.exports = {Products};
+module.exports = {Product};

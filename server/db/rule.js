@@ -16,6 +16,6 @@ RuleSchema.index({
 });
 
 //Creating a new user example
-const Rules = mongoose.model('Rules', RuleSchema);
+const Rule = mongoose.model('Rule', RuleSchema);
 
-module.exports = {Rules};
+module.exports = {Rule};

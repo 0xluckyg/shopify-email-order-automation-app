@@ -39,6 +39,8 @@ const {processPayment} = require('./server/auth/shopify-payment');
 const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
+const getRules = require('./server/get-rules');
+const {addRule, editRule} = require('./server/add-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
 
@@ -70,6 +72,9 @@ app.prepare().then(() => {
     router.get('/get-user', getUser);    
     router.post('/contact-us', contactUs);
     router.get('/get-products', getProducts);
+    router.get('/get-rules', getRules);
+    router.post('/add-rule', addRule);
+    router.post('/edit-rule', editRule);
     //validates webhook and listens for products/create in the store
     router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)
 

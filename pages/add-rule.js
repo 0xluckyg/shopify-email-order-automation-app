@@ -102,17 +102,46 @@ class AddRule extends React.Component {
         this.setState({ selectedItems });
     };
     handleFinalSubmit = () => {        
+        const {showProductSelect, emails, selectedItems, appliedFilters} = this.state
+        
         this.setState({buttonIsLoading: true})
-        if (this.state.showProductSelect) {
+        if (showProductSelect) {
             this.setState({buttonIsLoading: false})
             return this.props.showToastAction(true, 'Please select products')
         }        
-        if (this.state.emails.length <= 0) {
+        if (emails.length <= 0) {
             this.setState({buttonIsLoading: false})
             return this.props.showToastAction(true, 'Please enter one or more emails')
         }        
 
-        this.setState({buttonIsLoading: false})
+        axios.post(process.env.APP_URL + '/add-rule', {
+            //rules for filtering products
+            filters: appliedFilters,
+            //manually selected products if the user has done so
+            selectedProducts: selectedItems,
+            emails
+        })
+        .then(() => {
+            if (!this.isMounted) return            
+            this.setState({
+                productsAreLoading: true,
+                hasPreviousPage: false,
+                hasNextPage: false,
+                selectedItems: [],
+                searchValue: '',
+                appliedFilters: [],                
+                products: [],
+                showProductSelect: true,
+                email: '',
+                emails: [],
+                emailFieldError: '',
+                buttonIsLoading: false
+            })
+            this.props.showToastAction(true, 'Rule saved!')
+            this.fetchProducts({filters: JSON.stringify([])})
+        }).catch(err => {            
+            this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
+        })        
     }
     
     redirectToProductPage = (url) => {        

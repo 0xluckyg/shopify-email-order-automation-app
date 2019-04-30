@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 
 //Creating a new todo example
 const OrderSchema = new mongoose.Schema({        
+    //NEEDED BY APP
     shop: String,  
+
+    //PROVIDED BY WEBHOOOK
     id: String,
     email: String,
     closed_at: null,    
@@ -79,6 +82,6 @@ OrderSchema.index({
 });
 
 //Creating a new user example
-const Orders = mongoose.model('Orders', OrderSchema);
+const Order = mongoose.model('Order', OrderSchema);
 
-module.exports = {Orders};
+module.exports = {Order};

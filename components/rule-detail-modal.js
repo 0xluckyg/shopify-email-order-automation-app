@@ -7,6 +7,7 @@ import {
     Layout    
 } from '@shopify/polaris';
 import * as PropTypes from 'prop-types';
+import _ from 'lodash';
 import { Redirect } from '@shopify/app-bridge/actions';
 import Modal from "react-responsive-modal";
 import axios from 'axios';
@@ -17,6 +18,7 @@ import AddEmails from './add-emails';
 
 //A pop up to ask users to write a review
 class RulesDetailModal extends React.Component {    
+    mounted = false
     constructor(props){
         super(props)                          
         this.state = {
@@ -34,6 +36,13 @@ class RulesDetailModal extends React.Component {
 
     componentWillReceiveProps(newProps) {
         {this.setState({emails:newProps.detail.emails})} 
+    }
+    componentDidMount() {        
+        this.isMounted = true        
+    }
+
+    componentWillUnmount() {
+        this.isMounted = false
     }
 
     fetchProducts(beforeCursor, afterCursor) {
@@ -104,6 +113,7 @@ class RulesDetailModal extends React.Component {
             </ResourceList.Item>
         );
     };
+
     handleNextPage = () => {
         const afterCursor = this.state.products[this.state.products.length - 1].cursor                
         this.fetchProducts(undefined, afterCursor)
@@ -162,7 +172,23 @@ class RulesDetailModal extends React.Component {
     }
 
     handleEdit() {
-
+        const { _id, filters, selectedProducts, emails } = this.props.detail;
+        if (_.isEqual(emails, this.state.emails)) return            
+        axios.post(process.env.APP_URL + '/edit-rule', {
+            _id,
+            //rules for filtering products
+            filters,
+            //manually selected products if the user has done so
+            selectedProducts,
+            emails: this.state.emails
+        })
+        .then(() => {
+            if (!this.isMounted) return
+            this.props.onUpdate({ _id, filters, selectedProducts, emails })
+            this.props.showToastAction(true, 'Rule edited!')            
+        }).catch(() => {            
+            this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
+        })    
     }
 
     render() {        
@@ -186,7 +212,7 @@ class RulesDetailModal extends React.Component {
                         <br />                            
                         <AddEmails emails={this.state.emails} setEmails={emails => this.setState({emails})}/>
                         <div style={finalButtonStyle}>
-                            <Button primary loading={this.state.buttonIsLoading} size="large" onClick={() => this.handleEdit()}>Edit!</Button>
+                            <Button primary loading={this.state.buttonIsLoading} size="large" onClick={this.handleEdit}>Edit!</Button>
                         </div>                 
                         </Layout.Section>  
                     </Layout>  
