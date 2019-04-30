@@ -2,8 +2,7 @@ import {
     Card,         
     Layout, 
     ButtonGroup,
-    Button,    
-    CalloutCard
+    Button
 } from '@shopify/polaris';
 import pageHeader from '../components/page-header'
 import GmailCard from '../components/gmail-auth'

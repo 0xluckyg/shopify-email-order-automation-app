@@ -7,9 +7,7 @@ import {
     Pagination,
     SettingToggle,
     Layout,    
-    Badge,
-    TextField,
-    Tag,    
+    Badge,    
 } from '@shopify/polaris';
 import * as PropTypes from 'prop-types';
 import { Redirect } from '@shopify/app-bridge/actions';
@@ -18,8 +16,8 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import * as keys from '../config/keys'
-import emailValidator from "email-validator";
-import pageHeader from '../components/page-header'
+import pageHeader from '../components/page-header';
+import AddEmails from '../components/add-emails';
 
 class AddRule extends React.Component {
     isMounted = false
@@ -259,59 +257,6 @@ class AddRule extends React.Component {
         }
     }
 
-    renderEmailTags() {
-        let emails = this.state.emails        
-        return (
-            <div style={{width: '80%'}}>
-                {emails.map(email => {  
-                    const tag = 
-                    <div style={{display: 'inline-block', margin: '10px 10px 0px 0px'}}>
-                        <Tag onRemove={() => {
-                            let index = emails.indexOf(email);
-                            emails.splice(index, 1)                            
-                            this.setState({emails})
-                        }}>{email}</Tag>
-                    </div>                    
-                    return tag
-                })}
-            </div>
-        )
-    }
-
-    renderAddEmails() {        
-        return (
-            <Card sectioned>
-                <p style={{marginBottom: '10px'}}>Add emails to send orders to when customer purchases the products you've specified above</p>
-                <div style={{display:'flex', justifyContent: 'space-between'}}>
-                <div style={{width:'80%'}}>                
-                    <TextField     
-                        placeholder="Email (eg. kroco@gmail.com)"
-                        value={this.state.email}
-                        onChange={(email) => this.setState({email})}
-                        error={this.state.emailFieldError}
-                    />
-                </div>
-                <div style={{width:'15%'}}>
-                    <Button primary fullWidth onClick={() => {
-                        if (!emailValidator.validate(this.state.email)) {
-                            return this.setState({emailFieldError: "Please provide a valid email"})                            
-                        }
-                        if (this.state.emails.indexOf(this.state.email) >= 0) {
-                            return this.setState({emailFieldError: "This email's already on the list"})                            
-                        }
-                        let emails = this.state.emails
-                        emails.push(this.state.email)
-                        this.setState({emails, emailFieldError: ''})
-                    }}>
-                        Add
-                    </Button>
-                </div>
-                </div>
-                {this.renderEmailTags()}
-            </Card>            
-        )
-    }
-
     render() {
         return (
             <Layout>                
@@ -319,7 +264,7 @@ class AddRule extends React.Component {
                     {pageHeader('Add Email Rule')}
                     {this.showProductSelect()}
                     <br />    
-                    {this.renderAddEmails()}
+                    <AddEmails emails={this.state.emails} setEmails={emails => this.setState({emails})}/>
                     <br />    
                     <div style={finalButtonStyle}>
                         <Button primary loading={this.state.buttonIsLoading} size="large" onClick={() => this.handleFinalSubmit()}>Create Rule!</Button>

@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
         //shopify, woocommerce, bigcommerce, etc
         type: String,
         default: "shopify"
-    },
+    },    
     //whether the app is installed on the store or not
     active: {
         type: Boolean,
@@ -33,6 +33,34 @@ const UserSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
+    },
+
+    gmailAccessToken: {
+        unique: true,
+        type: String
+    },
+    gmailRefreshToken: {
+        type: String
+    },
+    sendMethod: {
+        method: {
+            //automatic, manual, and immediate
+            type: String,
+            default: "automatic"
+        },
+        frequency: {
+            //1: once a day, 2: once per 2 days, 7: once a week... etc
+            type: Number,
+            default: 1
+        },
+        time: {
+            //Hour in UTC
+            type: Number,
+            default: 8
+        }
+    },
+    orderScript: {
+        type: String
     }
 },{
     timestamps: true // Saves createdAt and updatedAt as dates
