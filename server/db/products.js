@@ -1,44 +1,51 @@
 const mongoose = require('mongoose');
 
 //Creating a new todo example
-const ProductSchema = new mongoose.Schema({        
-    shop: String,
-    orderName: String,
-    orderId: String,    
-    fulfillableQuantity: Number,
-    fulfillableQuantity: Number,
-    fulfillmentService: {
-        handle: String,
-        id: String,
-        serviceName: String,        
-    },    
-    fulfillmentStatus: String,
+const ProductSchema = new mongoose.Schema({
+    //PROVIDED BY WEBHOOK        
     id: String,
-    image: {
-        originalSrc: String,
-        transformedSrc: String
-    },
-    name: String,
-    originalTotalSet: {
-
-    },
-    product: {
-
-    },
+    variant_id: Number,
+    //Title of product
+    title: String,
     quantity: Number,
     sku: String,
-    taxable: Boolean,
-    title: String,
-    unfulfilledQuantity: Number,
-    variant: {
-
-    },
-    variantTitle: String,
+    variant_title: String,
     vendor: String,
-    // Date and time when the order was processed. When orders are imported from an app, this date and time may not match the date and time when the order was created.
-    processedAt: Date,
+    fulfillment_service: String,
+    product_id: Number,
+    requires_shipping: Boolean,
+    taxable: Boolean,    
+    //Name of product variant
+    name: String,
+    properties: [
+        {
+            //ex: custom engraving
+            name: String,
+            // Happy Birthday Mom!    
+            value: String,
+        }
+    ],
+    product_exists: Boolean,
+    fulfillable_quantity: Number,
+    grams: Number,
+    price: String,
+    total_discount: String,
+    fulfillment_status: String,
+    
+    //NOT PROVIDED BY WEBHOOK
+    tags: [String],
+    product_type: String,
+    gtin: String,
+
+    //NEEDED BY APP
+    shop: String,
+    order_id: String,
+    order_number: Number,
     emails: [{
-        email: String,
+        email: {
+            type: String,
+            unique: true
+        },
         sent: Boolean
     }]
 },{
@@ -47,9 +54,8 @@ const ProductSchema = new mongoose.Schema({
 
 //Allows find by shop to be faster by making it an index
 ProductSchema.index({
-    shop: 1,
-    orderName: 1,
-    orderId: 1
+    shop: String,
+    order_id: String
 });
 
 //Creating a new user example

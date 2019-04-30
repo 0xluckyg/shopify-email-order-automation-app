@@ -3,88 +3,70 @@ const mongoose = require('mongoose');
 //Creating a new todo example
 const OrderSchema = new mongoose.Schema({        
     shop: String,  
-    // Generated messages that appear at the top of an order page in the Shopify admin  
-    alerts: {
-        severity: {
-            type: String,
-            // DEFAULT
-            // INFO
-            // WARNING
-            // SUCCESS
-            // CRITICAL
-            default: "DEFAULT"
-        },
-        title: String
-    },
-    canMarkAsPaid: Boolean,
-    cancelReason: {
-        type:String,
-        // CUSTOMER
-        // The customer wanted to cancel the order.
-        // FRAUD        
-        // INVENTORY        
-        // DECLINED        
-        // OTHER
-        // null 
-        default: null       
-    },
-    capturable: Boolean,
-    closed: Boolean,
-    closedAt: Date,    
-    currencyCode: {
-        type: String,
-        default: "USD"
-    },
-    customer: {
-        displayName: String,        
-        id: String,
-        ordersCount: Number,        
-        totalSpent: String,        
-    },
-    discountCode: String,
-    disputes: [{
-        id: String,
-        // CHARGEBACK
-        // INQUIRY
-        initiatedAs: String,
-        // NEEDS_RESPONSE
-        // UNDER_REVIEW
-        // CHARGE_REFUNDED
-        // ACCEPTED
-        // WON
-        // LOST
-        status: String
-    }],
-    email: String,
-    fulfillable: Boolean,
     id: String,
-    // Unique identifier for the order that appears on the order. For example, #1000 or _Store1001.
-    name: String,
-    phone: String,
-    // Date and time when the order was processed. When orders are imported from an app, this date and time may not match the date and time when the order was created.
-    processedAt: Date,
-    refundable: Boolean,
-    riskLevel: {
-        type: String,
-        // LOW
-        // MEDIUM
-        // HIGH
-        default: "LOW"
-    },
-    shippingAddress: {
-
-    },
-    tags: [String],
-    totalPriceSet: {
-
-    },
-    totalRefundedSet: {
-
-    },
-    // Total weight (grams) of the order.
-    totalWeight: Number,
-    unpaid: Boolean,
-    updatedAtShop: Date,    
+    email: String,
+    closed_at: null,    
+    updated_at: Date,    
+    note: null,    
+    test: Boolean,
+    total_price: String,    
+    total_weight: 0,
+    total_tax: String,    
+    currency: String,    
+    confirmed: Boolean,
+    total_discounts: String,
+    total_line_items_price: String,    
+    referring_site: null,
+    cancelled_at: Date,
+    cancel_reason: String,    
+    processed_at: null,    
+    customer_locale: String,
+    landing_site_ref: null,
+    order_number: Number,
+    // checkout, direct,  manual, offsite, and express.
+    processing_method: String,
+    source_name: String,
+    fulfillment_status: String,
+    tags: String,
+    order_status_url: String,
+    shipping_lines: [
+    {
+        id: String,
+        title: String,
+        price: String,
+        carrier_identifier: String,
+    }
+    ],
+    shipping_address: {
+        first_name: String,
+        address1: String,
+        phone: String,
+        city: String,
+        zip: String,
+        province: String,
+        country: String,
+        last_name: String,
+        address2: String,
+        company: String,
+        country_code: String,
+        province_code: String
+    },        
+    customer: {
+        id: String,
+        email: String,
+        created_at: Date,
+        updated_at: Date,
+        first_name: String,
+        last_name: String,
+        orders_count: Number,
+        total_spent: String,
+        last_order_id: String,
+        note: String,                
+        tax_exempt: Boolean,
+        phone: String,
+        tags: String,
+        currency: String
+    }
 },{
     timestamps: true // Saves createdAt and updatedAt as dates
 });
@@ -92,7 +74,7 @@ const OrderSchema = new mongoose.Schema({
 //Allows find by shop to be faster by making it an index
 OrderSchema.index({
     shop: 1,
-    name: 1,
+    order_number: 1,
     id: 1
 });
 
