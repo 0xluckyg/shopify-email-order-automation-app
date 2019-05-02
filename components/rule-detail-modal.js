@@ -74,8 +74,7 @@ class RulesDetailModal extends React.Component {
             })
         }).catch(err => {
             this.setState({productsAreLoading: false})
-            this.props.showToastAction(true, "Couldn't get products. Please refresh.")
-            console.log('err getting products, ', err)
+            this.props.showToastAction(true, "Couldn't get products. Please refresh.")            
         })
     }
 
@@ -172,8 +171,8 @@ class RulesDetailModal extends React.Component {
     }
 
     handleEdit() {
+        this.setState({buttonIsLoading: true})
         const { _id, filters, selectedProducts, emails } = this.props.detail;
-        if (_.isEqual(emails, this.state.emails)) return            
         axios.post(process.env.APP_URL + '/edit-rule', {
             _id,
             //rules for filtering products
@@ -182,11 +181,12 @@ class RulesDetailModal extends React.Component {
             selectedProducts,
             emails: this.state.emails
         })
-        .then(() => {
-            if (!this.mounted) return
-            this.props.onUpdate({ _id, filters, selectedProducts, emails })
+        .then(() => {            
+            if (!this.mounted) return                       
             this.props.showToastAction(true, 'Rule edited!')            
-        }).catch(() => {            
+            this.setState({buttonIsLoading: false}) 
+            this.props.onUpdate({ _id, filters, selectedProducts, emails })            
+        }).catch(err => {                        
             this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
         })    
     }
@@ -212,7 +212,7 @@ class RulesDetailModal extends React.Component {
                         <br />                            
                         <AddEmails emails={this.state.emails} setEmails={emails => this.setState({emails})}/>
                         <div style={finalButtonStyle}>
-                            <Button primary loading={this.state.buttonIsLoading} size="large" onClick={this.handleEdit}>Edit!</Button>
+                            <Button primary loading={this.state.buttonIsLoading} size="large" onClick={() => this.handleEdit()}>Edit!</Button>
                         </div>                 
                         </Layout.Section>  
                     </Layout>  

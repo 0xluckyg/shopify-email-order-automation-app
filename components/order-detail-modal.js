@@ -65,8 +65,7 @@ class OrderDetailModal extends React.Component {
             })
         }).catch(err => {
             this.setState({productsAreLoading: false})
-            this.props.showToastAction(true, "Couldn't get products. Please refresh.")
-            console.log('err getting products, ', err)
+            this.props.showToastAction(true, "Couldn't get products. Please refresh.")            
         })
     }
 

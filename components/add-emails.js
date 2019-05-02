@@ -25,8 +25,8 @@ class AddEmails extends React.Component {
             <div style={{width: '80%'}}>
                 {emails.map(email => {  
                     const tag = 
-                    <div style={{display: 'inline-block', margin: '10px 10px 0px 0px'}}>
-                        <Tag key={email} onRemove={() => {
+                    <div key={email} style={{display: 'inline-block', margin: '10px 10px 0px 0px'}}>
+                        <Tag onRemove={() => {
                             let index = emails.indexOf(email);
                             emails.splice(index, 1)                            
                             this.props.setEmails(emails)
@@ -62,7 +62,7 @@ class AddEmails extends React.Component {
                         let emails = this.props.emails
                         emails.push(this.state.email)
                         this.props.setEmails(emails)
-                        this.setState({emailFieldError: ''})
+                        this.setState({email:'', emailFieldError: ''})
                     }}>
                         Add
                     </Button>

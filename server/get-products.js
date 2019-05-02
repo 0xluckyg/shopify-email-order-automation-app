@@ -56,14 +56,12 @@ async function querySelectedProducts(selectedProducts, client) {
         // result => { "data": { "nodes": [ { "id": String, "description": String} ] } }        
         return res.nodes
     } catch (err) {
-        console.log('querySelectedProducts failed: ', err)
+        console.log('Failed querySelectedProducts: ', err)
     }
 }
 
 async function getProducts(ctx) {          
-    const { shop, accessToken } = ctx.session;    
-    console.log('session ', ctx.session)
-    console.log('GOT QUERY! ', shop)   
+    const { shop, accessToken } = ctx.session;        
 
     const uri = `https://${shop}/admin/api/graphql.json`       
     const client = new GraphQLClient(uri, {
@@ -129,11 +127,10 @@ async function getProducts(ctx) {
     }`
     
     try {
-        const products = await client.request(query, variables)     
-        console.log('GOT THEM! ', products.products.edges.length)   
+        const products = await client.request(query, variables)             
         ctx.body = products
     } catch(err) {
-        console.log('error getting products from Shopify: ', err)
+        console.log('Failed getting products from Shopify: ', err)
         ctx.status = 400
     }
 }

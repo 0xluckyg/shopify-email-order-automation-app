@@ -89,10 +89,16 @@ class Rules extends React.Component {
     }
 
     refreshCurrentPage() {
-        this.fetchEmailRules({ skip: (currentPage * perPage) - perPage })
+        const {currentPage, perPage} = this.state
+        let skip = (currentPage * perPage) - perPage
+        if (skip % 10 == 0 && currentPage != 1) {
+            this.fetchEmailRules({skip: skip - perPage}, () => this.state.currentPage - 1)
+        } else {
+            this.fetchEmailRules({skip})
+        }
     }
 
-    removeRule() {
+    removeRule(_id) {
         this.setState({rulesLoading: true})
         axios.post(process.env.APP_URL + '/remove-rule', {_id})
         .then(() => {            
@@ -126,7 +132,7 @@ class Rules extends React.Component {
                             </Button>
                         </div>
                         <div style={rowButtonStyle}>
-                            <Button onClick={this.removeRule} size="slim">
+                            <Button onClick={() => this.removeRule(_id)} size="slim">
                                 Remove
                             </Button>
                         </div>                
@@ -176,7 +182,7 @@ class Rules extends React.Component {
                     const index = rules.findIndex((r => r._id == update._id))
                     if (index < 0) return
                     rules[index] = update
-                    this.setState({rules})
+                    this.setState({rules, showDetail: false})
                  }}
             />
             <Layout.Section>       

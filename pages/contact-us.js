@@ -90,8 +90,7 @@ class ContactUs extends React.Component {
                 body: this.state.bodyValue
             }            
             axios.post(process.env.APP_URL + '/contact-us', emailContent, headers)
-            .then(res => {
-                console.log('Contact us email send success', res)
+            .then(() => {                
                 this.props.showToastAction(true, 'Email Sent!')
                 this.setState({
                     subjectValue: "",
@@ -101,8 +100,7 @@ class ContactUs extends React.Component {
                     emailError: "",
                     bodyError: ""
                 })
-            }).catch(err => {
-                console.log('Error sending contact us email', err)
+            }).catch(() => {                
                 this.props.showToastAction(true, 'Having Trouble.. Please Try Again Later ):')
             })
         }

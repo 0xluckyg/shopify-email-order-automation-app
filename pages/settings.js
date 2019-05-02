@@ -12,7 +12,7 @@ import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import pageHeader from '../components/page-header'
 import GmailCard from '../components/gmail-auth'
-import * as keys from '../config/keys'
+import keys from '../config/template'
 
 class Settings extends React.Component {
     mounted = false
@@ -20,7 +20,8 @@ class Settings extends React.Component {
         super(props)       
         
         this.state = {            
-            templateText: keys.TEMPLATE_TEXT,            
+            previousTemplateText: keys.TEMPLATE_TEXT,
+            templateText: keys.TEMPLATE_TEXT,
             templateTextLoading: false,
             sendMethod: 'manual',  
             sendMethodLoading: false,
@@ -32,23 +33,24 @@ class Settings extends React.Component {
         axios.get(process.env.APP_URL + '/get-settings')
         .then(res => {            
             if (!this.mounted) return
-            if (!res.data.templateText) return this.props.setState({ sendMethod:res.data.sendMethod })            
-            this.props.setState({
+            if (!res.data.templateText) return this.setState({ sendMethod:res.data.sendMethod.method })
+            this.setState({
+                previousTemplateText: res.data.templateText,
                 templateText: res.data.templateText,
-                sendMethod: res.data.sendMethod
+                sendMethod: res.data.sendMethod.method
             })
-        }).catch(() => {   
+        }).catch(err => {               
             if (!this.mounted) return            
             this.props.showToastAction(true, "Couldn't get settings. Please try again later.")
         })  
     }
 
-    saveEmailTemplate() {
+    setEmailTemplate() {
         this.setState({templateTextLoading: true})
         axios.post(process.env.APP_URL + '/email-template', {templateText: this.state.templateText})
         .then(() => {            
-            if (!this.mounted) return
-            this.setState({templateTextLoading: false})
+            if (!this.mounted) return            
+            this.setState({previousTemplateText: this.state.templateText, templateTextLoading: false})
             this.props.showToastAction(true, 'Saved settings!')
         }).catch(() => {   
             if (!this.mounted) return            
@@ -57,12 +59,12 @@ class Settings extends React.Component {
         })   
     }
 
-    switchSendMethod(sendMethod) {
+    setSendMethod(sendMethod) {
         this.setState({sendMethodLoading: true})
         axios.post(process.env.APP_URL + '/send-method', {sendMethod})
-        .then(res => {            
-            if (!this.mounted) return
-            this.setState({sendMethod:res.data, sendMethodLoading: false});
+        .then(() => {            
+            if (!this.mounted) return            
+            this.setState({sendMethod, sendMethodLoading: false});
             this.props.showToastAction(true, 'Saved settings!')
         }).catch(() => {   
             if (!this.mounted) return            
@@ -120,15 +122,17 @@ class Settings extends React.Component {
                             </div>
                         </div>
                         <div style={{display:'flex', justifyContent:'flex-end'}}>
+                        <div style={{marginRight:'20px'}}>
                         <Button 
                             disabled={(this.state.templateText == keys.TEMPLATE_TEXT)}
                             onClick={() => this.setState({templateText:keys.TEMPLATE_TEXT})}
                         >
                             Reset to default
                         </Button>
+                        </div>
                         <Button 
-                            disabled={(this.state.saveEmailTemplate == keys.TEMPLATE_TEXT)}
-                            onClick={this.saveEmailTemplate}
+                            disabled={(this.state.previousTemplateText == this.state.templateText)}
+                            onClick={() => this.setEmailTemplate()}
                             loading={this.state.templateTextLoading}
                         >
                             Save
@@ -141,18 +145,14 @@ class Settings extends React.Component {
                         <ButtonGroup segmented>
                             <Button 
                                 disabled={(this.state.sendMethod == 'manual')}
-                                onClick={() => {
-                                    this.setState({sendMethod:true})
-                                }}
+                                onClick={() => this.setSendMethod('manual')}
                                 loading={this.state.sendMethodLoading}
                             >
                                 Manual
                             </Button>
                             <Button 
                                 disabled={(this.state.sendMethod == 'automatic')}
-                                onClick={() => {
-                                    this.setState({sendMethod:false})
-                                }}
+                                onClick={() => this.setSendMethod('automatic')}
                                 loading={this.state.sendMethodLoading}
                             >
                                 Automatic
