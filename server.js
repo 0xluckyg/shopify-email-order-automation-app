@@ -40,6 +40,7 @@ const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
+const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
@@ -50,31 +51,34 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 const { SHOPIFY_API_SECRET_KEY } = process.env;
+
 const whitelist = [    
     '/_next',
     '/static',
     '/authenticate'
 ]
+async function handleRender(ctx) {    
+    await handle(ctx.req, ctx.res);
+    ctx.respond = false;
+    ctx.res.statusCode = 200;        
+    return
+}
 
 app.prepare().then(() => {
     
-    const server = new Koa();    
-    const router = new Router();    
+    const server = new Koa();        
+    const router = new Router();            
     server.keys = [SHOPIFY_API_SECRET_KEY];
-    //Allows routes that do not require authentication to be handled
+    
     server.use(bodyParser());
+    //Allows routes that do not require authentication to be handled    
     server.use(async (ctx, next) => {
         let noAuth = false
         for (i in whitelist) {
-            if (ctx.request.url.startsWith(whitelist[i])) {                
-                noAuth = true; break;
-            }
+            if (ctx.request.url.startsWith(whitelist[i])) noAuth = true
         }
         if (noAuth) {               
-            await handle(ctx.req, ctx.res);
-            ctx.respond = false;
-            ctx.res.statusCode = 200;        
-            return
+            return handleRender(ctx)
         } else {
             await next()   
         }
@@ -98,20 +102,19 @@ app.prepare().then(() => {
     router.get('/get-user', getUser);        
     router.get('/get-products', getProducts);
     router.get('/get-rules', getRules);
+    router.get('/get-settings', getSettings);
+
     router.post('/add-rule', addRule);
     router.post('/edit-rule', editRule);
     router.post('/remove-rule', removeRule);
     router.post('/contact-us', contactUs);
+    router.post('/email-template', setTemplateText);
+    router.post('/send-method', setSendMethod);
     //validates webhook and listens for products/create in the store
     router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)
     server.use(router.routes());  
     //Lets next.js prepare all the requests on the React side
-    server.use(async (ctx) => {                
-        await handle(ctx.req, ctx.res);          
-        ctx.respond = false;
-        ctx.res.statusCode = 200;        
-        return
-    });   
+    server.use(handleRender);   
 
     server.listen(port, () => {
         console.log(`Running on port: ${port}`);

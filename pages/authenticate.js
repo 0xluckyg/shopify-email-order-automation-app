@@ -107,10 +107,10 @@ class Authenticate extends React.Component {
             <div style={outerWrapper}>
                 <div style={pageWrapper}>
                     <Card>
-                        <div style={{display: 'flex', height: '500px', justifyContent: 'center',alignItems: 'center'}}>
+                        <div style={cardWrapper}>
                             <div style={{margin:'40px', width: '300px'}}>
                                 <img style={logoStyle} src={'../static/logo-color.svg'}/>
-                                <p style={{marginBottom: '10px', fontSize: '15px', textAlign: 'center'}}><strong>Shopify Domain</strong></p>
+                                <p style={textStyle}>Shopify Domain</p>
                                 <TextField                                    
                                     placeholder="(ex. kroco.myshopify.com)"
                                     value={this.state.domain}
@@ -222,7 +222,19 @@ const logoStyle = {
     width: '300px',
     
 }
+const textStyle = { 
+    marginBottom: '20px', 
+    fontSize: '20px', 
+    fontWeight: '300',
+    textAlign: 'center' 
+}
 const outerWrapper = { display: 'flex', justifyContent: 'center' }
 const pageWrapper = { width: '70%', padding: '30px 40px 40px 40px' }
+const cardWrapper = { 
+    display: 'flex', 
+    height: '500px', 
+    justifyContent: 'center',
+    alignItems: 'center'
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Authenticate);

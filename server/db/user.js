@@ -59,7 +59,7 @@ const UserSchema = new mongoose.Schema({
             default: 8
         }
     },
-    orderScript: {
+    templateText: {
         type: String
     }
 },{

@@ -9,9 +9,10 @@ import {
 import axios from 'axios';
 import RuleDetailModal from '../components/rule-detail-modal.js';
 import pageHeader from '../components/page-header'
+import NoContent from '../components/no-content'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {showToastAction, isLoadingAction} from '../redux/actions';
+import {showToastAction, isLoadingAction, routerAction} from '../redux/actions';
 
 class Rules extends React.Component {   
     mounted = false 
@@ -145,6 +146,18 @@ class Rules extends React.Component {
         return (totalRulesCount == 0 || currentPage == totalPages) ? false : true
     }
 
+    renderNoContent() {
+        if (this.state.rules.length != 0 || this.state.rulesLoading) return null
+        return (
+            <NoContent
+                logo='../static/email.svg'
+                text='Set up some rules to automate orders!'
+                action={() => this.props.routerAction(2)}
+                actionText='Create a Rule'          
+            />
+        )
+    }
+
     render() {
         const resourceName = {
             singular: 'rule',
@@ -169,7 +182,7 @@ class Rules extends React.Component {
             <Layout.Section>       
                 {pageHeader('Rules')}
                 <Card>
-                    <img src={'../static/email.png'}/>
+                    {this.renderNoContent()}
                     <ResourceList
                         resourceName={resourceName}
                         items={this.state.rules}
@@ -214,9 +227,10 @@ class Rules extends React.Component {
 const paginationWrapper = {float:"left", padding: "16px"}
 const rowButtonStyle = {display: "inline", paddingRight:"10px"}
 
+
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {showToastAction, isLoadingAction},
+        {showToastAction, isLoadingAction, routerAction},
         dispatch
     );
 }

@@ -9,6 +9,7 @@ import {
 import axios from 'axios';
 import OrderDetailModal from '../components/order-detail-modal.js';
 import pageHeader from '../components/page-header'
+import NoContent from '../components/no-content'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
@@ -96,6 +97,16 @@ class Orders extends React.Component {
         return (totalOrdersCount == 0 || currentPage == totalPages) ? false : true
     }
 
+    renderNoContent() {
+        if (this.state.orders.length != 0 || this.state.ordersLoading) return null
+        return (
+            <NoContent
+                logo='../static/shopping-bag.svg'
+                text='Your store has no orders yet!'
+            />
+        )
+    }
+
     render() {
         const resourceName = {
             singular: 'order',
@@ -111,6 +122,7 @@ class Orders extends React.Component {
             <Layout.Section>       
                 {pageHeader('Orders')}
                 <Card>
+                    {this.renderNoContent()}
                     <ResourceList
                         resourceName={resourceName}
                         items={this.state.orders}
