@@ -13,7 +13,8 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
 
-class Rules extends React.Component {    
+class Rules extends React.Component {   
+    mounted = false 
     constructor(props) {
         super(props)
         
@@ -30,15 +31,23 @@ class Rules extends React.Component {
         };   
     }     
 
-    componentDidMount() {
-        this.fetchEmailRules({ skip: 0 });           
+
+    componentDidMount() {        
+        this.mounted = true
+        this.fetchEmailRules({ skip: 0 });                   
+    }
+    
+    componentWillUnmount() {
+        this.mounted = false
     }
 
     fetchEmailRules(params, changePage) {        
+        this.setState({rulesLoading: true})
         axios.get(process.env.APP_URL + '/get-rules', {
             params,
             withCredentials: true
         }).then(res => {
+            if (!this.mounted) return
             let currentPage = this.state.currentPage;            
             if (changePage) currentPage = changePage()            
             const {total, rules} = res.data
@@ -50,6 +59,7 @@ class Rules extends React.Component {
                 hasPrevious: this.hasPrevious(currentPage)
             })
         }).catch(err => {
+            if (!this.mounted) return
             this.setState({rulesLoading: false})
             this.props.showToastAction(true, "Couldn't get rules. Please refresh.")
             console.log('err getting rules, ', err)
@@ -77,8 +87,26 @@ class Rules extends React.Component {
         )
     }
 
+    refreshCurrentPage() {
+        this.fetchEmailRules({ skip: (currentPage * perPage) - perPage })
+    }
+
+    removeRule() {
+        this.setState({rulesLoading: true})
+        axios.post(process.env.APP_URL + '/remove-rule', {_id})
+        .then(() => {            
+            if (!this.mounted) return
+            this.refreshCurrentPage()
+            this.props.showToastAction(true, 'Rule removed!')
+        }).catch(() => {   
+            if (!this.mounted) return
+            this.setState({rulesLoading: false})
+            this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
+        })    
+    }
+
     renderItem = (item) => {
-        const { _id, filters, selectedProducts, emails, createdAt, updatedAt } = item;
+        const { _id, filters, selectedProducts, emails } = item;
         return (
             <ResourceList.Item
                 id={_id}                                
@@ -97,9 +125,7 @@ class Rules extends React.Component {
                             </Button>
                         </div>
                         <div style={rowButtonStyle}>
-                            <Button onClick={() => {
-                                
-                            }} size="slim">
+                            <Button onClick={this.removeRule} size="slim">
                                 Remove
                             </Button>
                         </div>                
@@ -143,6 +169,7 @@ class Rules extends React.Component {
             <Layout.Section>       
                 {pageHeader('Rules')}
                 <Card>
+                    <img src={'../static/email.png'}/>
                     <ResourceList
                         resourceName={resourceName}
                         items={this.state.rules}
@@ -154,7 +181,7 @@ class Rules extends React.Component {
                             hasPrevious={this.state.hasPrevious}
                             onPrevious={() => {
                                 let {currentPage, perPage} = this.state
-                                this.setState({hasNext: false, hasPrevious: false, rulesLoading: true});                                
+                                this.setState({hasNext: false, hasPrevious: false});                                
                                 this.fetchEmailRules({
                                     skip: ((currentPage - 1) * perPage) - perPage
                                 }, () => {         
@@ -165,7 +192,7 @@ class Rules extends React.Component {
                             }}
                             hasNext={this.state.hasNext}
                             onNext={() => {
-                                this.setState({hasNext: false, hasPrevious: false, rulesLoading: true});
+                                this.setState({hasNext: false, hasPrevious: false});
                                 let {currentPage, perPage} = this.state
                                 this.fetchEmailRules({
                                     skip: currentPage * perPage

@@ -24,7 +24,6 @@ async function addRule(ctx) {
     }
 }
 
-//Returns user on the render of the index file on client side
 async function editRule(ctx) {
     try {                
         const body = JSON.parse(ctx.request.rawBody)
@@ -33,13 +32,23 @@ async function editRule(ctx) {
             filters, selectedProducts, emails
         }})
         ctx.status = 200
-        ctx.body = 'rule saved'
+        ctx.body = 'rule edited'
     } catch (err) {
         console.log('Failed editing rule: ', err)
         ctx.status = 400
     }
 }
 
+async function removeRule(ctx) {
+    try {
+        const body = JSON.parse(ctx.request.rawBody)        
+        await Rule.findByIdAndRemove(body._id)
+        ctx.status = 200
+        ctx.body = 'rule removed'
+    } catch (err) {
+        console.log('Failed removing rule: ', err)
+        ctx.status = 400
+    }
+}
 
-
-module.exports = {addRule, editRule}
+module.exports = {addRule, editRule, removeRule}

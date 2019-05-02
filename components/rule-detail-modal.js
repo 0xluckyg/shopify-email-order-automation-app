@@ -38,11 +38,11 @@ class RulesDetailModal extends React.Component {
         {this.setState({emails:newProps.detail.emails})} 
     }
     componentDidMount() {        
-        this.isMounted = true        
+        this.mounted = true        
     }
 
     componentWillUnmount() {
-        this.isMounted = false
+        this.mounted = false
     }
 
     fetchProducts(beforeCursor, afterCursor) {
@@ -183,7 +183,7 @@ class RulesDetailModal extends React.Component {
             emails: this.state.emails
         })
         .then(() => {
-            if (!this.isMounted) return
+            if (!this.mounted) return
             this.props.onUpdate({ _id, filters, selectedProducts, emails })
             this.props.showToastAction(true, 'Rule edited!')            
         }).catch(() => {            

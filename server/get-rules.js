@@ -15,6 +15,7 @@ async function getRules(ctx) {
         .sort({createdAt: -1})
         .skip(skip)
         .limit(10)
+        console.log('rules ', rules)
         ctx.body = {rules, total}
     } catch (err) {
         console.log('Failed getting rules: ', err)
@@ -22,4 +23,4 @@ async function getRules(ctx) {
     }
 }
 
-module.exports = {getRules}
+module.exports = getRules

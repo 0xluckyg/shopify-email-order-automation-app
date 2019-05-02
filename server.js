@@ -40,7 +40,7 @@ const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
-const {addRule, editRule} = require('./server/add-rule');
+const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
 
@@ -50,38 +50,64 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 const { SHOPIFY_API_SECRET_KEY } = process.env;
+const whitelist = [    
+    '/_next',
+    '/static',
+    '/authenticate'
+]
 
-//Prepare next.js react app
 app.prepare().then(() => {
-
-    //Koa acts like "app" in express
+    
     const server = new Koa();    
-    const router = new Router();
+    const router = new Router();    
     server.keys = [SHOPIFY_API_SECRET_KEY];
-
-    server.use(bodyParser());      
-    server.use(session(server));
+    //Allows routes that do not require authentication to be handled
+    server.use(bodyParser());
+    server.use(async (ctx, next) => {
+        let noAuth = false
+        for (i in whitelist) {
+            if (ctx.request.url.startsWith(whitelist[i])) {                
+                noAuth = true; break;
+            }
+        }
+        if (noAuth) {               
+            await handle(ctx.req, ctx.res);
+            ctx.respond = false;
+            ctx.res.statusCode = 200;        
+            return
+        } else {
+            await next()   
+        }
+    });
+    server.use(session({
+        //30 days in miliseconds
+        maxAge: 2419200000,        
+        renew: true
+    }, server));
     server.use(shopifyAuth());
-    //Returns a middleware to verify requests before letting the app further in the chain.
-    //Everything after this point will require authentication        
-    //authRoute: '/foo/auth' (Path to redirect to if verification fails. defaults to '/auth')        
-    //fallbackRoute: '/install' (Path to redirect to if verification fails and there is no shop on the query. defaults to '/auth')
-    server.use(verifyRequest());                      
+    server.use(verifyRequest({
+        // path to redirect to if verification fails
+        // defaults to '/auth'
+        authRoute: '/authenticate',
+        // path to redirect to if verification fails and there is no shop on the query
+        // defaults to '/auth'
+        fallbackRoute: '/authenticate',
+    }));
 
-    router.get('/', processPayment);    
-    router.get('/get-user', getUser);    
-    router.post('/contact-us', contactUs);
+    router.get('/', processPayment);        
+    router.get('/get-user', getUser);        
     router.get('/get-products', getProducts);
     router.get('/get-rules', getRules);
     router.post('/add-rule', addRule);
     router.post('/edit-rule', editRule);
+    router.post('/remove-rule', removeRule);
+    router.post('/contact-us', contactUs);
     //validates webhook and listens for products/create in the store
     router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)
-
-    server.use(router.routes());      
+    server.use(router.routes());  
     //Lets next.js prepare all the requests on the React side
-    server.use(async (ctx) => {        
-        await handle(ctx.req, ctx.res);
+    server.use(async (ctx) => {                
+        await handle(ctx.req, ctx.res);          
         ctx.respond = false;
         ctx.res.statusCode = 200;        
         return

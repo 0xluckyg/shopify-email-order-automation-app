@@ -20,7 +20,7 @@ import pageHeader from '../components/page-header';
 import AddEmails from '../components/add-emails';
 
 class AddRule extends React.Component {
-    isMounted = false
+    mounted = false
     state = {
         productsAreLoading: true,
         hasPreviousPage: false,
@@ -43,12 +43,12 @@ class AddRule extends React.Component {
     };
 
     componentDidMount() {        
-        this.isMounted = true
+        this.mounted = true
         this.fetchProducts({filters: JSON.stringify([])})
     }
 
     componentWillUnmount() {
-        this.isMounted = false
+        this.mounted = false
     }
 
     fetchProducts(params) {
@@ -56,7 +56,7 @@ class AddRule extends React.Component {
             params,
             withCredentials: true
         }).then(res => {            
-            if (!this.isMounted) return            
+            if (!this.mounted) return            
             this.setState({
                 hasPreviousPage: res.data.products.pageInfo.hasPreviousPage,
                 hasNextPage: res.data.products.pageInfo.hasNextPage,
@@ -64,7 +64,7 @@ class AddRule extends React.Component {
                 productsAreLoading: false
             })            
         }).catch(err => {
-            if (!this.isMounted) return
+            if (!this.mounted) return
             this.setState({productsAreLoading: false})
             this.props.showToastAction(true, "Couldn't get products. Please refresh.")
             console.log('err getting products, ', err)
@@ -122,7 +122,7 @@ class AddRule extends React.Component {
             emails
         })
         .then(() => {
-            if (!this.isMounted) return            
+            if (!this.mounted) return            
             this.setState({
                 productsAreLoading: true,
                 hasPreviousPage: false,

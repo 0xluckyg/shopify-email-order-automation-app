@@ -49,8 +49,8 @@ function shopifyAuth() {
             const { shop, accessToken } = ctx.session;                   
             //The app will use a library called Shopify App Bridge to communicate with Shopify by passing in Shopify API key to shopOrigin in Polaris AppProvider
             //shopOrigin (shop) is the myshopify URL of the store that installs the app
-            //httpOnly: true tells the cookie that the cookie should only be accessible by the server  
-            ctx.cookies.set('shopOrigin', shop, { httpOnly: false })
+            //httpOnly: true tells the cookie that the cookie should only be accessible by the server              
+            await ctx.cookies.set('shopOrigin', shop, { httpOnly: false })
 
             //Webhook for detecting when the app unisntalls from the store
             registerAppUninstalled(shop, accessToken);
