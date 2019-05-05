@@ -40,6 +40,7 @@ const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
+const {getOrders, getOrdersByDay} = require('./server/orders');
 const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
@@ -102,6 +103,8 @@ app.prepare().then(() => {
     router.get('/get-user', getUser);        
     router.get('/get-products', getProducts);
     router.get('/get-rules', getRules);
+    router.get('/get-orders-by-day', getOrdersByDay);
+    router.get('/get-orders', getOrders);
     router.get('/get-settings', getSettings);
 
     router.post('/add-rule', addRule);

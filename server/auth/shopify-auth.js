@@ -2,6 +2,7 @@
 const { default: createShopifyAuth } = require('@shopify/koa-shopify-auth');
 const {initiatePayment} = require('./shopify-payment');
 const {registerAppUninstalled} = require('../webhooks/app-uninstalled');
+const {registerOrderWebhook} = require('../webhooks/orders-webhook');
 const {User} = require('../db/user');
 //app refers to the Next.js app, which is the react build
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY } = process.env;
@@ -53,6 +54,7 @@ function shopifyAuth() {
             await ctx.cookies.set('shopOrigin', shop, { httpOnly: false })
 
             //Webhook for detecting when the app unisntalls from the store
+            registerOrderWebhook(shop, accessToken);
             registerAppUninstalled(shop, accessToken);
             
             const user = await User.findOne({shop})

@@ -6,6 +6,22 @@
 
 const {Order} = require('./db/order');
 
+async function getOrdersByDay(ctx) {               
+    try {        
+        const shop = ctx.session.shop
+        const skip = parseInt(ctx.query.skip)        
+        const total = await Order.countDocuments({shop})
+        const rules = await Order.find({shop})
+        .sort({createdAt: -1})
+        .skip(skip)
+        .limit(10)        
+        ctx.body = {rules, total}
+    } catch (err) {
+        console.log('Failed getting orders: ', err)
+        ctx.status = 400
+    }
+}
+
 async function getOrders(ctx) {               
     try {        
         const shop = ctx.session.shop
@@ -22,4 +38,4 @@ async function getOrders(ctx) {
     }
 }
 
-module.exports = getOrders
+module.exports = {getOrdersByDay, getOrders}

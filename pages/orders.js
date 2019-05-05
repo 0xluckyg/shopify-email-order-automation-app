@@ -51,7 +51,7 @@ class Orders extends React.Component {
             this.setState({
                 totalOrdersCount: total,
                 ordersLoading: false,
-                orders,
+                // orders,
                 hasNext: this.hasNext(currentPage, total),
                 hasPrevious: this.hasPrevious(currentPage)
             })
@@ -102,7 +102,7 @@ class Orders extends React.Component {
         return (totalOrdersCount == 0 || currentPage == totalPages) ? false : true
     }
 
-    renderNoContent() {
+    renderNoContent() {        
         if (this.state.orders.length != 0 || this.state.ordersLoading) return null
         return (
             <NoContent
@@ -116,7 +116,7 @@ class Orders extends React.Component {
         const selectedDate = this.state.selectedDate
         let date = (selectedDate.start) ? selectedDate.start : selectedDate
         return (this.state.selectedTab == 2) ? undefined : 
-                `${date.getFullYear()}/${date.getMonth()}/${date.getDay()}`
+                `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`
     }
 
     renderDatePicker() {
