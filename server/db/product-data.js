@@ -1,3 +1,5 @@
+//ONLY FOR DATA COLLECTING PURPOSES. NOT USED BY THE APP
+
 const mongoose = require('mongoose');
 
 //Creating a new todo example

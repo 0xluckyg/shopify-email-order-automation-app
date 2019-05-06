@@ -40,7 +40,7 @@ const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
-const {getOrders, getOrdersByDay} = require('./server/orders');
+const {getOrders, getOrdersByDay} = require('./server/get-orders');
 const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
@@ -74,6 +74,7 @@ app.prepare().then(() => {
     server.use(bodyParser());
     //Allows routes that do not require authentication to be handled    
     server.use(async (ctx, next) => {
+        console.log('request ', ctx.request.url)
         let noAuth = false
         for (i in whitelist) {
             if (ctx.request.url.startsWith(whitelist[i])) noAuth = true
@@ -81,7 +82,7 @@ app.prepare().then(() => {
         if (noAuth) {               
             return handleRender(ctx)
         } else {
-            await next()   
+            await next()
         }
     });
     server.use(session({
@@ -89,7 +90,9 @@ app.prepare().then(() => {
         maxAge: 2419200000,        
         renew: true
     }, server));
+    server.use(router.routes());  
     server.use(shopifyAuth());
+    //Everything after this point will require shopify authentication
     server.use(verifyRequest({
         // path to redirect to if verification fails
         // defaults to '/auth'
@@ -104,6 +107,7 @@ app.prepare().then(() => {
     router.get('/get-products', getProducts);
     router.get('/get-rules', getRules);
     router.get('/get-orders-by-day', getOrdersByDay);
+    router.get('/get-orders-by-products', getOrdersByDay);
     router.get('/get-orders', getOrders);
     router.get('/get-settings', getSettings);
 
@@ -113,9 +117,10 @@ app.prepare().then(() => {
     router.post('/contact-us', contactUs);
     router.post('/email-template', setTemplateText);
     router.post('/send-method', setSendMethod);
-    //validates webhook and listens for products/create in the store
-    router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)
-    server.use(router.routes());  
+
+    //validates webhook and listens for events in the store
+    router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)    
+
     //Lets next.js prepare all the requests on the React side
     server.use(handleRender);   
 

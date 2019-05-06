@@ -33,7 +33,7 @@ function registerAppUninstalled(shop, accessToken) {
 }
 
 //We put this function in POST webhook/app/uninstalled on our server, and Shopify notifies this endpoint everytime app uninstall triggers
-function appUninstalled(ctx) {
+async function appUninstalled(ctx) {
     const validated = validateWebhook(ctx)
     
     if (validated) {
@@ -41,22 +41,23 @@ function appUninstalled(ctx) {
         console.log('app/uninstalled webhook response: ',body)                
         const shopifyDomain = JSON.parse(body).myshopify_domain
         if (shopifyDomain) {
-            return unregisterUser(shopifyDomain);
+            await unregisterUser(shopifyDomain);
+            ctx.status = 200
+            ctx.body = 'app uninstalled'
         } 
     }
 }
 
 //Shopify automatically stops subscription when user uninstalls. Set active and payment status to false in our db.
-function unregisterUser(shop) {
-    User.findOneAndUpdate(
-        { shop }, 
-        { $set: { "active": false, "payment.accepted": false } }
-    )
-    .then(res => {
-        return res
-    }).catch(err => {
+async function unregisterUser(shop) {
+    try {
+        return await User.findOneAndUpdate(
+            { shop }, 
+            { $set: { "active": false, "payment.accepted": false } }
+        )
+    } catch (err) {
         console.log('error saving declined payment', err)
-    })
+    }
 }
 
 module.exports = {registerAppUninstalled, appUninstalled}
