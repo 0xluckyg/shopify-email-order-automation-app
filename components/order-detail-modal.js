@@ -13,7 +13,7 @@ import axios from 'axios';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
-import AddEmails from './add-emails';
+import AddEmail from './add-email';
 
 //A pop up to ask users to write a review
 class OrderDetailModal extends React.Component {    
@@ -183,7 +183,7 @@ class OrderDetailModal extends React.Component {
                         <br />
                         {this.showProducts()}
                         <br />                            
-                        <AddEmails emails={this.state.emails} setEmails={emails => this.setState({emails})}/>
+                        <AddEmail emails={this.state.emails} setEmails={emails => this.setState({emails})}/>
                         <div style={finalButtonStyle}>
                             <Button primary loading={this.state.buttonIsLoading} size="large" onClick={() => this.handleEdit()}>Edit!</Button>
                         </div>                 

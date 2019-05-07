@@ -85,7 +85,7 @@ function shopifyAuth() {
                 } else if (user.payment.accepted == false ) {                        
                     confirmationURL = await initiatePayment(ctx, user)
                     console.log(`${user.shop} complete payment process`)                    
-                }                         
+                }
             }
 
             //If payment must be initiated again

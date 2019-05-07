@@ -14,7 +14,7 @@ import axios from 'axios';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
-import AddEmails from './add-emails';
+import AddEmail from './add-email';
 
 //A pop up to ask users to write a review
 class RulesDetailModal extends React.Component {    
@@ -26,7 +26,7 @@ class RulesDetailModal extends React.Component {
             hasPreviousPage: false,
             hasNextPage: false,
             products: [],
-            emails: [],
+            email: null,
             buttonIsLoading: false
         }
     }    
@@ -34,8 +34,8 @@ class RulesDetailModal extends React.Component {
         polaris: PropTypes.object,
     };
 
-    componentWillReceiveProps(newProps) {
-        {this.setState({emails:newProps.detail.emails})} 
+    componentWillReceiveProps(newProps) {        
+        {this.setState({email:newProps.detail.email})} 
     }
     componentDidMount() {        
         this.mounted = true        
@@ -172,21 +172,22 @@ class RulesDetailModal extends React.Component {
 
     handleEdit() {
         this.setState({buttonIsLoading: true})
-        const { _id, filters, selectedProducts, emails } = this.props.detail;
+        const { _id, filters, selectedProducts } = this.props.detail;
+        const newEmail = this.state.email
         axios.post(process.env.APP_URL + '/edit-rule', {
             _id,
             //rules for filtering products
             filters,
             //manually selected products if the user has done so
             selectedProducts,
-            emails: this.state.emails
+            email: this.state.email
         })
         .then(() => {            
             if (!this.mounted) return                       
             this.props.showToastAction(true, 'Rule edited!')            
-            this.setState({buttonIsLoading: false}) 
-            this.props.onUpdate({ _id, filters, selectedProducts, emails })            
-        }).catch(err => {                        
+            this.props.onUpdate({ _id, filters, selectedProducts, email: newEmail })
+            this.setState({buttonIsLoading: false})            
+        }).catch(err => {
             this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
         })    
     }
@@ -210,7 +211,7 @@ class RulesDetailModal extends React.Component {
                         <br />
                         {this.showProducts()}
                         <br />                            
-                        <AddEmails emails={this.state.emails} setEmails={emails => this.setState({emails})}/>
+                        <AddEmail email={this.state.email} setEmail={email => this.setState({email})}/>
                         <div style={finalButtonStyle}>
                             <Button primary loading={this.state.buttonIsLoading} size="large" onClick={() => this.handleEdit()}>Edit!</Button>
                         </div>                 

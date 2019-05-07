@@ -62,7 +62,6 @@ async function querySelectedProducts(selectedProducts, client) {
 
 async function getProducts(ctx) {          
     const { shop, accessToken } = ctx.session;        
-
     const uri = `https://${shop}/admin/api/graphql.json`       
     const client = new GraphQLClient(uri, {
         headers: {

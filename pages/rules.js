@@ -80,14 +80,7 @@ class Rules extends React.Component {
         }
         return queryString
     }
-
-    makeEmailDescription(emails) {        
-        const text = (emails.length > 1) ? `${emails.length} emails` : emails[0]
-        return (
-            <Badge>{text}</Badge>
-        )
-    }
-
+    
     refreshCurrentPage() {
         const {currentPage, perPage} = this.state
         let skip = (currentPage * perPage) - perPage
@@ -113,15 +106,15 @@ class Rules extends React.Component {
     }
 
     renderItem = (item) => {
-        const { _id, filters, selectedProducts, emails } = item;
+        const { _id, filters, selectedProducts, email } = item;
         return (
             <ResourceList.Item
                 id={_id}                                
                 persistActions
             >
-                <div style={{display:"flex", justifyContent: "space-between"}}>
-                    <p style={{width:"45%"}}>{this.makeSelectionDescription(filters, selectedProducts)}</p>                                                      
-                    {this.makeEmailDescription(emails)}
+                <div style={{display:"flex", justifyContent: "space-between"}}>                    
+                    <div style={{width:"20%"}}><Badge>{email}</Badge></div>
+                    <p style={{width:"35%"}}>{this.makeSelectionDescription(filters, selectedProducts)}</p>
                     
                     <div>
                         <div style={rowButtonStyle}>
@@ -182,6 +175,7 @@ class Rules extends React.Component {
                     const index = rules.findIndex((r => r._id == update._id))
                     if (index < 0) return
                     rules[index] = update
+                    console.log('update: ', update)
                     this.setState({rules, showDetail: false})
                  }}
             />

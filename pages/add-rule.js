@@ -17,7 +17,7 @@ import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import * as keys from '../config/keys'
 import pageHeader from '../components/page-header';
-import AddEmails from '../components/add-emails';
+import AddEmail from '../components/add-email';
 
 class AddRule extends React.Component {
     mounted = false
@@ -33,8 +33,7 @@ class AddRule extends React.Component {
         // { cursor: String, node: { featuredImage:{originalSource:url}, handle, id, onlineStoreUrl, productType, tags:[], title, vendor }} 
         products: [],
         showProductSelect: true,
-        email: '',
-        emails: [],
+        email: '',        
         emailFieldError: '',
         buttonIsLoading: false        
     };
@@ -102,24 +101,24 @@ class AddRule extends React.Component {
         this.setState({ selectedItems });
     };
     handleFinalSubmit = () => {        
-        const {showProductSelect, emails, selectedItems, appliedFilters} = this.state
+        const {showProductSelect, email, selectedItems, appliedFilters} = this.state
         
         this.setState({buttonIsLoading: true})
         if (showProductSelect) {
             this.setState({buttonIsLoading: false})
             return this.props.showToastAction(true, 'Please select products')
         }        
-        if (emails.length <= 0) {
+        if (!email) {
             this.setState({buttonIsLoading: false})
-            return this.props.showToastAction(true, 'Please enter one or more emails')
-        }        
+            return this.props.showToastAction(true, 'Please enter an email')
+        }
 
         axios.post(process.env.APP_URL + '/add-rule', {
             //rules for filtering products
             filters: appliedFilters,
             //manually selected products if the user has done so
             selectedProducts: selectedItems,
-            emails
+            email
         })
         .then(() => {
             if (!this.mounted) return            
@@ -132,8 +131,7 @@ class AddRule extends React.Component {
                 appliedFilters: [],                
                 products: [],
                 showProductSelect: true,
-                email: '',
-                emails: [],
+                email: null,
                 emailFieldError: '',
                 buttonIsLoading: false
             })
@@ -293,7 +291,7 @@ class AddRule extends React.Component {
                     {pageHeader('Add Email Rule')}
                     {this.showProductSelect()}
                     <br />    
-                    <AddEmails emails={this.state.emails} setEmails={emails => this.setState({emails})}/>
+                    <AddEmail email={this.state.email} setEmail={email => this.setState({email})}/>
                     <br />    
                     <div style={finalButtonStyle}>
                         <Button primary loading={this.state.buttonIsLoading} size="large" onClick={() => this.handleFinalSubmit()}>Create Rule!</Button>

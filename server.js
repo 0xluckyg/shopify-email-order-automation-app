@@ -90,7 +90,7 @@ app.prepare().then(() => {
         maxAge: 2419200000,        
         renew: true
     }, server));
-    server.use(router.routes());  
+    server.use(router.routes());
     server.use(shopifyAuth());
     //Everything after this point will require shopify authentication
     server.use(verifyRequest({

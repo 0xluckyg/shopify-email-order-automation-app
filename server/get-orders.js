@@ -70,7 +70,9 @@ async function getOrders(ctx) {
             }
         })
         
-        ctx.body = orders
+        console.log('ORDerS: ',orders)
+
+        ctx.body = orders.data
     } catch (err) {
         console.log('Failed getting orders: ', err)
         ctx.status = 400

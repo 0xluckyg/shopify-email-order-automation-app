@@ -11,9 +11,9 @@ async function addRule(ctx) {
     try {        
         const shop = ctx.session.shop
         const body = JSON.parse(ctx.request.rawBody)
-        const {filters, selectedProducts, emails} = body
+        const {filters, selectedProducts, email} = body
         const rule = new Rule({
-            shop, filters, selectedProducts, emails
+            shop, filters, selectedProducts, email
         });
         await rule.save()
         ctx.status = 200
@@ -27,9 +27,9 @@ async function addRule(ctx) {
 async function editRule(ctx) {
     try {                
         const body = JSON.parse(ctx.request.rawBody)
-        const {_id, filters, selectedProducts, emails} = body
+        const {_id, filters, selectedProducts, email} = body
         await Rule.findByIdAndUpdate(_id, {$set: {
-            filters, selectedProducts, emails
+            filters, selectedProducts, email
         }})
         ctx.status = 200
         ctx.body = 'rule edited'

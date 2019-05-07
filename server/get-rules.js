@@ -12,7 +12,7 @@ async function getRules(ctx) {
         const skip = parseInt(ctx.query.skip)        
         const total = await Rule.countDocuments({shop})
         const rules = await Rule.find({shop}, {products: 0})
-        .sort({createdAt: -1})
+        .sort({email: 1})
         .skip(skip)
         .limit(10)        
         ctx.body = {rules, total}

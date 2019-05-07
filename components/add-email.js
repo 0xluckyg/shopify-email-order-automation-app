@@ -9,7 +9,7 @@ import emailValidator from "email-validator";
 //Props: 
 //emails (array)
 //setEmails (func)
-class AddEmails extends React.Component {    
+class AddEmail extends React.Component {    
     constructor(props){
         super(props)
 
@@ -20,20 +20,15 @@ class AddEmails extends React.Component {
     }    
 
     renderEmailTags() {
-        let emails = this.props.emails
+        let email = this.props.email
+        if (!email) return null
         return (
             <div style={{width: '80%'}}>
-                {emails.map(email => {  
-                    const tag = 
-                    <div key={email} style={{display: 'inline-block', margin: '10px 10px 0px 0px'}}>
-                        <Tag onRemove={() => {
-                            let index = emails.indexOf(email);
-                            emails.splice(index, 1)                            
-                            this.props.setEmails(emails)
-                        }}>{email}</Tag>
-                    </div>                    
-                    return tag
-                })}
+                <div style={{display: 'inline-block', margin: '10px 10px 0px 0px'}}>
+                    <Tag onRemove={() => {
+                        this.props.setEmail(null)
+                    }}>{email}</Tag>
+                </div>          
             </div>
         )
     }
@@ -41,7 +36,7 @@ class AddEmails extends React.Component {
     render() {         
         return (
             <Card sectioned>
-                <p style={{marginBottom: '10px'}}>Add emails to send orders to when customer purchases the products you've specified above</p>
+                <p style={{marginBottom: '10px'}}>Add an email to send orders to when customer purchases the products you've specified above</p>
                 <div style={{display:'flex', justifyContent: 'space-between'}}>
                 <div style={{width:'80%'}}>                
                     <TextField     
@@ -55,13 +50,8 @@ class AddEmails extends React.Component {
                     <Button primary fullWidth onClick={() => {
                         if (!emailValidator.validate(this.state.email)) {
                             return this.setState({emailFieldError: "Please provide a valid email"})                            
-                        }
-                        if (this.props.emails.indexOf(this.state.email) >= 0) {
-                            return this.setState({emailFieldError: "This email's already on the list"})                            
-                        }
-                        let emails = this.props.emails
-                        emails.push(this.state.email)
-                        this.props.setEmails(emails)
+                        }                                       
+                        this.props.setEmail(this.state.email)
                         this.setState({email:'', emailFieldError: ''})
                     }}>
                         Add
@@ -74,4 +64,4 @@ class AddEmails extends React.Component {
     }
 }
 
-export default AddEmails;
+export default AddEmail;
