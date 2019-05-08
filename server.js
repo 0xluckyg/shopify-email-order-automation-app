@@ -106,8 +106,7 @@ app.prepare().then(() => {
     router.get('/get-user', getUser);        
     router.get('/get-products', getProducts);
     router.get('/get-rules', getRules);
-    router.get('/get-orders-by-day', getOrdersByDay);
-    router.get('/get-orders-by-products', getOrdersByDay);
+    router.get('/get-orders-by-day', getOrdersByDay);    
     router.get('/get-orders', getOrders);
     router.get('/get-settings', getSettings);
 
