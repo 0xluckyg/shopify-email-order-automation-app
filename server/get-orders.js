@@ -1,34 +1,42 @@
 const axios = require('axios');
 const version = '2019-04'
 
+function getHeaders(accessToken) {
+    return {
+        'X-Shopify-Access-Token': accessToken,
+        'Content-Type': 'application/json',
+    }
+}
+
 async function getOrdersByDay(ctx) {               
     try {        
-        const {shop, accessToken} = ctx.session        
-        const {date, cursor} = ctx.query
-        const headers = {
-            'X-Shopify-Access-Token': accessToken,
-            'Content-Type': 'application/json',
-        }
+        const {shop, accessToken} = ctx.session
+        const {page} = ctx.query     
+        const limit = 10
+        let hasPrevious = true; let hasNext = true
+        const headers = getHeaders(accessToken)
+
         const total = await axios.get(`https://${shop}/admin/api/${version}/orders/count.json`, {
-            headers,
+            headers
             // params: {                
-                // created_at_min:
-                // created_at_max:
+            //     created_at_min:
+            //     created_at_max:
             // }
-        })
+        })        
+        const totalPages = Math.ceil(total.data.count / limit)        
+        if (page == totalPages) hasNext = false
+        if (page == 1) hasPrevious = false
         const orders = await axios.get(`https://${shop}/admin/api/${version}/orders.json`, {
             headers,
             params: {
-                limit: 10,
-                since_id: cursor,
-                created_at_min: date,
-                created_at_max: date
+                limit,
+                page,                          
+                // created_at_min:
+                // created_at_max:            
             }
-        })
+        })        
 
-        console.log('ORDerS: ',orders)
-
-        ctx.body = {orders: orders.data, total: total.data}
+        ctx.body = {orders: orders.data, hasPrevious, hasNext, page}
     } catch (err) {
         console.log('Failed getting orders: ', err)
         ctx.status = 400
@@ -36,31 +44,28 @@ async function getOrdersByDay(ctx) {
 }
 
 async function getOrders(ctx) {
-    try {
+    try {        
         const {shop, accessToken} = ctx.session
-        const {cursor} = ctx.query           
-        const headers = {
-            'X-Shopify-Access-Token': accessToken,
-            'Content-Type': 'application/json',
-        }
+        const {page} = ctx.query     
+        const limit = 10
+        let hasPrevious = true; let hasNext = true
+        const headers = getHeaders(accessToken)
+
         const total = await axios.get(`https://${shop}/admin/api/${version}/orders/count.json`, {
-            headers,
-            // params: {                
-            //     created_at_min:
-            //     created_at_max:
-            // }
-        })
+            headers
+        })        
+        const totalPages = Math.ceil(total.data.count / limit)        
+        if (page == totalPages) hasNext = false
+        if (page == 1) hasPrevious = false
         const orders = await axios.get(`https://${shop}/admin/api/${version}/orders.json`, {
             headers,
             params: {
-                limit: 250,
-                since_id: cursor
+                limit,
+                page,
             }
-        })
-        
-        console.log('ORDerS: ',orders)
+        })        
 
-        ctx.body = {orders: orders.data, total: total.data}
+        ctx.body = {orders: orders.data.orders, hasPrevious, hasNext, page}
     } catch (err) {
         console.log('Failed getting orders: ', err)
         ctx.status = 400

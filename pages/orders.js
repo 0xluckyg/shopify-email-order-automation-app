@@ -4,7 +4,8 @@ import {
     Button,
     Pagination,
     Layout,
-    Tabs
+    Tabs,
+    Badge
 } from '@shopify/polaris';
 import axios from 'axios';
 import OrderDetailModal from '../components/order-detail-modal.js';
@@ -23,38 +24,30 @@ class Orders extends React.Component {
             selectedTab: 0,
 
             totalOrdersCount: 0,
-            orders: [],            
+            orders: [],
             showDetail: false,
             orderDetail: {},
-            perPage: 10,
-            currentPage: 1,
+            page: 1,
+            hasPrevious: false,
+            hasNext: false,
             ordersLoading: true,
-            revertButtonIsLoading: false,
-            restoreButtonIsLoading: false,
 
-            selectedDate: new Date(),            
+            selectedDate: new Date(),
         };
     }     
 
     componentDidMount() {
-        this.fetchOrders({ skip: 0 });
+        this.fetchOrders({ page: 1 });
     }
 
-    fetchOrders(params, changePage) {        
+    fetchOrders(params) {        
         axios.get(process.env.APP_URL + '/get-orders', {
             params,
             withCredentials: true
-        }).then(res => {
-            let currentPage = this.state.currentPage;            
-            if (changePage) currentPage = changePage()            
-            const {total, orders} = res.data
-            this.setState({
-                totalOrdersCount: total,
-                ordersLoading: false,
-                // orders,
-                hasNext: this.hasNext(currentPage, total),
-                hasPrevious: this.hasPrevious(currentPage)
-            })
+        }).then(res => {            
+            const {orders, page, hasNext, hasPrevious} = res.data
+            console.log('got orders: ', orders)
+            this.setState({ orders, page, hasNext, hasPrevious, ordersLoading: false })
         }).catch(err => {
             this.setState({ordersLoading: false})
             this.props.showToastAction(true, "Couldn't get orders. Please refresh.")
@@ -63,44 +56,35 @@ class Orders extends React.Component {
     }
 
     renderItem = (item) => {
-        const { _id, products, emails, status, total, createdAt, customer, orderNumber, emailSent, } = item;
+        console.log('item: ', item)
+        const { id, total_price, currency, processed_at, order_number, customer, line_items, shipping_address  } = item;
+        const { email, first_name, last_name, phone, orders_count, total_spent } = customer
+        const { address1, address2, city, company, country, province, province_code, zip } = shipping_address        
+        const date = new Date(processed_at)
+        const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}` 
         return (
             <ResourceList.Item
-                id={_id}                                
+                id={id}
                 persistActions
             >
-                <div style={{display:"flex", justifyContent: "space-between"}}>
-                    <p style={{width:"45%"}}></p>
-                    <div>
-                        <div style={rowButtonStyle}>
-                            <Button 
-                                onClick={() => this.setState({orderDetail: item, showDetail:true})} 
-                                size="slim">
-                                View Details
-                            </Button>
-                        </div>
-                        <div style={rowButtonStyle}>
-                            <Button onClick={() => {
-                                
-                            }} primary size="slim">
-                                Send Emails
-                            </Button>
-                        </div>                
-                    </div>
+                <div style={{display:"flex", justifyContent: "space-between"}}>                                      
+                    <div style={{width:"20%"}}><Badge>#{order_number}</Badge></div>
+                    <div style={{width:"20%"}}>{dateString}</div>
+                    <div style={{width:"20%"}}>{first_name} {last_name}</div>
+                    <div style={{width:"10%"}}>{total_price} {currency}</div>
+                    <div style={{width:"10%"}}>{line_items.length}</div>
+                    
+                    <div style={{width: "10%"}}>
+                        <Button 
+                            onClick={() => this.setState({orderDetail: item, showDetail:true})} 
+                            size="slim">
+                            Details
+                        </Button>
+                    </div>                                                          
                 </div>                
             </ResourceList.Item>
         );
     };
-
-    hasPrevious(currentPage) {        
-        return (currentPage == 1) ? false : true
-    }
-
-    hasNext(currentPage, totalOrdersCount) {              
-        const {perPage} = this.state
-        const totalPages = Math.ceil(totalOrdersCount / perPage)
-        return (totalOrdersCount == 0 || currentPage == totalPages) ? false : true
-    }
 
     renderNoContent() {        
         if (this.state.orders.length != 0 || this.state.ordersLoading) return null
@@ -135,27 +119,15 @@ class Orders extends React.Component {
     };
 
     onPrevious = () => {
-        let {currentPage, perPage} = this.state
-        this.setState({hasNext: false, hasPrevious: false, ordersLoading: true});                                
-        this.fetchOrders({
-            skip: ((currentPage - 1) * perPage) - perPage
-        }, () => {         
-            currentPage = currentPage - 1;                           
-            this.setState({currentPage})                                    
-            return currentPage
-        })
+        let page = Number(this.state.page) - 1      
+        this.setState({hasNext: false, hasPrevious: false, ordersLoading: true});
+        this.fetchOrders({page})
     }
 
     onNext = () => {
+        let page = Number(this.state.page) + 1       
         this.setState({hasNext: false, hasPrevious: false, ordersLoading: true});
-        let {currentPage, perPage} = this.state
-        this.fetchOrders({
-            skip: currentPage * perPage
-        }, () => {
-            currentPage = currentPage + 1;
-            this.setState({currentPage})                                    
-            return currentPage
-        })
+        this.fetchOrders({page})
     }
 
     render() {
@@ -198,6 +170,14 @@ class Orders extends React.Component {
                 <Card>
                     <Tabs tabs={tabs} selected={selectedTab} onSelect={this.handleTabChange}>      
                         {this.renderNoContent()}
+                        <div style={{display:"flex", justifyContent: "space-between", margin: "20px"}}>                                      
+                            <div style={{width:"20%"}}><b>Order Number</b></div>
+                            <div style={{width:"20%"}}><b>Date Ordered</b></div>
+                            <div style={{width:"20%"}}><b>Customer Name</b></div>
+                            <div style={{width:"10%"}}><b>Price</b></div>
+                            <div style={{width:"10%"}}><b>Products</b></div>                            
+                            <div style={{width: "10%"}}><b>Show Details</b></div>
+                        </div>        
                         <ResourceList
                             resourceName={resourceName}
                             items={this.state.orders}
@@ -221,7 +201,6 @@ class Orders extends React.Component {
 }
 
 const paginationWrapper = {float:"left", padding: "16px"}
-const rowButtonStyle = {display: "inline", paddingRight:"10px"}
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(

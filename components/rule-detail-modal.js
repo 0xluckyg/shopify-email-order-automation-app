@@ -30,15 +30,13 @@ class RulesDetailModal extends React.Component {
             buttonIsLoading: false
         }
     }    
-    static contextTypes = {
-        polaris: PropTypes.object,
-    };
 
     componentWillReceiveProps(newProps) {        
         {this.setState({email:newProps.detail.email})} 
     }
-    componentDidMount() {        
-        this.mounted = true        
+    
+    componentDidMount() {
+        this.mounted = true
     }
 
     componentWillUnmount() {
@@ -78,14 +76,6 @@ class RulesDetailModal extends React.Component {
         })
     }
 
-    redirectToProductPage = (url) => {
-        const redirect = Redirect.create(this.context.polaris.appBridge)
-        redirect.dispatch(Redirect.Action.REMOTE, {
-            url,
-            newContext: true,
-        });
-    }
-
     renderItem = (item) => {
         if (item.node) { item = item.node }
         const {id, title, vendor, productType, featuredImage, onlineStoreUrl } = item
@@ -106,7 +96,7 @@ class RulesDetailModal extends React.Component {
                 <div>{productType}</div>
             </div>
             <div style={{display:'block', float: 'right'}}>
-                <Button onClick={() => this.redirectToProductPage(onlineStoreUrl)} plain>View product</Button>
+                <Button onClick={() => window.open(onlineStoreUrl, '_blank')} plain>View product</Button>
             </div>
             </div>
             </ResourceList.Item>
