@@ -11,7 +11,7 @@ function getHeaders(accessToken) {
 async function getOrdersByDay(ctx) {               
     try {        
         const {shop, accessToken} = ctx.session
-        const {page} = ctx.query     
+        const {page, date} = ctx.query     
         const limit = 10
         let hasPrevious = true; let hasNext = true
         const headers = getHeaders(accessToken)
@@ -34,7 +34,7 @@ async function getOrdersByDay(ctx) {
                 // created_at_min:
                 // created_at_max:            
             }
-        })        
+        })
 
         ctx.body = {orders: orders.data, hasPrevious, hasNext, page}
     } catch (err) {
@@ -46,24 +46,42 @@ async function getOrdersByDay(ctx) {
 async function getOrders(ctx) {
     try {        
         const {shop, accessToken} = ctx.session
-        const {page} = ctx.query     
+        let {page, date} = ctx.query     
         const limit = 10
         let hasPrevious = true; let hasNext = true
         const headers = getHeaders(accessToken)
+        
+        if (date) {            
+            date = new Date(date)          
+            let endDate = new Date(date).setDate(date.getDate() + 1)
+            console.log('date1: ', date)
+            console.log('date2: ', new Date(endDate))
+            date = {
+                created_at_min: date.toISOString(),
+                created_at_max: new Date(endDate).toISOString()
+            }
+        } else {
+            date = {}
+        }
 
         const total = await axios.get(`https://${shop}/admin/api/${version}/orders/count.json`, {
-            headers
+            headers,
+            params: date
         })        
         const totalPages = Math.ceil(total.data.count / limit)        
-        if (page == totalPages) hasNext = false
+        if (page == totalPages || totalPages == 0) hasNext = false
         if (page == 1) hasPrevious = false
+
         const orders = await axios.get(`https://${shop}/admin/api/${version}/orders.json`, {
             headers,
             params: {
                 limit,
                 page,
+                ...date
             }
         })        
+        console.log('total: ', totalPages)
+        console.log('orders: ', orders.data.orders.length)
 
         ctx.body = {orders: orders.data.orders, hasPrevious, hasNext, page}
     } catch (err) {

@@ -174,8 +174,7 @@ class Rules extends React.Component {
                     let rules = this.state.rules                    
                     const index = rules.findIndex((r => r._id == update._id))
                     if (index < 0) return
-                    rules[index] = update
-                    console.log('update: ', update)
+                    rules[index] = update                    
                     this.setState({rules, showDetail: false})
                  }}
             />

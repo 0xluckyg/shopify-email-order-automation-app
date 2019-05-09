@@ -108,9 +108,7 @@ class OrderDetailModal extends React.Component {
         return(
             <Modal 
                 open={this.props.open}                
-                onClose={() => {
-                    this.props.close()
-                }}
+                onClose={this.props.close}
                 showCloseIcon={true}
                 center
             >
@@ -121,7 +119,7 @@ class OrderDetailModal extends React.Component {
                             {this.showCustomer()}
                             {this.showAddress()}
                             <div style={finalButtonStyle}>
-                                <Button primary size="large" onClick={() => this.handleAction()}>Close</Button>
+                                <Button primary size="large" onClick={this.props.close}>Close</Button>
                             </div>
                         </Layout.Section>  
                     </Layout>  

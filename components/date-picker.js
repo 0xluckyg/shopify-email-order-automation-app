@@ -31,7 +31,7 @@ class DatePickerMarkup extends React.Component {
     renderActivator = () => {        
         const selectedDate = this.props.selectedDate
         let date = (selectedDate.start) ? selectedDate.start : selectedDate
-        date = `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`
+        date = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
         return <Button onClick={this.togglePopover}>{date}</Button>
     }
 
