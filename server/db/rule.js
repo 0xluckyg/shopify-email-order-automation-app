@@ -4,8 +4,11 @@ const mongoose = require('mongoose');
 const RuleSchema = new mongoose.Schema({    
     shop: String,    
     email: String,
-    filters: [ {key: String, value: String} ],
-    selectedProducts: [ String ],    
+    filters: {
+        title: String,
+        vendor: String
+    },
+    selectedProducts: [ String ],
 },{
     timestamps: true // Saves createdAt and updatedAt as dates
 });

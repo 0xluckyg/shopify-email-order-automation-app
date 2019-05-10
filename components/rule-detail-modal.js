@@ -6,9 +6,7 @@ import {
     Pagination,
     Layout    
 } from '@shopify/polaris';
-import * as PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Redirect } from '@shopify/app-bridge/actions';
 import Modal from "react-responsive-modal";
 import axios from 'axios';
 import {connect} from 'react-redux';
@@ -23,8 +21,10 @@ class RulesDetailModal extends React.Component {
         super(props)                          
         this.state = {
             productsAreLoading: true,        
-            hasPreviousPage: false,
-            hasNextPage: false,
+            hasPrevious: false,
+            hasNext: false,
+            page: 1, 
+
             products: [],
             email: null,
             buttonIsLoading: false
@@ -43,43 +43,42 @@ class RulesDetailModal extends React.Component {
         this.mounted = false
     }
 
-    fetchProducts(beforeCursor, afterCursor) {
-        this.setState({hasNextPage: false, hasPreviousPage: false})
-        const { filters, selectedProducts } = this.props.detail;        
-        // const { addText, removeText, filters, selectedProducts, completed, count, editType, editMethod, editContentType, updatedAt } = this.props.detail;                
+    fetchProducts(page) {
+        // const { addText, removeText, filters, selectedProducts, completed, count, editType, editMethod, editContentType, updatedAt } = this.props.detail;
+        this.setState({hasNext: false, hasPrevious: false})
+        const { filters, selectedProducts } = this.props.detail;                
+        console.log('filtesr: ', filters)
+        console.log('selected: ', selectedProducts)
         axios.get(process.env.APP_URL + '/get-products', {
             params: {
                 filters: JSON.stringify(filters), 
                 selectedProducts: JSON.stringify(selectedProducts),
-                afterCursor,
-                beforeCursor
+                page
             },
             withCredentials: true
         }).then(res => {                        
-            let hasPreviousPage; let hasNextPage; let products = []            
-            if (selectedProducts.length > 0 || res.data.products == undefined) {
-                hasPreviousPage = false, hasNextPage = false, products = res.data
-            } else {                
-                hasPreviousPage = res.data.products.pageInfo.hasPreviousPage
-                hasNextPage = res.data.products.pageInfo.hasNextPage
-                products = res.data.products.edges
-            }                        
+            const {products, page, hasNext, hasPrevious} = res.data
             this.setState({
-                hasPreviousPage,
-                hasNextPage,
+                page,
+                hasPrevious,
+                hasNext,
                 products,
                 productsAreLoading: false
             })
         }).catch(err => {
+            console.log('Failed getting products: ', err)
             this.setState({productsAreLoading: false})
             this.props.showToastAction(true, "Couldn't get products. Please refresh.")            
         })
     }
 
+    redirectToProductPage = (id) => {        
+        window.open(`https://${this.props.getUserReducer.shop}/admin/products/${id}`, '_blank')
+    }
+
     renderItem = (item) => {
-        if (item.node) { item = item.node }
-        const {id, title, vendor, productType, featuredImage, onlineStoreUrl } = item
-        const imgSrc = (featuredImage) ? featuredImage.originalSrc : null
+        const {id, title, vendor, product_type, images } = item
+        const imgSrc = (images.length > 0) ? images[0].src : null
         const media = <img style={productImageStyle} src={imgSrc} />;                
         return (
             <ResourceList.Item
@@ -93,10 +92,10 @@ class RulesDetailModal extends React.Component {
                     <TextStyle variation="strong">{title}</TextStyle>
                 </h3>
                 <div>{vendor}</div>
-                <div>{productType}</div>
+                <div>{product_type}</div>
             </div>
             <div style={{display:'block', float: 'right'}}>
-                <Button onClick={() => window.open(onlineStoreUrl, '_blank')} plain>View product</Button>
+                <Button onClick={() => this.redirectToProductPage(id)} plain>View product</Button>
             </div>
             </div>
             </ResourceList.Item>
@@ -104,14 +103,14 @@ class RulesDetailModal extends React.Component {
     };
 
     handleNextPage = () => {
-        const afterCursor = this.state.products[this.state.products.length - 1].cursor                
-        this.fetchProducts(undefined, afterCursor)
-        this.setState({productsAreLoading: true})
+        let page = Number(this.state.page) + 1       
+        this.setState({hasNext: false, hasPrevious: false, productsAreLoading: true});
+        this.fetchProducts(page)
     }
     handlePreviousPage = () => {
-        const beforeCursor = this.state.products[0].cursor        
-        this.fetchProducts(beforeCursor, undefined)
-        this.setState({productsAreLoading: true})
+        let page = Number(this.state.page) - 1
+        this.setState({hasNext: false, hasPrevious: false, productsAreLoading: true});
+        this.fetchProducts(page)
     }
 
     showProducts() {        
@@ -129,8 +128,8 @@ class RulesDetailModal extends React.Component {
                 </div>                
                 <div style={paginationStyle}>
                     <Pagination
-                        hasPrevious={this.state.hasPreviousPage}
-                        hasNext={this.state.hasNextPage}
+                        hasPrevious={this.state.hasPrevious}
+                        hasNext={this.state.hasNext}
                         onPrevious={() => this.handlePreviousPage()}
                         onNext={() => this.handleNextPage()}
                     />
@@ -186,7 +185,7 @@ class RulesDetailModal extends React.Component {
         return(
             <Modal 
                 open={this.props.open}
-                onEntered={() => this.fetchProducts()}
+                onEntered={() => this.fetchProducts(this.state.page)}
                 onClose={() => {
                     this.setState({products: [], productsAreLoading: true})
                     this.props.close()
@@ -239,4 +238,8 @@ function mapDispatchToProps(dispatch){
     );
 }
 
-export default connect(null, mapDispatchToProps)(RulesDetailModal);
+function mapStateToProps({getUserReducer}) {
+    return {getUserReducer};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RulesDetailModal);

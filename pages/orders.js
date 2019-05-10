@@ -28,11 +28,11 @@ class Orders extends React.Component {
 
     getDateText() {
         const selectedDate = this.state.selectedDate.start
-        return (this.state.selectedTab == 2) ? undefined : this.formatDate(selectedDate)
+        return (this.state.selectedTab == 1) ? undefined : this.formatDate(selectedDate)
     }
 
     renderDatePicker() {
-        if (this.state.selectedTab == 2) {
+        if (this.state.selectedTab == 1) {
             return undefined
         } else {
             return <DatePicker

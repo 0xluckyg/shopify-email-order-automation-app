@@ -15,7 +15,6 @@ import axios from 'axios';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
-import * as keys from '../config/keys'
 import pageHeader from '../components/page-header';
 import AddEmail from '../components/add-email';
 
@@ -23,8 +22,10 @@ class AddRule extends React.Component {
     mounted = false
     state = {
         productsAreLoading: true,
-        hasPreviousPage: false,
-        hasNextPage: false,
+        hasPrevious: false,
+        hasNext: false,
+        page: 1,
+
         selectedItems: [],
         searchValue: '',
         // [{key:"key", value:"value"}]
@@ -33,7 +34,7 @@ class AddRule extends React.Component {
         // { cursor: String, node: { featuredImage:{originalSource:url}, handle, id, onlineStoreUrl, productType, tags:[], title, vendor }} 
         products: [],
         showProductSelect: true,
-        email: '',        
+        email: '',                
         emailFieldError: '',
         buttonIsLoading: false        
     };
@@ -43,23 +44,26 @@ class AddRule extends React.Component {
 
     componentDidMount() {        
         this.mounted = true
-        this.fetchProducts({filters: JSON.stringify([])})
+        this.fetchProducts({page: 1, filters: []})
     }
 
     componentWillUnmount() {
         this.mounted = false
     }
 
-    fetchProducts(params) {
+    fetchProducts(params) {       
+        params.filters = JSON.stringify(params.filters) 
         axios.get(process.env.APP_URL + '/get-products', {
             params,
             withCredentials: true
         }).then(res => {            
             if (!this.mounted) return            
+            const {products, page, hasNext, hasPrevious} = res.data
             this.setState({
-                hasPreviousPage: res.data.products.pageInfo.hasPreviousPage,
-                hasNextPage: res.data.products.pageInfo.hasNextPage,
-                products: res.data.products.edges,
+                hasPrevious,
+                hasNext,
+                products,
+                page,
                 productsAreLoading: false
             })            
         }).catch(err => {
@@ -70,38 +74,54 @@ class AddRule extends React.Component {
         })
     }
 
-    handleSearchChange = () => {        
-        // Only one value for title
-        if (this.state.searchValue == "") return
-        
-        const newFilter = {key: "title", value: this.state.searchValue}        
-        let newAppliedFilters = this.state.appliedFilters        
-        const i = newAppliedFilters.findIndex(filter => newFilter.key == filter.key)        
-        if (i > -1) { newAppliedFilters[i] = newFilter } 
-        else { newAppliedFilters.push(newFilter) }        
+    modifyFilters = (newFilter) => {        
+        //Only allows 1 unique value per key
+        let filters = this.state.appliedFilters
+        const i = filters.findIndex(filter => newFilter.key == filter.key)
+        if (i > -1) { filters[i] = newFilter } 
+        else { filters.push(newFilter) }
+        return filters
+    }
 
-        this.setState({ appliedFilters: newAppliedFilters, productsAreLoading: true });   
-        this.fetchProducts({filters: JSON.stringify(newAppliedFilters)});
+    handleSearchChange = () => {
+        if (this.state.searchValue == "") return        
+        const newFilter = {key: "title", value: this.state.searchValue}        
+        const filters = this.modifyFilters(newFilter)
+
+        this.setState({ appliedFilters: filters, productsAreLoading: true });   
+        this.fetchProducts({page: 1, filters});
     };
-    handleFiltersChange = (appliedFilters) => {           
-        this.setState({ appliedFilters, productsAreLoading: true });        
-        this.fetchProducts({filters: JSON.stringify(appliedFilters)})
+    handleFiltersChange = (appliedFilters) => {      
+        //remove filter
+        if (appliedFilters.length < this.state.appliedFilters.length) {
+            this.setState({ appliedFilters, productsAreLoading: true });
+            this.fetchProducts({page: 1, filters: appliedFilters})
+            return
+        }
+        
+        //modify filter
+        const newFilter = appliedFilters[appliedFilters.length - 1]
+        const filters = this.modifyFilters(newFilter)        
+
+        console.log('filters: ', filters)
+        this.setState({ appliedFilters: filters, productsAreLoading: true });
+        this.fetchProducts({page: 1, filters})
     };
     handleNextPage = () => {
-        const afterCursor = this.state.products[this.state.products.length - 1].cursor                
-        this.fetchProducts({filters: JSON.stringify(this.state.appliedFilters), afterCursor})
-        this.setState({productsAreLoading: true})
+        let page = Number(this.state.page) + 1       
+        this.setState({hasNext: false, hasPrevious: false, productsAreLoading: true});
+        this.fetchProducts({page, filters: this.state.appliedFilters })
     }
     handlePreviousPage = () => {
-        const beforeCursor = this.state.products[0].cursor        
-        this.fetchProducts({filters: JSON.stringify(this.state.appliedFilters), beforeCursor})
-        this.setState({productsAreLoading: true})
+        let page = Number(this.state.page) - 1     
+        this.setState({hasNext: false, hasPrevious: false, productsAreLoading: true});
+        this.fetchProducts({page, filters: this.state.appliedFilters })
     }    
-    handleSelectionChange = (selectedItems) => {        
+    handleSelectionChange = (selectedItems) => {
         this.setState({ selectedItems });
     };
     handleFinalSubmit = () => {        
-        const {showProductSelect, email, selectedItems, appliedFilters} = this.state
+        const {showProductSelect, page, email, selectedItems, appliedFilters} = this.state
         
         this.setState({buttonIsLoading: true})
         if (showProductSelect) {
@@ -116,6 +136,7 @@ class AddRule extends React.Component {
         axios.post(process.env.APP_URL + '/add-rule', {
             //rules for filtering products
             filters: appliedFilters,
+            page,
             //manually selected products if the user has done so
             selectedProducts: selectedItems,
             email
@@ -124,8 +145,10 @@ class AddRule extends React.Component {
             if (!this.mounted) return            
             this.setState({
                 productsAreLoading: true,
-                hasPreviousPage: false,
-                hasNextPage: false,
+                hasPrevious: false,
+                hasNext: false,
+                page: 1,
+
                 selectedItems: [],
                 searchValue: '',
                 appliedFilters: [],                
@@ -136,24 +159,19 @@ class AddRule extends React.Component {
                 buttonIsLoading: false
             })
             this.props.showToastAction(true, 'Rule saved!')
-            this.fetchProducts({filters: JSON.stringify([])})
+            this.fetchProducts({page: 1, filters: []})
         }).catch(err => {            
             this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
         })        
     }
     
-    redirectToProductPage = (url) => {        
-        if (!keys.EMBEDDED) { window.open(url, '_blank'); return }
-        const redirect = Redirect.create(this.context.polaris.appBridge)
-        redirect.dispatch(Redirect.Action.REMOTE, {
-            url,
-            newContext: true,
-        });
+    redirectToProductPage = (id) => {        
+        window.open(`https://${this.props.getUserReducer.shop}/admin/products/${id}`, '_blank')
     }
 
     renderItem = (item) => {
-        const {id, title, vendor, productType, featuredImage, onlineStoreUrl } = item
-        const imgSrc = (featuredImage) ? featuredImage.originalSrc : null
+        const {id, title, vendor, product_type, images } = item
+        const imgSrc = (images.length > 0) ? images[0].src : null
         const media = <img style={productImageStyle} src={imgSrc} />;                
         return (
             <ResourceList.Item
@@ -167,10 +185,10 @@ class AddRule extends React.Component {
                     <TextStyle variation="strong">{title}</TextStyle>
                 </h3>
                 <div>{vendor}</div>
-                <div>{productType}</div>
+                <div>{product_type}</div>
             </div>
             <div style={{display:'block', float: 'right'}}>
-                <Button onClick={() => this.redirectToProductPage(onlineStoreUrl)} plain>View product</Button>
+                <Button onClick={() => this.redirectToProductPage(id)} plain>View product</Button>
             </div>
             </div>
             </ResourceList.Item>
@@ -186,14 +204,12 @@ class AddRule extends React.Component {
             let key = appliedFilters[i].key
             if (key == 'product_type') key = 'product type'
             queryString = queryString + key + ' is ' + appliedFilters[i].value
-            if (i != appliedFilters.length - 1) queryString = queryString + ' OR '                        
+            if (i != appliedFilters.length - 1) queryString = queryString + ' AND '                        
         }
         return queryString
     }
 
-    showProductSelect() {        
-        //need to filter products before rendering so that each object has "id" in it's root
-        const productsReadyForRendering = this.state.products.map(product => product.node)
+    showProductSelect() {                
         const promotedBulkActions = [
             {
                 content: 'Select only the selected products',
@@ -202,22 +218,11 @@ class AddRule extends React.Component {
         ];
         const filters = [            
             {
-                key: 'product_type',
-                label: 'Product type',
-                operatorText: 'is',
-                type: FilterType.TextField                
-            },
-            {
                 key: 'vendor',
                 label: 'Product vendor',
                 operatorText: 'is',
                 type: FilterType.TextField
-            },
-            {
-                key: 'tag',
-                label: 'Tagged with',                
-                type: FilterType.TextField
-            }            
+            }  
         ];
         const filterControl = (
             <ResourceList.FilterControl
@@ -239,7 +244,7 @@ class AddRule extends React.Component {
                 <Card>                
                 <ResourceList
                     resourceName={{ singular: 'product', plural: 'products' }}
-                    items={productsReadyForRendering}
+                    items={this.state.products}
                     renderItem={this.renderItem}
                     selectedItems={this.state.selectedItems}
                     onSelectionChange={this.handleSelectionChange}
@@ -251,8 +256,8 @@ class AddRule extends React.Component {
                 </div>                
                 <div style={paginationStyle}>
                     <Pagination
-                        hasPrevious={this.state.hasPreviousPage}
-                        hasNext={this.state.hasNextPage}
+                        hasPrevious={this.state.hasPrevious}
+                        hasNext={this.state.hasNext}
                         onPrevious={() => this.handlePreviousPage()}
                         onNext={() => this.handleNextPage()}
                     />
@@ -321,4 +326,8 @@ function mapDispatchToProps(dispatch){
     );
 }
 
-export default connect(null, mapDispatchToProps)(AddRule);
+function mapStateToProps({getUserReducer}) {
+    return {getUserReducer};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddRule);

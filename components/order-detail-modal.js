@@ -9,7 +9,6 @@ import Modal from "react-responsive-modal";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
-import orders from '../pages/orders';
 
 //A pop up to ask users to write a review
 class OrderDetailModal extends React.Component {    

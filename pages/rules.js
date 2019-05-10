@@ -76,7 +76,7 @@ class Rules extends React.Component {
             let key = filters[i].key
             if (key == 'product_type') key = 'product type'
             queryString = queryString + key + ' is ' + filters[i].value
-            if (i != filters.length - 1) queryString = queryString + ' OR '                        
+            if (i != filters.length - 1) queryString = queryString + ' AND '                        
         }
         return queryString
     }

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const {Rule} = require('./db/rule')
 const version = '2019-04'
 
 function getHeaders(accessToken) {
@@ -8,39 +9,20 @@ function getHeaders(accessToken) {
     }
 }
 
-async function getOrdersByDay(ctx) {               
-    try {        
-        const {shop, accessToken} = ctx.session
-        const {page, date} = ctx.query     
-        const limit = 10
-        let hasPrevious = true; let hasNext = true
-        const headers = getHeaders(accessToken)
+async function findRulesAndCompare(shop, orders) {
+    const rules = await Rule.find({shop})
+    orders.forEach(order => {
+        if (!order.line_items) return
+        order.line_items.forEach(item => {
+            rules.forEach(rule => {
+                //vendor
 
-        const total = await axios.get(`https://${shop}/admin/api/${version}/orders/count.json`, {
-            headers
-            // params: {                
-            //     created_at_min:
-            //     created_at_max:
-            // }
-        })        
-        const totalPages = Math.ceil(total.data.count / limit)        
-        if (page == totalPages) hasNext = false
-        if (page == 1) hasPrevious = false
-        const orders = await axios.get(`https://${shop}/admin/api/${version}/orders.json`, {
-            headers,
-            params: {
-                limit,
-                page,                          
-                // created_at_min:
-                // created_at_max:            
-            }
+                //title
+
+                //product_id
+            })
         })
-
-        ctx.body = {orders: orders.data, hasPrevious, hasNext, page}
-    } catch (err) {
-        console.log('Failed getting orders: ', err)
-        ctx.status = 400
-    }
+    })
 }
 
 async function getOrders(ctx) {
@@ -79,7 +61,7 @@ async function getOrders(ctx) {
                 page,
                 ...date
             }
-        })        
+        })
         console.log('total: ', totalPages)
         console.log('orders: ', orders.data.orders.length)
 
@@ -90,4 +72,4 @@ async function getOrders(ctx) {
     }
 }
 
-module.exports = {getOrdersByDay, getOrders}
+module.exports = {getOrders}
