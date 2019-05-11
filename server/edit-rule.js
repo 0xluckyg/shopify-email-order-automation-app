@@ -1,8 +1,9 @@
 const {Rule} = require('./db/rule');
 
-function convertFiltersIntoParams(filters) {
-    filters = JSON.parse(filters) 
+function convertFiltersIntoParams(filters, selectedProducts) { 
     params = {}
+    //params are ignored if there are product ids in selectedProducts
+    if (selectedProducts && selectedProducts.length > 0) return params
     filters.forEach(filter => {
         let {key, value} = filter
         params[key] = value
@@ -16,7 +17,7 @@ async function addRule(ctx) {
         const shop = ctx.session.shop
         const body = JSON.parse(ctx.request.rawBody)
         let {filters, selectedProducts, email} = body
-        filters = convertFiltersIntoParams(filters)
+        filters = convertFiltersIntoParams(filters, selectedProducts)        
         const rule = new Rule({
             shop, filters, selectedProducts, email
         });
@@ -33,7 +34,7 @@ async function editRule(ctx) {
     try {                
         const body = JSON.parse(ctx.request.rawBody)
         let {_id, filters, selectedProducts, email} = body
-        filters = convertFiltersIntoParams(filters)
+        filters = convertFiltersIntoParams(filters, selectedProducts)
         await Rule.findByIdAndUpdate(_id, {$set: {
             filters, selectedProducts, email
         }})

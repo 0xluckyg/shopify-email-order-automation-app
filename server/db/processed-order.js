@@ -3,21 +3,16 @@
 const mongoose = require('mongoose');
 
 //Creating a new todo example
-const ProcessedOrderSchema = new mongoose.Schema({        
+const ProcessedOrderSchema = new mongoose.Schema({
+    //If order and product id matches -> if email matches        
+    email: String,
     title: String,
     order_id: String,
     order_date: Date,
     product_id: Number,
     variant_id: Number,    
     shop: String,
-    order_number: Number,
-    emails: [{
-        email: {
-            type: String,
-            unique: true
-        },
-        sent: Boolean
-    }]
+    order_number: Number,    
 },{
     timestamps: true // Saves createdAt and updatedAt as dates
 });

@@ -67,17 +67,14 @@ class Rules extends React.Component {
         })
     }
 
-    makeSelectionDescription(filters, selectedItems) {   
-        if (!filters) return
-        if (filters.length == 0 && selectedItems.length == 0) return 'All products selected'
-        if (selectedItems.length > 0) return `${selectedItems.length} custom items selected`        
+    makeSelectionDescription(filters, selectedItems) {                   
+        if (filters && filters.length == 0 && selectedItems.length == 0) return 'All products'
+        if (selectedItems.length > 0) return `${selectedItems.length} custom items`
         let queryString = 'Products where '
-        for (let i = 0; i < filters.length; i ++) {    
-            let key = filters[i].key
-            if (key == 'product_type') key = 'product type'
-            queryString = queryString + key + ' is ' + filters[i].value
-            if (i != filters.length - 1) queryString = queryString + ' AND '                        
-        }
+        Object.keys(filters).map((key, i) => {
+            queryString = queryString + key + ' is ' + filters[key]
+            if (i != Object.keys(filters).length - 1) queryString = queryString + ' AND '
+        });                
         return queryString
     }
     

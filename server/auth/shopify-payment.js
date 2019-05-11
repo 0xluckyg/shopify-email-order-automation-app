@@ -66,7 +66,7 @@ async function processPayment (ctx, next) {
                         .then(() => { 
                             saveAcceptPayment(shop)                            
                         })
-                        .catch((error) => console.log('error2', error));
+                        .catch((error) => console.log('Failed processing payment: ', error));
                 }
                 else return ctx.redirect('/')
             });

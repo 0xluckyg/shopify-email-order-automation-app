@@ -37,27 +37,21 @@ async function getProducts(ctx) {
         const { shop, accessToken } = ctx.session;
         const headers = getHeaders(accessToken)        
         let hasPrevious = true; let hasNext = true
-        let {page, filters, selectedProducts} = ctx.query        
-
-        console.log('selected: ', selectedProducts)
+        let {page, filters, selectedProducts} = ctx.query                
 
         //For detailed edit history view 
         if (ctx.query.selectedProducts && JSON.parse(selectedProducts).length > 0) {            
             selectedProducts = await getSelectedProducts(JSON.parse(selectedProducts), ctx.session)
             ctx.body = selectedProducts.data;
             return
-        }
-
-        console.log('filters: ', filters)
+        }        
 
         let params = convertFiltersIntoParams(filters)
         params = {
             ...params,
             page,
             limit
-        }
-
-        console.log('params: ', params)
+        }        
 
         const total = await axios.get(`https://${shop}/admin/api/${version}/products/count.json`, {
             headers,
@@ -72,8 +66,6 @@ async function getProducts(ctx) {
         const totalPages = Math.ceil(total.data.count / limit)        
         if (page == totalPages || totalPages == 0) hasNext = false
         if (page == 1) hasPrevious = false
-
-        console.log('products: ', products.data.products.length)
 
         ctx.body = {products: products.data.products, hasPrevious, hasNext, page}
     } catch(err) {

@@ -24,7 +24,7 @@ class OrderDetailModal extends React.Component {
     }
 
     renderItem = (item) => {        
-        const { product_id, title, quantity, sku, price, variant_title, vendor } = item
+        const { product_id, title, quantity, sku, price, variant_title, vendor, emails } = item
         return (
             <ResourceList.Item
                 id={product_id}                                

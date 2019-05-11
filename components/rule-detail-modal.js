@@ -43,15 +43,21 @@ class RulesDetailModal extends React.Component {
         this.mounted = false
     }
 
+    convertFiltersForParams(filters) {
+        let params = []
+        Object.keys(filters).map((key) => {
+            params.push({key, value: filters[key]}) 
+        });         
+        return params
+    }
+
     fetchProducts(page) {
         // const { addText, removeText, filters, selectedProducts, completed, count, editType, editMethod, editContentType, updatedAt } = this.props.detail;
         this.setState({hasNext: false, hasPrevious: false})
-        const { filters, selectedProducts } = this.props.detail;                
-        console.log('filtesr: ', filters)
-        console.log('selected: ', selectedProducts)
+        const { filters, selectedProducts } = this.props.detail;
         axios.get(process.env.APP_URL + '/get-products', {
             params: {
-                filters: JSON.stringify(filters), 
+                filters: JSON.stringify(this.convertFiltersForParams(filters)), 
                 selectedProducts: JSON.stringify(selectedProducts),
                 page
             },

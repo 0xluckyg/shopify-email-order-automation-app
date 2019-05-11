@@ -27,8 +27,7 @@ class OrdersByDay extends React.Component {
     }     
 
     componentDidUpdate(prevProps) {
-        if (prevProps.date !== this.props.date) {
-            console.log('new date? ', this.props.date)
+        if (prevProps.date !== this.props.date) {            
             this.fetchOrders({page: 1, date: this.props.date})
         }
     }

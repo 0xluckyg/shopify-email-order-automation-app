@@ -102,8 +102,7 @@ class AddRule extends React.Component {
         //modify filter
         const newFilter = appliedFilters[appliedFilters.length - 1]
         const filters = this.modifyFilters(newFilter)        
-
-        console.log('filters: ', filters)
+        
         this.setState({ appliedFilters: filters, productsAreLoading: true });
         this.fetchProducts({page: 1, filters})
     };

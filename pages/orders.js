@@ -57,8 +57,7 @@ class Orders extends React.Component {
                 id: 'all-orders',
                 content: 'All Orders',                
             },
-        ];
-        console.log('why date: ', this.state.selectedDate.start)
+        ];        
         return (        
         <Layout>                        
             <Layout.Section>       
