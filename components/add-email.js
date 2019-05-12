@@ -40,7 +40,7 @@ class AddEmail extends React.Component {
                 <div style={{display:'flex', justifyContent: 'space-between'}}>
                 <div style={{width:'80%'}}>                
                     <TextField     
-                        placeholder="Email (eg. kroco@gmail.com)"
+                        placeholder="Email (ex. kroco@gmail.com)"
                         value={this.state.email}
                         onChange={(email) => this.setState({email})}
                         error={this.state.emailFieldError}

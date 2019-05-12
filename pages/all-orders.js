@@ -7,6 +7,7 @@ import {
 import axios from 'axios';
 import OrderDetailModal from '../components/order-detail-modal.js';
 import NoContent from '../components/no-content'
+import sentStatus from '../components/order-sent-status'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
@@ -46,6 +47,7 @@ class Orders extends React.Component {
     }
 
     renderItem = (item) => {        
+        console.log(item)
         const { id, total_price, currency, processed_at, order_number, customer, line_items, shipping_address  } = item;
         const { email, first_name, last_name, phone, orders_count, total_spent } = customer
         const { address1, address2, city, company, country, province, province_code, zip } = shipping_address        
@@ -57,8 +59,9 @@ class Orders extends React.Component {
                 persistActions
             >
                 <div style={{display:"flex", justifyContent: "space-between"}}>                                      
-                    <div style={{width:"15%"}}><Badge>#{order_number}</Badge></div>
-                    <div style={{width:"20%"}}>{dateString}</div>
+                    <div style={{width:"10%"}}><Badge>#{order_number}</Badge></div>                    
+                    <div style={{width:"15%"}}>{dateString}</div>
+                    <div style={{width:"15%"}}>{sentStatus(line_items)}</div>
                     <div style={{width:"20%"}}>{first_name} {last_name}</div>
                     <div style={{width:"10%"}}>{total_price} {currency}</div>
                     <div style={{width:"10%"}}>{line_items.length}</div>
@@ -114,8 +117,9 @@ class Orders extends React.Component {
                     close={() => this.setState({showDetail:false})}
                 />                
                 <div style={{display:"flex", justifyContent: "space-between", margin: "20px"}}>                                      
-                    <div style={{width:"15%"}}><b>Order Number</b></div>
-                    <div style={{width:"20%"}}><b>Date Ordered</b></div>
+                    <div style={{width:"10%"}}><b>Order #</b></div>                    
+                    <div style={{width:"15%"}}><b>Date Ordered</b></div>
+                    <div style={{width:"15%"}}><b>Sent Status</b></div>
                     <div style={{width:"20%"}}><b>Customer Name</b></div>
                     <div style={{width:"10%"}}><b>Price</b></div>
                     <div style={{width:"10%"}}><b>Products</b></div>                            

@@ -1,5 +1,7 @@
 const axios = require('axios');
 const {Rule} = require('./db/rule')
+const {ProcessedOrder} = require('./db/processed-order')
+const _ = require('lodash')
 const version = '2019-04'
 
 function getHeaders(accessToken) {
@@ -9,10 +11,23 @@ function getHeaders(accessToken) {
     }
 }
 
-async function asyncForEach(array, callback) {
+async function asyncForEach(array, callback) {    
     for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array);
     }
+}
+
+async function cleanOrders(orders) {    
+    await asyncForEach(orders, async (order, i, array) => {        
+        if (!order.customer || !order.shipping_address || !order.line_items) return 
+        array[i] = _.pick(order, ["id", "total_price", "currency", "processed_at", "order_number", "customer", "line_items", "shipping_address"])
+        array[i].customer = _.pick(order.customer, ["email", "first_name", "last_name", "phone", "orders_count", "total_spent"])
+        array[i].shipping_address = _.pick(order.shipping_address, ["address1", "address2", "city", "company", "country", "province", "province_code", "zip"])        
+        await asyncForEach(order.line_items, (item, j) => {            
+            array[i].line_items[j] = _.pick(item, ["variant_id", "product_id", "title", "quantity", "sku", "price", "variant_title", "vendor"])
+        })
+    })
+    return orders
 }
 
 function compareVendors(item, rule) {
@@ -33,7 +48,13 @@ function compareProductIds(item, rule) {
     true : false    
 }
 
-async function findRulesAndCompare(shop, orders) {
+function ruleIncludesAllProducts(rule, filters) {
+    return (rule.selectedProducts.length < 0 
+        && !filters.title 
+        && !filters.vendor) ? true : false
+}
+
+async function combineOrdersAndEmailRules(shop, orders) {
     const rules = await Rule.find({shop})
     await asyncForEach(orders, async (order, i, array) => {
         if (!order.line_items) return
@@ -50,11 +71,12 @@ async function findRulesAndCompare(shop, orders) {
 
                 if (compareTitles(item, rule) || 
                     compareVendors(item, rule) || 
-                    compareProductIds(item, rule)) {
+                    compareProductIds(item, rule) || 
+                    ruleIncludesAllProducts(rule, filters)) {
                     
-                    console.log('title: ', item.title)    
-                    console.log('filter: ', rule.filters)
-                    console.log('email: ', rule.email)
+                    // console.log('title: ', item.title)    
+                    // console.log('filter: ', rule.filters)
+                    // console.log('email: ', rule.email)
 
                     //put send all emails to by day page
                     array[i].line_items[j].email_rules.push({email: rule.email, sent: false})
@@ -65,8 +87,34 @@ async function findRulesAndCompare(shop, orders) {
     return orders
 }
 
-function findEmailHistoryAndCompare(orders) {
-    
+async function getProcessedEmails(orders) {
+    const orderIds = []
+    await asyncForEach(orders, async (order) => {
+        orderIds.push(order.id)
+    })
+    return await ProcessedOrder.find({
+        'order_id': { $in: orderIds }
+    })
+}
+
+async function combineOrdersAndSentHistory(orders) { 
+    //If order matches -> if product id matches & if email matches
+    const processedEmails = await getProcessedEmails(orders)
+    await asyncForEach(orders, async (order, i, array) => {
+        if (!order.line_items) return
+        await asyncForEach(order.line_items, async (item, j) => {
+            await asyncForEach(processedEmails, async (processed) => {
+                item.emails.forEach((email, k) => {
+                    // product_id and email have to match if the email has already been processed
+                    if (processed.product_id == item.product_id && 
+                        processed.email == email) {
+                        array[i].line_items[j].email_rules[k].sent = true
+                    }
+                })
+            })                      
+        })
+    })
+    return orders
 }
 
 async function getOrders(ctx) {
@@ -107,8 +155,10 @@ async function getOrders(ctx) {
         })
         console.log('total: ', totalPages)
         console.log('orders: ', orders.data.orders.length)
-
-        orders = await findRulesAndCompare(shop, orders.data.orders)
+        
+        orders = await cleanOrders(orders.data.orders)
+        orders = await combineOrdersAndEmailRules(shop, orders)
+        orders = await combineOrdersAndSentHistory(orders)        
 
         ctx.body = {orders, hasPrevious, hasNext, page}
     } catch (err) {

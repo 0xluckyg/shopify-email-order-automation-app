@@ -3,7 +3,8 @@ import {
     Card,    
     Button,
     Layout,
-    Badge
+    Badge,
+    Tag
 } from '@shopify/polaris';
 import Modal from "react-responsive-modal";
 import {connect} from 'react-redux';
@@ -23,8 +24,32 @@ class OrderDetailModal extends React.Component {
         window.open(`https://${this.props.getUserReducer.shop}/admin/products/${id}`, '_blank')
     }
 
+    renderCircleMark = (positive) => {
+        if (positive) {
+            return <div style={{ margin: '2.5px 5px 2.5px 0px', float: 'left', width:'15px', height:'15px',  borderRadius:'7.5px', backgroundColor: "#bbe5b3"}}></div>
+        } else {
+            return null
+        }
+    }
+
+    renderEmailTags(emails) {
+        return (
+            <div style={{width: '80%'}}>
+                {emails.map(email => {
+                    return (
+                    <div key={email} style={{display: 'inline-block', margin: '10px 10px 0px 0px'}}>
+                        <Tag onRemove={() => {
+                            
+                        }}>{this.renderCircleMark(email.sent)}{email.email}</Tag>
+                    </div>
+                    )
+                })}                
+            </div>
+        )
+    }
+
     renderItem = (item) => {        
-        const { product_id, title, quantity, sku, price, variant_title, vendor, emails } = item
+        const { product_id, title, quantity, sku, price, variant_title, vendor, email_rules } = item
         return (
             <ResourceList.Item
                 id={product_id}                                
@@ -38,18 +63,19 @@ class OrderDetailModal extends React.Component {
                 {(vendor) ? <div >{vendor}</div> : null}
                 {(sku) ? <div >{sku}</div> : null}                
             </div>
-            <div >
+            <div>
                 <Button onClick={() => this.redirectToProductPage(product_id)} plain>
                     View product
                 </Button>
             </div>
+            {this.renderEmailTags(email_rules)}
             </ResourceList.Item>
         );
     };    
 
     showProducts() {        
         return (
-            <Card>                
+            <Card>                         
                 <div style={productSelectBoxStyle}>
                 <Card>                
                     <ResourceList
@@ -113,7 +139,9 @@ class OrderDetailModal extends React.Component {
             >
                 <div style={modalContentStyle}>
                     <Layout>
-                        <Layout.Section>
+                        <Layout.Section>                            
+                            <div style={{margin: '0px 10px 15px 0px', float: 'left'}}><Tag>{this.renderCircleMark(true)}Email has been sent</Tag></div>
+                            <div style={{margin: '0px 0px 15px 0px'}}><Tag>{this.renderCircleMark(false)}Email has not been sent</Tag></div> 
                             {this.showProducts()}
                             {this.showCustomer()}
                             {this.showAddress()}

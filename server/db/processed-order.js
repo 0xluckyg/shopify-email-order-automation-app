@@ -3,25 +3,23 @@
 const mongoose = require('mongoose');
 
 //Creating a new todo example
-const ProcessedOrderSchema = new mongoose.Schema({
-    //If order and product id matches -> if email matches        
+const ProcessedOrderSchema = new mongoose.Schema({    
     email: String,
     title: String,
     order_id: String,
     order_date: Date,
     product_id: Number,
-    variant_id: Number,    
+    variant_id: Number,
     shop: String,
     order_number: Number,    
 },{
-    timestamps: true // Saves createdAt and updatedAt as dates
+    timestamps: true // Saves created
 });
 
 //Allows find by shop to be faster by making it an index
 ProcessedOrderSchema.index({
     shop: String,
-    order_id: String,
-    product_id: String
+    order_id: String    
 });
 
 //Creating a new user example
