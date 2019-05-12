@@ -2,23 +2,38 @@ import {
     ResourceList,    
     Card,    
     Button,
-    Layout,
-    Badge,
-    Tag
+    Layout,    
+    Tag,
+    TextField
 } from '@shopify/polaris';
 import Modal from "react-responsive-modal";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
+import emailValidator from "email-validator";
 
 //A pop up to ask users to write a review
 class OrderDetailModal extends React.Component {    
     constructor(props){
         super(props)                          
         this.state = {                                    
-            
+            additionalEmails: [],
+            emailErrors: [],
+            orderDetail: {}
         }
     }    
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.detail === prevState.orderDetail 
+            || Object.keys(nextProps.detail).length == 0) return
+        const orderDetail = nextProps.detail                
+        let additionalEmails = []; let emailErrors = [];
+        orderDetail.line_items.map(() => {
+            additionalEmails.push('')
+            emailErrors.push('')
+        })
+        return ({orderDetail, additionalEmails, emailErrors})
+    }
 
     redirectToProductPage = (id) => {
         window.open(`https://${this.props.getUserReducer.shop}/admin/products/${id}`, '_blank')
@@ -32,14 +47,17 @@ class OrderDetailModal extends React.Component {
         }
     }
 
-    renderEmailTags(emails) {
+    renderEmailTags(emails, index) {
         return (
             <div style={{width: '80%'}}>
-                {emails.map(email => {
+                {emails.map((email, i) => {
                     return (
-                    <div key={email} style={{display: 'inline-block', margin: '10px 10px 0px 0px'}}>
+                    <div key={`${index}${i}`} style={{display: 'inline-block', margin: '10px 10px 0px 0px'}}>
                         <Tag onRemove={() => {
-                            
+                            let orderDetail = this.state.orderDetail
+                            let emailRules = orderDetail.line_items[index].email_rules.filter(e => e.email !== email.email)
+                            orderDetail.line_items[index].email_rules = emailRules
+                            this.setState({orderDetail})
                         }}>{this.renderCircleMark(email.sent)}{email.email}</Tag>
                     </div>
                     )
@@ -48,8 +66,49 @@ class OrderDetailModal extends React.Component {
         )
     }
 
+    renderEmailTextField(index) {
+        return (
+            <div style={{marginTop: '10px', display:'flex', justifyContent: 'space-between'}}>
+                <div style={{width:'80%'}}>
+                    <TextField
+                        placeholder="Add Email (ex. kroco@gmail.com)"
+                        value={this.state.additionalEmails[index]}
+                        onChange={(email) => {
+                            let additionalEmails = this.state.additionalEmails                            
+                            additionalEmails[index] = email
+                            this.setState({additionalEmails})
+                        }}
+                        error={this.state.emailErrors[index]}
+                    />
+                </div>
+                <div style={{width:'15%'}}>
+                    <Button primary fullWidth onClick={() => {
+                        if (!emailValidator.validate(this.state.additionalEmails[index])) {                            
+                            let emailErrors = this.state.emailErrors
+                            emailErrors[index] = "Please provide a valid email"
+                            return this.setState({emailErrors})                                                        
+                        }
+                        let {additionalEmails, emailErrors} = this.state                        
+                        
+                        //save new added email
+                        let orderDetail = this.state.orderDetail                        
+                        orderDetail.line_items[index].email_rules.push({email: additionalEmails[index], sent: false})                        
+                        //reset errors and textfield
+                        additionalEmails[index] = ''
+                        emailErrors[index] = ''
+
+                        this.setState({orderDetail, emailErrors, additionalEmails})
+                    }}>
+                        Add
+                    </Button>
+                </div>
+            </div>
+        )
+    }
+
     renderItem = (item) => {        
-        const { product_id, title, quantity, sku, price, variant_title, vendor, email_rules } = item
+        const { product_id, title, variant_id, quantity, sku, price, variant_title, vendor, email_rules } = item        
+        const index = this.state.orderDetail.line_items.findIndex(item => item.variant_id == variant_id)        
         return (
             <ResourceList.Item
                 id={product_id}                                
@@ -68,7 +127,8 @@ class OrderDetailModal extends React.Component {
                     View product
                 </Button>
             </div>
-            {this.renderEmailTags(email_rules)}
+            {this.renderEmailTags(email_rules, index)}
+            {this.renderEmailTextField(index)}
             </ResourceList.Item>
         );
     };    
@@ -80,7 +140,7 @@ class OrderDetailModal extends React.Component {
                 <Card>                
                     <ResourceList
                         resourceName={{ singular: 'product', plural: 'products' }}
-                        items={this.props.detail.line_items}
+                        items={this.state.orderDetail.line_items}
                         renderItem={this.renderItem}
                     />    
                 </Card>
@@ -90,8 +150,8 @@ class OrderDetailModal extends React.Component {
     }
 
     showCustomer() {        
-        if (Object.keys(this.props.detail).length === 0) return
-        const { email, first_name, last_name, phone, orders_count, total_spent } = this.props.detail.customer        
+        if (Object.keys(this.state.orderDetail).length === 0) return
+        const { email, first_name, last_name, phone, orders_count, total_spent } = this.state.orderDetail.customer        
         return (
             <Card>
                 <div style={{margin:'20px'}}>
@@ -107,8 +167,8 @@ class OrderDetailModal extends React.Component {
     }
 
     showAddress() {
-        if (Object.keys(this.props.detail).length === 0) return
-        const { address1, address2, city, company, country, province, province_code, zip } = this.props.detail.shipping_address        
+        if (Object.keys(this.state.orderDetail).length === 0) return
+        const { address1, address2, city, company, country, province, province_code, zip } = this.state.orderDetail.shipping_address        
         return (
             <Card>
                 <div style={{margin:'20px'}}>
@@ -126,7 +186,7 @@ class OrderDetailModal extends React.Component {
     }
 
     handleAction() {
-
+        
     }
 
     render() {        
@@ -146,7 +206,7 @@ class OrderDetailModal extends React.Component {
                             {this.showCustomer()}
                             {this.showAddress()}
                             <div style={finalButtonStyle}>
-                                <Button primary size="large" onClick={this.props.close}>Close</Button>
+                                <Button primary size="large" onClick={() => {}}>Send Orders</Button>
                             </div>
                         </Layout.Section>  
                     </Layout>  
@@ -164,7 +224,7 @@ const modalContentStyle = {
     alignItems: "center",
     justifyContent: "center",    
 }
-const productSelectBoxStyle = {maxHeight: '300px', minWidth: '650px', overflowX: 'auto'}
+const productSelectBoxStyle = {minWidth: '650px'}
 const finalButtonStyle = {float:"right", padding: "16px 0px 16px 0px"}
 
 function mapDispatchToProps(dispatch){

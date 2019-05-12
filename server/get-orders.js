@@ -48,10 +48,10 @@ function compareProductIds(item, rule) {
     true : false    
 }
 
-function ruleIncludesAllProducts(rule, filters) {
+function ruleIncludesAllProducts(rule) {
     return (rule.selectedProducts.length < 0 
-        && !filters.title 
-        && !filters.vendor) ? true : false
+        && !rule.filters.title 
+        && !rule.filters.vendor) ? true : false
 }
 
 async function combineOrdersAndEmailRules(shop, orders) {
@@ -72,14 +72,17 @@ async function combineOrdersAndEmailRules(shop, orders) {
                 if (compareTitles(item, rule) || 
                     compareVendors(item, rule) || 
                     compareProductIds(item, rule) || 
-                    ruleIncludesAllProducts(rule, filters)) {
+                    ruleIncludesAllProducts(rule)) {
                     
                     // console.log('title: ', item.title)    
                     // console.log('filter: ', rule.filters)
                     // console.log('email: ', rule.email)
-
+                    
+                    let emailRules = array[i].line_items[j].email_rules
+                    //filter out duplicates
+                    if (emailRules.filter(e => e.email === rule.email).length > 0) return
                     //put send all emails to by day page
-                    array[i].line_items[j].email_rules.push({email: rule.email, sent: false})
+                    emailRules.push({email: rule.email, sent: false})
                 }
             })
         })
