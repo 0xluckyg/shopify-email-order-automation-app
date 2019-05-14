@@ -25,7 +25,7 @@ class OrderDetailModal extends React.Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         if (nextProps.detail === prevState.orderDetail 
-            || Object.keys(nextProps.detail).length == 0) return
+            || Object.keys(nextProps.detail).length == 0) return null
         const orderDetail = nextProps.detail                
         let additionalEmails = []; let emailErrors = [];
         orderDetail.line_items.map(() => {

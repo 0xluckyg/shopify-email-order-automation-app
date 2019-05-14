@@ -3,31 +3,28 @@ const {getHeaders, asyncForEach, cleanOrders, combineOrdersAndEmailRules, combin
 const _ = require('lodash')
 const version = '2019-04'
 
-function createEmailMap(emails, order, item, email) {    
-    if (!emails.has(email.email)){ 
-        emails.set(email.email, new Map())
+function createEmailObject(emails, order, item, email) {    
+    if (!emails[email.email]){ 
+        emails[email.email] = {}
     }
     
-    if (!emails.get(email.email).has(order.id)){
-        emails.get(email.email).set(order.id, {
+    if (!emails[email.email][order.id]){
+        emails[email.email][order.id] = {
             customer: order.customer,
             shipping_address: order.shipping_address,
-            items: new Map()
-        })
+            items: []
+        }
     }
 
-    if (!emails.get(email.email).get(order.id).items.has(item.variant_id)) {
-        emails.get(email.email).get(order.id).items.set(item.variant_id, item)
-    } else {
-        let newCount = emails.get(email.email).get(order.id).items.get(item.variant_id)
-        newCount.quantity += 1
-        emails.get(email.email).get(order.id).items.set(item.variant_id, newCount)
+    if (!emails[email.email][order.id].items[item.variant_id]) {
+        emails[email.email][order.id].items[item.variant_id] = item
+    } else {                
+        emails[email.email][order.id].items[item.variant_id][quantity] += 1
     }
-
     return emails
 }
 
-function reformatOrdersByEmail(orders) {
+async function reformatOrdersByEmail(orders) {
     //  [{
     //     id
     //     shipping_address
@@ -55,20 +52,21 @@ function reformatOrdersByEmail(orders) {
     //         }
     //     }
     // }
-    let emails = new Map()
+    // console.log('reform: ', orders.length)
+    let emails = {}
 
-    await asyncForEach(orders, async (order, i) => {
+    await asyncForEach(orders, async (order) => {
         if (!order.line_items) return
         await asyncForEach(order.line_items, async (item) => {
             await asyncForEach(item.email_rules, async (email) => {
-                emails = createEmailMap(emails, order, item, email)
+                emails = createEmailObject(emails, order, item, email)
             })
         })
     })
-    
+    return emails
 }
 
-async function getAllOrdersForDay(ctx) {
+async function fetchAllOrdersForDay(ctx) {
     try {        
         const {shop, accessToken} = ctx.session
         let {date} = ctx.query
@@ -76,10 +74,11 @@ async function getAllOrdersForDay(ctx) {
         let page = 1; let hasNext = true
         const headers = getHeaders(accessToken)
         
-        if (date) {            
-            date = new Date(date)          
+        if (date) {
+            console.log('date: ', date)
+            date = new Date(date)
             let endDate = new Date(date).setDate(date.getDate() + 1)
-                        
+            console.log('enddate: ', endDate)
             date = {
                 created_at_min: date.toISOString(),
                 created_at_max: new Date(endDate).toISOString()
@@ -91,8 +90,8 @@ async function getAllOrdersForDay(ctx) {
         const total = await axios.get(`https://${shop}/admin/api/${version}/orders/count.json`, {
             headers,
             params: date
-        })        
-        const totalPages = Math.ceil(total.data.count / limit)        
+        })
+        const totalPages = Math.ceil(total.data.count / limit)
 
         let allOrders = []
         while (hasNext) {           
@@ -104,29 +103,52 @@ async function getAllOrdersForDay(ctx) {
                     ...date
                 }
             })
-            allOrders = [...allOrders, ...orders]
+            console.log('api limit: ',orders.headers.http_x_shopify_shop_api_call_limit)            
+            allOrders = [...allOrders, ...orders.data.orders]            
+            console.log('page', page)
             if (page == totalPages || totalPages == 0) hasNext = false
-        }
-
-        ctx.body = {orders, hasPrevious, hasNext, page}
+            page ++
+        }        
+        return allOrders
     } catch (err) {
-        console.log('Failed getting orders: ', err)
-        ctx.status = 400
+        console.log('Failed getting orders: ', err)        
     }
 }
 
 
 function sendOneOrder(ctx) {
-
+    
 }
 
-function sendDayOrders(ctx) {
-    let allOrders = await getAllOrdersForDay(ctx)
-    allOrders = await cleanOrders(orders.data.orders)
-    allOrders = await combineOrdersAndEmailRules(shop, orders)
-    allOrders = await combineOrdersAndSentHistory(orders)
- 
-    reformattedOrders = await reformatOrdersByEmail(allOrders)
+async function sendAllOrdersForDay(ctx) {
+    try {
+        let allOrders = await fetchAllOrdersForDay(ctx)
+        allOrders = await cleanOrders(allOrders)
+        allOrders = await combineOrdersAndEmailRules(ctx.session.shop, allOrders)
+        allOrders = await combineOrdersAndSentHistory(allOrders)
+            
+        let reformattedOrders = await reformatOrdersByEmail(allOrders)
+
+    } catch (err) {
+        console.log('Failed sending all orders for day: ', err)
+        ctx.status = 400
+    }    
 }
 
-module.exports = {sendOneOrder, sendDayOrders}
+async function getAllOrdersForDay(ctx) {
+    try {
+        let allOrders = await fetchAllOrdersForDay(ctx)
+        allOrders = await cleanOrders(allOrders)
+        allOrders = await combineOrdersAndEmailRules(ctx.session.shop, allOrders)
+        allOrders = await combineOrdersAndSentHistory(allOrders)
+        
+        let reformattedOrders = await reformatOrdersByEmail(allOrders)                
+        console.log('reforedm1: ', reformattedOrders)                
+        ctx.body = reformattedOrders
+    } catch (err) {
+        console.log('Failed getting all orders for day: ', err)
+        ctx.status = 400
+    }
+}
+
+module.exports = {sendOneOrder, sendAllOrdersForDay, getAllOrdersForDay}

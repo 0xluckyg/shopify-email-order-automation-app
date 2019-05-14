@@ -1,5 +1,5 @@
 const axios = require('axios');
-const {getHeaders, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndEmailRules} = require('./orders-helperer')
+const {getHeaders, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory} = require('./orders-helper')
 const _ = require('lodash')
 const version = '2019-04'
 

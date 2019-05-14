@@ -2,11 +2,13 @@ import {
     Card,            
     Layout,
     Tabs,    
+    Button
 } from '@shopify/polaris';
 import pageHeader from '../components/page-header'
 import DatePicker from '../components/date-picker'
 import AllOrders from './all-orders'
 import OrdersByDay from './orders-by-day'
+import axios from 'axios';
 
 class Orders extends React.Component {    
     constructor(props) {
@@ -46,28 +48,46 @@ class Orders extends React.Component {
         this.setState({selectedTab});
     };
 
+    sendAllOrdersForDay = () => {
+        axios.get(process.env.APP_URL + '/get-day-orders', {
+            params: {
+                date: this.state.selectedDate.start
+            },
+            withCredentials: true
+        }).then(res => {
+            const {orders} = res.data
+            console.log(orders)
+        }).catch(err => {
+            console.log('err getting orders, ', err)
+        })
+    }
+
     render() {
         const {selectedTab} = this.state;
-        const tabs = [            
+        const tabs = [
             {
                 id: 'by-day',
-                content: 'By Day',                
+                content: 'By Day',
             },
             {
                 id: 'all-orders',
-                content: 'All Orders',                
+                content: 'All Orders',
             },
-        ];        
-        return (        
-        <Layout>                        
-            <Layout.Section>       
+        ];
+        return (
+        <Layout>
+            <Layout.Section>
                 {pageHeader(
                     'Orders', 
                     this.getDateText(),
-                    this.renderDatePicker()                  
-                )}                          
+                    this.renderDatePicker()
+                )}
                 <Card>
                     <Tabs tabs={tabs} selected={selectedTab} onSelect={this.handleTabChange}>      
+                        {(selectedTab == 0) ?   
+                            <div style={{margin: '15px'}}><Button primary onClick={this.sendAllOrdersForDay}>
+                                Send all orders for {this.getDateText()}
+                            </Button></div> : null}
                         {(selectedTab == 0) ? <OrdersByDay date={this.state.selectedDate.start}/> : null}
                         {(selectedTab == 1) ? <AllOrders/> : null}
                     </Tabs>
