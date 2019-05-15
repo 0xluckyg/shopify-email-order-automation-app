@@ -48,20 +48,6 @@ class Orders extends React.Component {
         this.setState({selectedTab});
     };
 
-    sendAllOrdersForDay = () => {
-        axios.get(process.env.APP_URL + '/get-day-orders', {
-            params: {
-                date: this.state.selectedDate.start
-            },
-            withCredentials: true
-        }).then(res => {
-            const {orders} = res.data
-            console.log(orders)
-        }).catch(err => {
-            console.log('err getting orders, ', err)
-        })
-    }
-
     render() {
         const {selectedTab} = this.state;
         const tabs = [
@@ -83,11 +69,7 @@ class Orders extends React.Component {
                     this.renderDatePicker()
                 )}
                 <Card>
-                    <Tabs tabs={tabs} selected={selectedTab} onSelect={this.handleTabChange}>      
-                        {(selectedTab == 0) ?   
-                            <div style={{margin: '15px'}}><Button primary onClick={this.sendAllOrdersForDay}>
-                                Send all orders for {this.getDateText()}
-                            </Button></div> : null}
+                    <Tabs tabs={tabs} selected={selectedTab} onSelect={this.handleTabChange}>                              
                         {(selectedTab == 0) ? <OrdersByDay date={this.state.selectedDate.start}/> : null}
                         {(selectedTab == 1) ? <AllOrders/> : null}
                     </Tabs>

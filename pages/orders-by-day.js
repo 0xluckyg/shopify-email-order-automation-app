@@ -11,6 +11,7 @@ import sentStatus from '../components/order-sent-status'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
+import EmailPreviewModal from '../components/email-preview-modal.js';
 
 class OrdersByDay extends React.Component {    
     constructor(props) {
@@ -19,7 +20,9 @@ class OrdersByDay extends React.Component {
         this.state = {            
             orders: [],
             showDetail: false,
+            showOrderPreview: false,
             orderDetail: {},
+            previewDetail: {},
             page: 1,
             hasPrevious: false,
             hasNext: false,
@@ -37,8 +40,7 @@ class OrdersByDay extends React.Component {
         this.fetchOrders({ page: 1, date: this.props.date });
     }
 
-    fetchOrders(params) {        
-        this.setState({ ordersLoading: true })
+    fetchOrders(params) {                
         axios.get(process.env.APP_URL + '/get-orders', {
             params,
             withCredentials: true
@@ -49,6 +51,22 @@ class OrdersByDay extends React.Component {
             this.setState({ordersLoading: false})
             this.props.showToastAction(true, "Couldn't get orders. Please refresh.")
             console.log('err getting orders, ', err)
+        })
+    }
+
+    getAllOrdersForDay = () => {
+        this.setState({ showOrderPreview: true })
+        axios.get(process.env.APP_URL + '/get-day-orders', {
+            params: {
+                date: this.props.date
+            },
+            withCredentials: true
+        }).then(res => {         
+            this.setState({ previewDetail: res.data })
+        }).catch(err => {
+            this.setState({ showOrderPreview: false })
+            this.props.showToastAction(true, "Couldn't get order preview. Please refresh.")
+            console.log('err getting preview, ', err)
         })
     }
 
@@ -96,18 +114,17 @@ class OrdersByDay extends React.Component {
         return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
     }
 
-    onPrevious = () => {
+    onPrevious() {
         let page = Number(this.state.page) - 1      
         this.setState({hasNext: false, hasPrevious: false, ordersLoading: true});
         this.fetchOrders({page, date: this.props.date})
     }
 
-    onNext = () => {
+    onNex() {
         let page = Number(this.state.page) + 1       
         this.setState({hasNext: false, hasPrevious: false, ordersLoading: true});
         this.fetchOrders({page, date: this.props.date})
     }
-
     render() {
         const resourceName = {
             singular: 'order',
@@ -119,7 +136,15 @@ class OrdersByDay extends React.Component {
                     open={this.state.showDetail} 
                     detail={this.state.orderDetail} 
                     close={() => this.setState({showDetail:false})}
-                />                
+                />
+                <EmailPreviewModal 
+                    open={this.state.showOrderPreview}
+                    detail={this.state.previewDetail}
+                    close={() => this.setState({showOrderPreview:false})}
+                />           
+                <div style={{margin: '15px'}}><Button primary onClick={this.getAllOrdersForDay}>
+                    Send all orders for {this.formatDate(this.props.date)}
+                </Button></div>     
                 <div style={{display:"flex", justifyContent: "space-between", margin: "20px"}}>                                      
                     <div style={{width:"10%"}}><b>Order #</b></div>                    
                     <div style={{width:"15%"}}><b>Date Ordered</b></div>
