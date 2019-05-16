@@ -1,5 +1,5 @@
 import * as keys from '../config/keys';
-
+import template from '../config/template'
 //Reducer that shows the status of the top bar save button when user is typing something unsaved.
 export const isDirtyReducer = (state = {}, action) => {
     switch (action.type) {

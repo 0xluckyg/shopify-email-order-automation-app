@@ -30,7 +30,7 @@ export const getUserAction = () => {
     return dispatch => {
         axios.get(process.env.APP_URL + '/get-user')
         .then(res => {            
-            dispatch(getUserResolveAction(res.data))            
+            dispatch(getUserResolveAction(res.data))
         }).catch(err => {
             console.log('Error getting user: ',err)
         })

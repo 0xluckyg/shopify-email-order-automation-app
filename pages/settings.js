@@ -19,7 +19,7 @@ class Settings extends React.Component {
     constructor(props){
         super(props)       
         
-        this.state = {            
+        this.state = {
             previousTemplateText: keys.TEMPLATE_TEXT,
             templateText: keys.TEMPLATE_TEXT,
             previousProductTemplateText: keys.PRODUCT_TEMPLATE_TEXT,
@@ -132,12 +132,12 @@ class Settings extends React.Component {
                                 <Badge status="success">{`{{${keys.QUANTITY}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.SKU}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.VENDOR}}}`}</Badge>                                
-                                <Badge status="success">{`{{${keys.GRAMS}}}`}</Badge>      
-                                <p style={{lineHeight:'35px'}}>
-                                    Because an order may have many different products, the order template will be combined with one or more product templates in the email. 
+                                <br/><br/>
+                                <p>
+                                    Because an order may have more than one products, the order template will be combined with one or more product templates in the email. 
                                 </p>                                                     
                             </div>
-                            <div>
+                            <div style={{flex:1, margin: '10px'}}>
                                 <TextField                                    
                                     value={this.state.templateText}
                                     onChange={templateText => this.setState({templateText})}

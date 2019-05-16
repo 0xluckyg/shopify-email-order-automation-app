@@ -40,7 +40,8 @@ class OrdersByDay extends React.Component {
         this.fetchOrders({ page: 1, date: this.props.date });
     }
 
-    fetchOrders(params) {                
+    fetchOrders(params) {               
+        this.setState({ordersLoading: true, hasNext: false, hasPrevious: false}) 
         axios.get(process.env.APP_URL + '/get-orders', {
             params,
             withCredentials: true
@@ -54,15 +55,15 @@ class OrdersByDay extends React.Component {
         })
     }
 
-    getAllOrdersForDay = () => {
-        this.setState({ showOrderPreview: true })
+    getAllOrdersForDay = () => {        
+        this.setState({ showOrderPreview: true, previewLoading: true })
         axios.get(process.env.APP_URL + '/get-day-orders', {
             params: {
                 date: this.props.date
             },
             withCredentials: true
-        }).then(res => {         
-            this.setState({ previewDetail: res.data })
+        }).then(res => {                     
+            this.setState({ previewDetail: res.data, previewLoading: false })
         }).catch(err => {
             this.setState({ showOrderPreview: false })
             this.props.showToastAction(true, "Couldn't get order preview. Please refresh.")
@@ -120,11 +121,12 @@ class OrdersByDay extends React.Component {
         this.fetchOrders({page, date: this.props.date})
     }
 
-    onNex() {
+    onNext() {
         let page = Number(this.state.page) + 1       
         this.setState({hasNext: false, hasPrevious: false, ordersLoading: true});
         this.fetchOrders({page, date: this.props.date})
     }
+
     render() {
         const resourceName = {
             singular: 'order',
@@ -138,9 +140,10 @@ class OrdersByDay extends React.Component {
                     close={() => this.setState({showDetail:false})}
                 />
                 <EmailPreviewModal 
+                    loading={this.state.previewLoading}
                     open={this.state.showOrderPreview}
                     detail={this.state.previewDetail}
-                    close={() => this.setState({showOrderPreview:false})}
+                    close={() => this.setState({showOrderPreview:false, previewDetail:{}})}
                 />           
                 <div style={{margin: '15px'}}><Button primary onClick={this.getAllOrdersForDay}>
                     Send all orders for {this.formatDate(this.props.date)}
@@ -164,20 +167,20 @@ class OrdersByDay extends React.Component {
                 <div style={paginationWrapper}>
                     <Pagination
                         hasPrevious={this.state.hasPrevious}
-                        onPrevious={this.onPrevious}
+                        onPrevious={() => this.onPrevious()}
                         hasNext={this.state.hasNext}
-                        onNext={this.onNext}
+                        onNext={() => this.onNext()}
                     />                  
                     <div>
                         <div style={rowButtonStyle}>
                             <Button 
-                                onClick={() => {}} 
+                                onClick={this.props.dayBefore} 
                                 size="slim">
                                 Day Before
                             </Button>
                         </div>
                         <div style={rowButtonStyle}>
-                            <Button onClick={() => {}} size="slim">
+                            <Button onClick={this.props.dayAfter} size="slim">
                                 Day After
                             </Button>
                         </div>                

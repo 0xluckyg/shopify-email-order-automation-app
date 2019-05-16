@@ -14,4 +14,5 @@ export const IS_LOADING = 'IS_LOADING';
 export const IS_DIRTY = 'IS_DIRTY';
 export const HANDLE_SAVE_ACTION = 'HANDLE_SAVE_ACTION';
 export const GET_USER = 'GET_USER';
+export const SET_SETTINGS = 'SET_SETTINGS';
 export const ROUTE = 'ROUTE';

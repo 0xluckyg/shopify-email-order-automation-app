@@ -41,7 +41,7 @@ class Index extends React.Component {
         userMenuOpen: false,
         searchOptions: this.searchOptions,
         showMobileNavigation: false,        
-        shop: Cookies.get('shopOrigin'),
+        shop: this.props.getUserReducer.shop,
         //Custom router and page status
         page: 0,
         modal: false,        

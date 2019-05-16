@@ -9,7 +9,7 @@ const keys = {
     SKU: 'SKU',
     VENDOR: 'VENDOR',
     // GTIN: 'GTIN',
-    GRAMS: 'GRAMS',
+    // GRAMS: 'GRAMS',
     NAME: 'NAME',
     EMAIL: 'EMAIL',
     PHONE: 'PHONE',
@@ -28,9 +28,8 @@ const keys = {
     // TOTAL_TAX: 'TOTAL_TAX',
 }
 
-const TEMPLATE_TEXT = 
-`
-ORDER {{${keys.ORDER_NUMBER}}}
+let TEMPLATE_TEXT = 
+`ORDER {{${keys.ORDER_NUMBER}}}
 --------------------
 Shop: {{${keys.SHOP}}}
 Order Number: {{${keys.ORDER_NUMBER}}}
@@ -49,62 +48,98 @@ Zip: {{${keys.ZIP}}}
 Province: {{${keys.PROVINCE}}} 
 Country: {{${keys.COUNTRY}}}
 Address2: {{${keys.ADDRESS2}}}
-Company: {{${keys.COMPANY}}}\n
+Company: {{${keys.COMPANY}}}\n`
+
+let PRODUCT_TEMPLATE_HEADER = 
+`
+PRODUCT INFORMATION
+--------------------
 `
 
-const PRODUCT_TEMPLATE_TEXT = 
-`
-Title: {{${keys.TITLE}}}
+let PRODUCT_TEMPLATE_TEXT = 
+`Title: {{${keys.TITLE}}}
 Variant Title: {{${keys.VARIANT_TITLE}}}
 Quantity: {{${keys.QUANTITY}}}
 SKU: {{${keys.SKU}}}
-Vendor: {{${keys.VENDOR}}}    
-grams: {{${keys.GRAMS}}}
-`
+Vendor: {{${keys.VENDOR}}}\n\n`
 
-function createOrderText(data, shop, templateText) {    
-    let orderText = (templateText) ? templateText : TEMPLATE_TEXT
+function createOrderText(data, shop, templateText, productTemplateText) {        
+    let orderText = ''
+
     Object.keys(data).map(orderID => {
+        let orderTemplate = (templateText) ? templateText : TEMPLATE_TEXT    
+        
         let order = data[orderID]
         let customer = order.customer
-        let shippingAddress = order.shippingAddress
+        let shippingAddress = order.shipping_address
 
-        let orderNumber = orderID
-        let shop = 'shop'
-        let date = order.processed_at
-        let note = order.note
+        let orderNumber = orderID ? orderID : 'Not provided'
+        let shopName = shop ? shop : 'Not provided'
+        let date = order.processed_at ? order.processed_at : 'Not provided'
+        let note = order.note ? order.note : 'None'
 
-        let customerName = `${customer.first_name} ${customer.last_name}`
-        let customerEmail = customer.email
-        let customerPhone = customer.phone
+        let customerName = `${customer.first_name} ${customer.last_name}` 
+        let customerEmail = customer.email ? customer.email : 'Not provided'
+        let customerPhone = customer.phone ? customer.phone : 'Not provided'
 
-        let address1 = shippingAddress.address1
-        let city = shippingAddress.city
-        let zip = shippingAddress.zip
-        let province = shippingAddress.province
-        let country = shippingAddress.country
-        let company = shippingAddress.company
-        let address2 = shippingAddress.address2
+        let address1 = shippingAddress.address1 ? shippingAddress.address1 : 'Not provided'
+        let city = shippingAddress.city ? shippingAddress.city : 'Not provided'
+        let zip = shippingAddress.zip ? shippingAddress.zip : 'Not provided'
+        let province = shippingAddress.province ? shippingAddress.province : 'Not provided'
+        let country = shippingAddress.country ? shippingAddress.country : 'Not provided'
+        let company = shippingAddress.company ? shippingAddress.company : 'Not provided'
+        let address2 = shippingAddress.address2 ? shippingAddress.address2 : 'Not provided'
 
-        Object.keys(order.items).map(itemID => {            
-            let item = order[itemID]
+        orderTemplate = orderTemplate.replace(`{{${keys.ORDER_NUMBER}}}`, orderNumber)
+        orderTemplate = orderTemplate.replace(`{{${keys.SHOP}}}`, shopName)
+        orderTemplate = orderTemplate.replace(`{{${keys.ORDER_NUMBER}}}`, orderNumber)
+        orderTemplate = orderTemplate.replace(`{{${keys.PROCESSED_AT}}}`, date)
+        orderTemplate = orderTemplate.replace(`{{${keys.NOTE}}}`, note)
 
-            let productTitle =  item.title
-            let variantTitle = item.variant_title
-            let productQuantity = item.quantity
-            let sku = item.sku
-            let vendor = item.vendor
-            let grams = item.grams
+        orderTemplate = orderTemplate.replace(`{{${keys.NAME}}}`, customerName)
+        orderTemplate = orderTemplate.replace(`{{${keys.EMAIL}}}`, customerEmail)
+        orderTemplate = orderTemplate.replace(`{{${keys.PHONE}}}`, customerPhone)
+
+        orderTemplate = orderTemplate.replace(`{{${keys.ADDRESS1}}}`, address1)
+        orderTemplate = orderTemplate.replace(`{{${keys.CITY}}}`, city)
+        orderTemplate = orderTemplate.replace(`{{${keys.ZIP}}}`, zip)
+        orderTemplate = orderTemplate.replace(`{{${keys.PROVINCE}}}`, province)
+        orderTemplate = orderTemplate.replace(`{{${keys.COUNTRY}}}`, country)
+        orderTemplate = orderTemplate.replace(`{{${keys.ADDRESS2}}}`, address2)
+        orderTemplate = orderTemplate.replace(`{{${keys.COMPANY}}}`, company)
+        
+        if (orderText != '') orderText = orderText + `\n\n`
+        orderText = orderText + orderTemplate
+
+        let productText = PRODUCT_TEMPLATE_HEADER
+        Object.keys(order.items).map(itemID => {                     
+            let item = order.items[itemID]
+            let productTemplate = (productTemplateText) ? productTemplateText : PRODUCT_TEMPLATE_TEXT            
+            
+            let productTitle =  item.title ? item.title : 'Not provided'
+            let variantTitle = item.variant_title ? item.variant_title : 'Not provided' 
+            let productQuantity = item.quantity ? item.quantity : 'Not provided'
+            let sku = item.sku ? item.sku : 'Not provided'
+            let vendor = item.vendor ? item.vendor : 'Not provided'            
+
+            productTemplate = productTemplate.replace(`{{${keys.TITLE}}}`, productTitle)
+            productTemplate = productTemplate.replace(`{{${keys.VARIANT_TITLE}}}`, variantTitle)
+            productTemplate = productTemplate.replace(`{{${keys.QUANTITY}}}`, productQuantity)
+            productTemplate = productTemplate.replace(`{{${keys.SKU}}}`, sku)
+            productTemplate = productTemplate.replace(`{{${keys.VENDOR}}}`, vendor)            
+
+            productText = productText + productTemplate
         })
 
-        data.
-    data.customer
-    data.shipping_address
+        orderText = orderText + productText
     })
+
+    return orderText
 }
 
 module.exports = {
     ...keys,
     TEMPLATE_TEXT,
-    PRODUCT_TEMPLATE_TEXT
+    PRODUCT_TEMPLATE_TEXT,
+    createOrderText
 }

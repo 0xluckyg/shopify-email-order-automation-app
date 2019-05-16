@@ -46,7 +46,16 @@ class Orders extends React.Component {
 
     handleTabChange = (selectedTab) => {
         this.setState({selectedTab});
-    };
+    }
+
+    changeDate(num) {
+        let date = this.state.selectedDate.start                                                    
+        date = new Date(date).setDate(date.getDate() + num)
+        date = new Date(date)
+        this.setState({selectedDate: {
+            start: date, end: date
+        }})
+    }
 
     render() {
         const {selectedTab} = this.state;
@@ -70,7 +79,11 @@ class Orders extends React.Component {
                 )}
                 <Card>
                     <Tabs tabs={tabs} selected={selectedTab} onSelect={this.handleTabChange}>                              
-                        {(selectedTab == 0) ? <OrdersByDay date={this.state.selectedDate.start}/> : null}
+                        {(selectedTab == 0) ? <OrdersByDay 
+                                                date={this.state.selectedDate.start}
+                                                dayBefore={() => this.changeDate(-1)}
+                                                dayAfter={() => this.changeDate(1)}
+                                            /> : null}
                         {(selectedTab == 1) ? <AllOrders/> : null}
                     </Tabs>
                 </Card>                

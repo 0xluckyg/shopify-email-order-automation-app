@@ -8,40 +8,80 @@ import {
     Spinner
 } from '@shopify/polaris';
 import Modal from "react-responsive-modal";
+import axios from 'axios';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
+import {createOrderText} from '../config/template'
 
 //A pop up to ask users to write a review
 class EmailPreviewModal extends React.Component {    
     constructor(props){
         super(props)                          
         this.state = {
-            emailDetail: {},
-            showSpinner: true,
-            openPreview: []
+            emailDetail: {},            
+            previewTexts: [],
+            previewTextsLoading: [],
+            templateText: '',
+            productTemplateText: ''
         }
     }    
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.detail === prevState.emailDetail 
-            || Object.keys(nextProps.detail).length == 0) return null
         const emailDetail = nextProps.detail
-        let openPreview = [];
-        Object.keys(emailDetail).map(() => openPreview.push(false))
-        return ({emailDetail, openPreview, showSpinner: false})
+        if (emailDetail === prevState.emailDetail 
+            || Object.keys(nextProps.detail).length == 0) return ({emailDetail})
+        let previewTexts = []; let previewTextsLoading = [];
+        Object.keys(emailDetail).map(() => {
+            previewTexts.push(false)
+            previewTextsLoading.push(false)
+        })
+        return ({emailDetail, previewTexts, previewTextsLoading})
     }
 
-    previewText() {
-        
+    async getPreviewText(index, email) {
+        let {previewTexts, previewTextsLoading, emailDetail, templateText, productTemplateText} = this.state        
+        //If already open
+        if (previewTexts[index]) {
+            previewTexts[index] = false
+            return this.setState({previewTexts})
+        }
+        let shop = this.props.getUserReducer.shop
+        //if tempalte texts are loaded
+        if (templateText != '' && productTemplateText != '') {
+            previewTexts[index] = createOrderText(emailDetail[email], shop, templateText, productTemplateText)
+            return this.setState({previewTexts})
+        }
+        //if template texts are not loaded
+        try {            
+            previewTextsLoading[index] = true
+            this.setState({previewTextsLoading})
+            let res =  await axios.get(process.env.APP_URL + '/get-settings')  
+            let previewText = createOrderText(emailDetail[email], shop, res.data.templateText, res.data.productTemplateText)      
+            this.setState(() => {
+                previewTextsLoading[index] = false
+                if (!previewTexts[index]) {
+                    previewTexts[index] = previewText
+                } else {
+                    previewTexts[index] = false
+                }
+                return {                     
+                    previewTexts,
+                    previewTextsLoading,
+                    templateText: res.data.templateText,
+                    productTemplateText: res.data.productTemplateText
+                };
+            })            
+        } catch (err) {            
+            this.props.showToastAction(true, "Couldn't get settings. Please try again later.")
+        }
     }
 
-    renderEmails(email, key, index) {
-        console.log('email: ', email)
+    renderEmails(data, key, index) {        
         let orderCount = 0; let productCount = 0;        
-        Object.keys(email).map((order) => {                        
+        Object.keys(data).map((order) => {                        
             orderCount++
-            Object.keys(email[order].items).map(() => { productCount++ })
+            Object.keys(data[order].items).map(() => { productCount++ })
         })        
         return <Card key={key}>            
             <div style={{width: '90%', margin: '20px', display:"flex", justifyContent: "space-between"}}>                                      
@@ -50,23 +90,18 @@ class EmailPreviewModal extends React.Component {
                 <div style={{width:"15%"}}>{productCount} products</div>                            
                 <div style={{width: "10%"}}>
                     <Button 
-                        onClick={() =>
-                            this.setState((state) => {
-                                let openPreview = state.openPreview
-                                openPreview[index] = !openPreview[index];                                
-                                return { openPreview };
-                            })
-                        } 
+                        loading={this.state.previewTextsLoading[index]}
+                        onClick={async () => await this.getPreviewText(index, key)} 
                         size="slim">
                         Preview
                     </Button>
                 </div>                
             </div>  
             <div style={{width: '90%', margin: '20px', maxHeight:'700px', overflowY: 'auto'}}>
-                <Collapsible open={this.state.openPreview[index]} id="basic-collapsible">
-                    <TextContainer>
-                       
-                    </TextContainer>
+                <Collapsible open={(this.state.previewTexts[index]) ? true : false} id="basic-collapsible">
+                    <div style={{whiteSpace: "pre-wrap"}}>
+                        {this.state.previewTexts[index]}
+                    </div>
                 </Collapsible>
             </div>
         </Card>
@@ -94,12 +129,24 @@ class EmailPreviewModal extends React.Component {
                 <div style={modalContentStyle}>                    
                     <Layout>
                         <Layout.Section>       
-                            {(this.state.showSpinner) ? <Spinner size="large" color="teal" /> : null}                                                 
-                            {this.showEmails()}                            
+                            {(this.props.loading) ? ( 
+                                <div style={{width: '650px', display:'flex', justifyContent: 'center'}}>
+                                    <div style={{alignSelf: 'center', margin: '100px 100px 50px 100px'}}>
+                                        <Spinner size="large" color="teal" /><br/>                                        
+                                    </div>
+                                </div>
+                            )
+                            : null}
+                            {(this.props.loading) ? ( 
+                                <p style={{marginBottom: '20px', textAlign: 'center', fontSize: '20px'}}>
+                                    If you have a lot of orders, this may take a while. Please don't close the popup.
+                                </p>
+                            ) : null }
+                            {this.showEmails()}
                             <div style={finalButtonStyle}>
-                                <Button primary size="large" onClick={() => {}}>Send Orders</Button>
+                                <Button disabled={this.props.loading} primary size="large" onClick={() => {}}>Send Orders</Button>
                             </div>
-                        </Layout.Section>  
+                        </Layout.Section>
                     </Layout>  
                 </div>
             </Modal>
