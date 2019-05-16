@@ -61,6 +61,9 @@ const UserSchema = new mongoose.Schema({
     },
     templateText: {
         type: String
+    },
+    productTemplateText: {
+        type: String
     }
 },{
     timestamps: true // Saves createdAt and updatedAt as dates

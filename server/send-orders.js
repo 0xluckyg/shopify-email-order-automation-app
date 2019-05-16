@@ -4,22 +4,26 @@ const _ = require('lodash')
 const version = '2019-04'
 
 function createEmailObject(emails, order, item, email) {    
+    if (item.email_rules && item.email_rules.sent) return emails
+
     if (!emails[email.email]){ 
         emails[email.email] = {}
     }
     
-    if (!emails[email.email][order.id]){
-        emails[email.email][order.id] = {
+    if (!emails[email.email][order.order_number]){
+        emails[email.email][order.order_number] = {
             customer: order.customer,
             shipping_address: order.shipping_address,
-            items: []
+            processed_at: order.processed_at,
+            note: order.note,
+            items: {}
         }
     }
 
-    if (!emails[email.email][order.id].items[item.variant_id]) {
-        emails[email.email][order.id].items[item.variant_id] = item
+    if (!emails[email.email][order.order_number].items[item.variant_id]) {
+        emails[email.email][order.order_number].items[item.variant_id] = item
     } else {                
-        emails[email.email][order.id].items[item.variant_id][quantity] += 1
+        emails[email.email][order.order_number].items[item.variant_id][quantity] += 1
     }
     return emails
 }

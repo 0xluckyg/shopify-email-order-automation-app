@@ -22,6 +22,8 @@ class Settings extends React.Component {
         this.state = {            
             previousTemplateText: keys.TEMPLATE_TEXT,
             templateText: keys.TEMPLATE_TEXT,
+            previousProductTemplateText: keys.PRODUCT_TEMPLATE_TEXT,
+            productTemplateText: keys.PRODUCT_TEMPLATE_TEXT,
             templateTextLoading: false,
             sendMethod: 'manual',  
             sendMethodLoading: false,
@@ -33,10 +35,26 @@ class Settings extends React.Component {
         axios.get(process.env.APP_URL + '/get-settings')
         .then(res => {            
             if (!this.mounted) return
-            if (!res.data.templateText) return this.setState({ sendMethod:res.data.sendMethod.method })
+            if (!res.data.templateText && res.data.productTemplateText) {
+                return this.setState({ 
+                    sendMethod:res.data.sendMethod.method,
+                    previousProductTemplateText: res.data.productTemplateText,
+                    productTemplateText: res.data.productTemplateText,
+                })
+            } else if (res.data.templateText && !res.data.productTemplateText) {
+                return this.setState({ 
+                    sendMethod:res.data.sendMethod.method,
+                    previousTemplateText: res.data.templateText,                
+                    templateText: res.data.templateText,
+                })
+            } else if (!res.data.templateText && !res.data.productTemplateText) {
+                return this.setState({ sendMethod:res.data.sendMethod.method })
+            }
             this.setState({
-                previousTemplateText: res.data.templateText,
+                previousTemplateText: res.data.templateText,                
                 templateText: res.data.templateText,
+                previousProductTemplateText: res.data.productTemplateText,
+                productTemplateText: res.data.productTemplateText,
                 sendMethod: res.data.sendMethod.method
             })
         }).catch(err => {               
@@ -47,10 +65,17 @@ class Settings extends React.Component {
 
     setEmailTemplate() {
         this.setState({templateTextLoading: true})
-        axios.post(process.env.APP_URL + '/email-template', {templateText: this.state.templateText})
+        axios.post(process.env.APP_URL + '/email-template', {
+            templateText: this.state.templateText,
+            productTemplateText: this.state.productTemplateText
+        })
         .then(() => {            
             if (!this.mounted) return            
-            this.setState({previousTemplateText: this.state.templateText, templateTextLoading: false})
+            this.setState({
+                previousTemplateText: this.state.templateText, 
+                previousProductTemplateText: this.state.productTemplateText,
+                templateTextLoading: false
+            })
             this.props.showToastAction(true, 'Saved settings!')
         }).catch(() => {   
             if (!this.mounted) return            
@@ -81,7 +106,7 @@ class Settings extends React.Component {
                     <Card sectioned title="Email Template">
                         <div style={{display:'flex', justifyContent:'space-between', marginBottom:'30px'}}>
                             <div style={{flex:1, margin: '10px'}}>
-                                <p style={{}}>
+                                <p>
                                     This is the template email per product that will be sent to the email you specify. 
                                     A line will be omitted if the information does not exist. <br/>
                                 </p>
@@ -89,14 +114,7 @@ class Settings extends React.Component {
                                 <Badge status="success">{`{{${keys.SHOP}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.ORDER_NUMBER}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.PROCESSED_AT}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.NOTE}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.TITLE}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.VARIANT_TITLE}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.QUANTITY}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.SKU}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.VENDOR}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.GTIN}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.GRAMS}}}`}</Badge>
+                                <Badge status="success">{`{{${keys.NOTE}}}`}</Badge>                                
                                 <Badge status="success">{`{{${keys.NAME}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.EMAIL}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.PHONE}}}`}</Badge>
@@ -106,17 +124,29 @@ class Settings extends React.Component {
                                 <Badge status="success">{`{{${keys.PROVINCE}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.COUNTRY}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.ADDRESS2}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.COMPANY}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.VARIANT_ID}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.PRODUCT_ID}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.PRICE}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.PRODUCT_TYPE}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.TOTAL_TAX}}}`}</Badge>
+                                <Badge status="success">{`{{${keys.COMPANY}}}`}</Badge>                                                                
+                                <Badge status="success">{`{{${keys.PRICE}}}`}</Badge>     
+                                <p style={{lineHeight:'35px'}}>List of product tags you can use:</p>
+                                <Badge status="success">{`{{${keys.TITLE}}}`}</Badge>
+                                <Badge status="success">{`{{${keys.VARIANT_TITLE}}}`}</Badge>
+                                <Badge status="success">{`{{${keys.QUANTITY}}}`}</Badge>
+                                <Badge status="success">{`{{${keys.SKU}}}`}</Badge>
+                                <Badge status="success">{`{{${keys.VENDOR}}}`}</Badge>                                
+                                <Badge status="success">{`{{${keys.GRAMS}}}`}</Badge>      
+                                <p style={{lineHeight:'35px'}}>
+                                    Because an order may have many different products, the order template will be combined with one or more product templates in the email. 
+                                </p>                                                     
                             </div>
-                            <div style={{flex:1, margin: '10px'}}>
+                            <div>
                                 <TextField                                    
                                     value={this.state.templateText}
                                     onChange={templateText => this.setState({templateText})}
+                                    multiline
+                                />
+                                <p style={{lineHeight:'35px'}}>Product template:</p>
+                                <TextField                                    
+                                    value={this.state.productTemplateText}
+                                    onChange={productTemplateText => this.setState({productTemplateText})}
                                     multiline
                                 />
                             </div>
@@ -124,14 +154,19 @@ class Settings extends React.Component {
                         <div style={{display:'flex', justifyContent:'flex-end'}}>
                         <div style={{marginRight:'20px'}}>
                         <Button 
-                            disabled={(this.state.templateText == keys.TEMPLATE_TEXT)}
-                            onClick={() => this.setState({templateText:keys.TEMPLATE_TEXT})}
+                            disabled={(this.state.templateText == keys.TEMPLATE_TEXT 
+                                && this.state.productTemplateText == keys.PRODUCT_TEMPLATE_TEXT)}
+                            onClick={() => this.setState({
+                                templateText:keys.TEMPLATE_TEXT,
+                                productTemplateText: keys.PRODUCT_TEMPLATE_TEXT
+                            })}
                         >
                             Reset to default
                         </Button>
                         </div>
                         <Button 
-                            disabled={(this.state.previousTemplateText == this.state.templateText)}
+                            disabled={(this.state.previousTemplateText == this.state.templateText 
+                                && this.state.previousProductTemplateText == this.state.productTemplateText)}
                             onClick={() => this.setEmailTemplate()}
                             loading={this.state.templateTextLoading}
                         >

@@ -18,11 +18,11 @@ async function asyncForEach(array, callback) {
 async function cleanOrders(orders) {    
     await asyncForEach(orders, async (order, i, array) => {        
         if (!order.customer || !order.shipping_address || !order.line_items) return 
-        array[i] = _.pick(order, ["id", "total_price", "currency", "processed_at", "order_number", "customer", "line_items", "shipping_address"])
+        array[i] = _.pick(order, ["id", "total_price", "currency", "processed_at", "order_number", "customer", "line_items", "shipping_address", "note"])
         array[i].customer = _.pick(order.customer, ["email", "first_name", "last_name", "phone", "orders_count", "total_spent"])
         array[i].shipping_address = _.pick(order.shipping_address, ["address1", "address2", "city", "company", "country", "province", "province_code", "zip"])        
         await asyncForEach(order.line_items, (item, j) => {            
-            array[i].line_items[j] = _.pick(item, ["variant_id", "product_id", "title", "quantity", "sku", "price", "variant_title", "vendor"])
+            array[i].line_items[j] = _.pick(item, ["variant_id", "product_id", "title", "quantity", "sku", "price", "variant_title", "vendor", "grams"])
         })
     })
     return orders
