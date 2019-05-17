@@ -10,7 +10,6 @@ import {
     Loading,        
 } from '@shopify/polaris';
 import {connect} from 'react-redux';
-import Cookies from 'js-cookie';
 import { Redirect } from '@shopify/app-bridge/actions';
 import * as PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
@@ -68,6 +67,11 @@ class Index extends React.Component {
         },            
     ]
 
+    static getDerivedStateFromProps(nextProps) {
+        const shop = nextProps.getUserReducer.shop                        
+        return ({shop})
+    }
+
     componentDidMount() {
         //get user and save it to the reducer on app mount        
         if (!this.props.getUserReducer.shop) {            
@@ -93,7 +97,7 @@ class Index extends React.Component {
     ]
 
     const searchResultsMarkup = (
-        <Card>            
+        <Card>
             <ActionList items={this.state.searchOptions}/>
         </Card>
     );

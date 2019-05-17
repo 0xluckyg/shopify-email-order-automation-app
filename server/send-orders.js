@@ -1,7 +1,51 @@
 const axios = require('axios');
+const {User} = require('./db/user');
+const {ProcessedOrder} = require('./db/processed-order');
 const {getHeaders, asyncForEach, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory} = require('./orders-helper')
 const _ = require('lodash')
 const version = '2019-04'
+
+async function sendEmails(shop, emails) {
+    try {
+
+        Object.keys(emails).map(email => {
+            const emailData = emails[email]
+            const settings = await User.findOne({shop}, {templateText: 1, productTemplateText: 1})
+            const orderText = createOrderText(
+                emailData, 
+                shop, 
+                settings.templateText, 
+                settings.productTemplateText
+            )
+            //SEND EMAIL orderText
+
+            let processedOrders = []        
+            Object.keys(emailData).map(orderId => {            
+                const order = emailData[orderId]                        
+                Object.keys(order.items).map(itemId => {
+                    const product = order.items[itemId]
+                    let processedOrder = {}
+
+                    processedOrder.shop = shop
+                    processedOrder.email = email
+                    processedOrder.order_number = order.order_number
+                    processedOrder.order_id = orderId
+                    processedOrder.order_date = order.processed_at
+                    processedOrder.title = product.title
+                    processedOrder.product_id = product.product_id
+                    processedOrder.variant_id = product.variant_id
+
+                    processedOrders.push(processedOrder)
+                })
+            })            
+
+            await ProcessedOrder.insertMany(processedOrders)
+        })
+
+    } catch (err) {
+        console.log('Failed sending emails: ', err)
+    }
+}
 
 function createEmailObject(emails, order, item, email) {    
     if (item.email_rules && item.email_rules.sent) return emails
@@ -121,7 +165,15 @@ async function fetchAllOrdersForDay(ctx) {
 
 
 function sendOneOrder(ctx) {
-    
+    let order = ctx.request.rawBody;                      
+    order = [JSON.parse(body)]
+    order = await cleanOrders(order)
+    order = await combineOrdersAndEmailRules(ctx.session.shop, order)
+    order = await combineOrdersAndSentHistory(order)
+        
+    let reformattedOrder = await reformatOrdersByEmail(order)
+
+    await sendEmails(ctx.session.shop, reformattedOrder)
 }
 
 async function sendAllOrdersForDay(ctx) {
@@ -133,12 +185,15 @@ async function sendAllOrdersForDay(ctx) {
             
         let reformattedOrders = await reformatOrdersByEmail(allOrders)
 
+        await sendEmails(ctx.session.shop, reformattedOrders)
+
     } catch (err) {
         console.log('Failed sending all orders for day: ', err)
         ctx.status = 400
     }    
 }
 
+//For previewing send
 async function getAllOrdersForDay(ctx) {
     try {
         let allOrders = await fetchAllOrdersForDay(ctx)
@@ -146,8 +201,7 @@ async function getAllOrdersForDay(ctx) {
         allOrders = await combineOrdersAndEmailRules(ctx.session.shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
         
-        let reformattedOrders = await reformatOrdersByEmail(allOrders)                
-        console.log('reforedm1: ', reformattedOrders)                
+        let reformattedOrders = await reformatOrdersByEmail(allOrders)                        
         ctx.body = reformattedOrders
     } catch (err) {
         console.log('Failed getting all orders for day: ', err)

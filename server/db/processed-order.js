@@ -4,13 +4,13 @@ const mongoose = require('mongoose');
 
 //Creating a new todo example
 const ProcessedOrderSchema = new mongoose.Schema({    
+    shop: String,
     email: String,
     title: String,
     order_id: String,
     order_date: Date,
     product_id: Number,
-    variant_id: Number,
-    shop: String,
+    variant_id: Number,    
     order_number: Number,    
 },{
     timestamps: true // Saves created
