@@ -74,8 +74,12 @@ function createShopName(shop) {
     return shopName.charAt(0).toUpperCase() + shopName.slice(1)
 }
 
-function createOrderText(data, shop, orderTemplateText, productTemplateText) {        
+function createOrderText(data, shop, headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText) {        
     let orderText = ''
+    let shopName = shop ? createShopName(shop) : 'our store'
+
+    let headerTemplate = (headerTemplateText) ? headerTemplateText : HEADER_TEMPLATE_TEXT        
+    headerTemplate = headerTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
 
     Object.keys(data).map(orderID => {
         let orderTemplate = (orderTemplateText) ? orderTemplateText : ORDER_TEMPLATE_TEXT    
@@ -84,8 +88,7 @@ function createOrderText(data, shop, orderTemplateText, productTemplateText) {
         let customer = order.customer
         let shippingAddress = order.shipping_address
 
-        let orderNumber = orderID ? orderID : 'Not provided'
-        let shopName = shop ? createShopName(shop) : 'Not provided'
+        let orderNumber = orderID ? orderID : 'Not provided'        
         let date = order.processed_at ? order.processed_at : 'Not provided'
         let note = order.note ? order.note : 'None'
 
@@ -139,10 +142,15 @@ function createOrderText(data, shop, orderTemplateText, productTemplateText) {
             productTemplate = productTemplate.replace(new RegExp(`{{${keys.VENDOR}}}`,"g"), vendor)            
 
             productText = productText + productTemplate
-        })
+        })        
 
         orderText = orderText + productText
     })
+
+    let footerTemplate = (footerTemplateText) ? footerTemplateText : FOOTER_TEMPLATE_TEXT
+    footerTemplate = footerTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
+
+    orderText = headerTemplate + orderText + footerTemplate
 
     return orderText
 }

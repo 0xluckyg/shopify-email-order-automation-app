@@ -22,8 +22,10 @@ class EmailPreview extends React.Component {
             emailDetail: {},            
             previewTexts: [],
             previewTextsLoading: [],
+            headerTemplateText: '',
             orderTemplateText: '',
-            productTemplateText: ''
+            productTemplateText: '',
+            footerTemplateText: ''
         }
     }    
 
@@ -40,7 +42,15 @@ class EmailPreview extends React.Component {
     }
 
     async getPreviewText(index, email) {
-        let {previewTexts, previewTextsLoading, emailDetail, orderTemplateText, productTemplateText} = this.state        
+        let {
+            previewTexts, 
+            previewTextsLoading, 
+            emailDetail, 
+            headerTemplateText, 
+            orderTemplateText, 
+            productTemplateText, 
+            footerTemplateText
+        } = this.state        
         //If already open
         if (previewTexts[index]) {
             previewTexts[index] = false
@@ -48,8 +58,15 @@ class EmailPreview extends React.Component {
         }
         let shop = this.props.getUserReducer.shop
         //if tempalte texts are loaded
-        if (orderTemplateText != '' && productTemplateText != '') {
-            previewTexts[index] = createOrderText(emailDetail[email], shop, orderTemplateText, productTemplateText)
+        if (headerTemplateText != '' && orderTemplateText != '' && productTemplateText != '' && footerTemplateText != '') {
+            previewTexts[index] = createOrderText(
+                emailDetail[email], 
+                shop, 
+                headerTemplateText,
+                orderTemplateText, 
+                productTemplateText,
+                footerTemplateText
+            )
             return this.setState({previewTexts})
         }
         //if template texts are not loaded
@@ -57,7 +74,15 @@ class EmailPreview extends React.Component {
             previewTextsLoading[index] = true
             this.setState({previewTextsLoading})
             let res =  await axios.get(process.env.APP_URL + '/get-settings')  
-            let previewText = createOrderText(emailDetail[email], shop, res.data.orderTemplateText, res.data.productTemplateText)      
+            let {headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText} = res.data
+            let previewText = createOrderText(
+                emailDetail[email], 
+                shop, 
+                headerTemplateText, 
+                orderTemplateText, 
+                productTemplateText, 
+                footerTemplateText
+            )      
             this.setState(() => {
                 previewTextsLoading[index] = false
                 if (!previewTexts[index]) {

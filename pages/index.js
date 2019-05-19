@@ -19,6 +19,7 @@ import SaveBar from '../components/save-bar';
 import UserPreviewMarkup from '../components/user-preview';
 import Toast from '../components/toast';
 import ReviewModal from "../components/review-modal";
+import GmailAuth from "../components/gmail-auth";
 import AddRule from './add-rule';
 import Rules from './rules';
 import Orders from './orders';
@@ -44,6 +45,7 @@ class Index extends React.Component {
         //Custom router and page status
         page: 0,
         modal: false,        
+        gmailAuthorized: true
     };
 
     static contextTypes = {
@@ -141,7 +143,12 @@ class Index extends React.Component {
             {contextualSaveBarMarkup}
             {loadingMarkup}
             <div style={pageWrapper}>
-                {pages[this.props.routerReducer]}
+                {(this.state.gmailAuthorized) 
+                ?                
+                    pages[this.props.routerReducer]                
+                :
+                    <GmailAuth/>
+                }            
             </div>
             {toastMarkup}
             <ReviewModal/>
