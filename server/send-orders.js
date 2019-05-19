@@ -136,7 +136,7 @@ function returnStartAndEndDate(ctx) {
 async function fetchAllOrdersForDay(ctx) {
     try {        
         const {shop, accessToken} = ctx.session        
-        const limit = 10
+        const limit = 250
         let page = 1; let hasNext = true
         const headers = getHeaders(accessToken)
         const date = returnStartAndEndDate(ctx)
@@ -156,8 +156,16 @@ async function fetchAllOrdersForDay(ctx) {
                     page,
                     ...date
                 }
-            })
-            console.log('api limit: ',orders.headers.http_x_shopify_shop_api_call_limit)            
+            })            
+            const callLimitHeader = orders.headers.http_x_shopify_shop_api_call_limit
+            const callLimit = parseInt(callLimitHeader.split('/')[0])
+            console.log(`api limit reached: ${callLimitHeader}`)
+            if (callLimit > 38) {                
+                console.log(`${shop} get order api limit reached: ${callLimitHeader}`)
+                const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
+                await waitFor(2000);
+            }
+
             allOrders = [...allOrders, ...orders.data.orders]            
             console.log('page', page)
             if (page == totalPages || totalPages == 0) hasNext = false
