@@ -48,10 +48,10 @@ class Orders extends React.Component {
 
     renderItem = (item) => {        
         console.log(item)
-        const { id, total_price, currency, processed_at, order_number, customer, line_items, shipping_address  } = item;
+        const { id, total_price, currency, created_at, order_number, customer, line_items, shipping_address  } = item;
         const { email, first_name, last_name, phone, orders_count, total_spent } = customer
         const { address1, address2, city, company, country, province, province_code, zip } = shipping_address        
-        const date = new Date(processed_at)
+        const date = new Date(created_at)
         const dateString = `${this.formatDate(date)} ${date.getHours()}:${date.getMinutes()}` 
         return (
             <ResourceList.Item

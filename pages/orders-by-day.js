@@ -17,7 +17,7 @@ class OrdersByDay extends React.Component {
     constructor(props) {
         super(props)
         
-        this.state = {            
+        this.state = {
             orders: [],
             showDetail: false,
             showOrderPreview: false,
@@ -72,9 +72,9 @@ class OrdersByDay extends React.Component {
     }
 
     renderItem = (item) => {        
-        const { id, total_price, currency, processed_at, order_number, customer, line_items, shipping_address  } = item;
+        const { id, total_price, currency, created_at, order_number, customer, line_items, shipping_address  } = item;
         const { first_name, last_name } = customer
-        const date = new Date(processed_at)
+        const date = new Date(created_at)
         const dateString = `${this.formatDate(date)} ${date.getHours()}:${date.getMinutes()}` 
         return (
             <ResourceList.Item

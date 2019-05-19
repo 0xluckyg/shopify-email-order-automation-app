@@ -1,6 +1,7 @@
 const axios = require('axios');
 const {User} = require('./db/user');
 const {ProcessedOrder} = require('./db/processed-order');
+const {createOrderText} = require('../config/template')
 const {getHeaders, asyncForEach, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory} = require('./orders-helper')
 const _ = require('lodash')
 const version = '2019-04'
@@ -8,7 +9,7 @@ const version = '2019-04'
 async function sendEmails(shop, emails) {
     try {
 
-        Object.keys(emails).map(email => {
+        Object.keys(emails).map(async email => {
             const emailData = emails[email]
             const settings = await User.findOne({shop}, {templateText: 1, productTemplateText: 1})
             const orderText = createOrderText(
@@ -20,24 +21,26 @@ async function sendEmails(shop, emails) {
             //SEND EMAIL orderText
 
             let processedOrders = []        
-            Object.keys(emailData).map(orderId => {            
-                const order = emailData[orderId]                        
+            Object.keys(emailData).map(orderNumber => {            
+                const order = emailData[orderNumber]                        
                 Object.keys(order.items).map(itemId => {
                     const product = order.items[itemId]
                     let processedOrder = {}
 
                     processedOrder.shop = shop
                     processedOrder.email = email
-                    processedOrder.order_number = order.order_number
-                    processedOrder.order_id = orderId
-                    processedOrder.order_date = order.processed_at
+                    processedOrder.order_id = order.id;
+                    processedOrder.order_number = orderNumber
+                    processedOrder.order_date = new Date(order.created_at)
                     processedOrder.title = product.title
                     processedOrder.product_id = product.product_id
-                    processedOrder.variant_id = product.variant_id
+                    processedOrder.variant_id = product.variant_id                    
 
                     processedOrders.push(processedOrder)
                 })
-            })            
+            })
+
+            console.log('processed: ', processedOrders.length)
 
             await ProcessedOrder.insertMany(processedOrders)
         })
@@ -58,8 +61,9 @@ function createEmailObject(emails, order, item, email) {
         emails[email.email][order.order_number] = {
             customer: order.customer,
             shipping_address: order.shipping_address,
-            processed_at: order.processed_at,
+            created_at: order.created_at,
             note: order.note,
+            id: order.id,
             items: {}
         }
     }
@@ -114,26 +118,27 @@ async function reformatOrdersByEmail(orders) {
     return emails
 }
 
+function returnStartAndEndDate(ctx) {
+    let {date} = ctx.query
+    if (date) {        
+        date = new Date(date)
+        let endDate = new Date(date).setDate(date.getDate() + 1)        
+        return {
+            created_at_min: date.toISOString(),
+            created_at_max: new Date(endDate).toISOString()
+        }
+    } else {
+        return {}
+    }
+}
+
 async function fetchAllOrdersForDay(ctx) {
     try {        
-        const {shop, accessToken} = ctx.session
-        let {date} = ctx.query
+        const {shop, accessToken} = ctx.session        
         const limit = 10
         let page = 1; let hasNext = true
         const headers = getHeaders(accessToken)
-        
-        if (date) {
-            console.log('date: ', date)
-            date = new Date(date)
-            let endDate = new Date(date).setDate(date.getDate() + 1)
-            console.log('enddate: ', endDate)
-            date = {
-                created_at_min: date.toISOString(),
-                created_at_max: new Date(endDate).toISOString()
-            }
-        } else {
-            date = {}
-        }
+        const date = returnStartAndEndDate(ctx)
 
         const total = await axios.get(`https://${shop}/admin/api/${version}/orders/count.json`, {
             headers,
@@ -164,12 +169,13 @@ async function fetchAllOrdersForDay(ctx) {
 }
 
 
-function sendOneOrder(ctx) {
-    let order = ctx.request.rawBody;                      
+async function sendOneOrder(ctx) {
+    let {shop} = ctx.session
+    let order = JSON.parse(ctx.request.rawBody).order;
     order = [JSON.parse(body)]
     order = await cleanOrders(order)
-    order = await combineOrdersAndEmailRules(ctx.session.shop, order)
-    order = await combineOrdersAndSentHistory(order)
+    order = await combineOrdersAndEmailRules(shop, order)
+    order = await combineOrdersAndSentHistory(shop, order)
         
     let reformattedOrder = await reformatOrdersByEmail(order)
 
@@ -178,14 +184,15 @@ function sendOneOrder(ctx) {
 
 async function sendAllOrdersForDay(ctx) {
     try {
-        let allOrders = await fetchAllOrdersForDay(ctx)
-        allOrders = await cleanOrders(allOrders)
-        allOrders = await combineOrdersAndEmailRules(ctx.session.shop, allOrders)
-        allOrders = await combineOrdersAndSentHistory(allOrders)
-            
-        let reformattedOrders = await reformatOrdersByEmail(allOrders)
+        // let allOrders = await fetchAllOrdersForDay(ctx)
+        // allOrders = await cleanOrders(allOrders)
+        // allOrders = await combineOrdersAndEmailRules(ctx.session.shop, allOrders)
+        // allOrders = await combineOrdersAndSentHistory(allOrders)
+        // let reformattedOrders = await reformatOrdersByEmail(allOrders)
 
-        await sendEmails(ctx.session.shop, reformattedOrders)
+        let allOrders = JSON.parse(ctx.request.rawBody).orders;             
+
+        await sendEmails(ctx.session.shop, allOrders)
 
     } catch (err) {
         console.log('Failed sending all orders for day: ', err)
@@ -196,10 +203,11 @@ async function sendAllOrdersForDay(ctx) {
 //For previewing send
 async function getAllOrdersForDay(ctx) {
     try {
+        const {shop} = ctx.session
         let allOrders = await fetchAllOrdersForDay(ctx)
         allOrders = await cleanOrders(allOrders)
-        allOrders = await combineOrdersAndEmailRules(ctx.session.shop, allOrders)
-        allOrders = await combineOrdersAndSentHistory(allOrders)
+        allOrders = await combineOrdersAndEmailRules(shop, allOrders)
+        allOrders = await combineOrdersAndSentHistory(shop, allOrders, returnStartAndEndDate(ctx))
         
         let reformattedOrders = await reformatOrdersByEmail(allOrders)                        
         ctx.body = reformattedOrders

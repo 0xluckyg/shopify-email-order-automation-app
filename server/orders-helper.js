@@ -18,7 +18,7 @@ async function asyncForEach(array, callback) {
 async function cleanOrders(orders) {    
     await asyncForEach(orders, async (order, i, array) => {        
         if (!order.customer || !order.shipping_address || !order.line_items) return 
-        array[i] = _.pick(order, ["id", "total_price", "currency", "processed_at", "order_number", "customer", "line_items", "shipping_address", "note"])
+        array[i] = _.pick(order, ["id", "total_price", "currency", "created_at", "order_number", "customer", "line_items", "shipping_address", "note"])
         array[i].customer = _.pick(order.customer, ["email", "first_name", "last_name", "phone", "orders_count", "total_spent"])
         array[i].shipping_address = _.pick(order.shipping_address, ["address1", "address2", "city", "company", "country", "province", "province_code", "zip"])        
         await asyncForEach(order.line_items, (item, j) => {            
@@ -94,21 +94,29 @@ async function getProcessedEmails(orders) {
         orderIds.push(order.id)
     })
     return await ProcessedOrder.find({
-        'order_id': { $in: orderIds }
+        'order_date': date
     })
 }
 
-async function combineOrdersAndSentHistory(orders) { 
+async function combineOrdersAndSentHistory(shop, orders, date) { 
     //If order matches -> if product id matches & if email matches
-    const processedEmails = await getProcessedEmails(orders)
+    const processedEmails = await ProcessedOrder.find({
+        'shop': shop,
+        'order_date': {
+            '$gte': new Date(date.created_at_min),
+            '$lt': new Date(date.created_at_max)
+        }
+    })    
+    console.log('ye got it: ', processedEmails.length)
     await asyncForEach(orders, async (order, i, array) => {
         if (!order.line_items) return
         await asyncForEach(order.line_items, async (item, j) => {
-            await asyncForEach(processedEmails, async (processed) => {
-                item.emails.forEach((email, k) => {
+            await asyncForEach(processedEmails, (processed) => {
+                item.email_rules.forEach((email, k) => {                    
                     // product_id and email have to match if the email has already been processed
                     if (processed.product_id == item.product_id && 
-                        processed.email == email) {
+                        processed.variant_id == item.variant_id &&
+                        processed.email == email.email) {
                         array[i].line_items[j].email_rules[k].sent = true
                     }
                 })

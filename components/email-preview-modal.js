@@ -19,6 +19,7 @@ class EmailPreviewModal extends React.Component {
     constructor(props){
         super(props)                          
         this.state = {
+            isSending: false,
             emailDetail: {},            
             previewTexts: [],
             previewTextsLoading: [],
@@ -118,6 +119,20 @@ class EmailPreviewModal extends React.Component {
         )               
     }
 
+    sendEmails() {
+        this.setState({isSending: true})
+        axios.post(process.env.APP_URL + '/send-day-orders', {
+            orders: this.state.emailDetail
+        })
+        .then(() => {
+            this.props.showToastAction(true, 'Orders sent!')
+            this.setState({isSending: false})
+        }).catch(err => {
+            this.props.showToastAction(true, "Couldn't send. Please Try Again Later.")
+            this.setState({isSending: false})
+        })    
+    }
+
     render() {        
         return(
             <Modal 
@@ -144,7 +159,7 @@ class EmailPreviewModal extends React.Component {
                             ) : null }
                             {this.showEmails()}
                             <div style={finalButtonStyle}>
-                                <Button disabled={this.props.loading} primary size="large" onClick={() => {}}>Send Orders</Button>
+                                <Button disabled={this.props.loading} loading={this.state.isSending} primary size="large" onClick={() => this.sendEmails()}>Send Orders</Button>
                             </div>
                         </Layout.Section>
                     </Layout>  

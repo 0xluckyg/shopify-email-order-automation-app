@@ -19,10 +19,10 @@ const ProcessedOrderSchema = new mongoose.Schema({
 //Allows find by shop to be faster by making it an index
 ProcessedOrderSchema.index({
     shop: String,
-    order_id: String    
+    order_date: String
 });
 
 //Creating a new user example
-const ProcessedOrder = mongoose.model('ProcessedOrderSchema', ProcessedOrderSchema);
+const ProcessedOrder = mongoose.model('Processed-Orders', ProcessedOrderSchema);
 
 module.exports = {ProcessedOrder};
