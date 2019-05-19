@@ -22,7 +22,7 @@ class EmailPreview extends React.Component {
             emailDetail: {},            
             previewTexts: [],
             previewTextsLoading: [],
-            templateText: '',
+            orderTemplateText: '',
             productTemplateText: ''
         }
     }    
@@ -40,7 +40,7 @@ class EmailPreview extends React.Component {
     }
 
     async getPreviewText(index, email) {
-        let {previewTexts, previewTextsLoading, emailDetail, templateText, productTemplateText} = this.state        
+        let {previewTexts, previewTextsLoading, emailDetail, orderTemplateText, productTemplateText} = this.state        
         //If already open
         if (previewTexts[index]) {
             previewTexts[index] = false
@@ -48,8 +48,8 @@ class EmailPreview extends React.Component {
         }
         let shop = this.props.getUserReducer.shop
         //if tempalte texts are loaded
-        if (templateText != '' && productTemplateText != '') {
-            previewTexts[index] = createOrderText(emailDetail[email], shop, templateText, productTemplateText)
+        if (orderTemplateText != '' && productTemplateText != '') {
+            previewTexts[index] = createOrderText(emailDetail[email], shop, orderTemplateText, productTemplateText)
             return this.setState({previewTexts})
         }
         //if template texts are not loaded
@@ -57,7 +57,7 @@ class EmailPreview extends React.Component {
             previewTextsLoading[index] = true
             this.setState({previewTextsLoading})
             let res =  await axios.get(process.env.APP_URL + '/get-settings')  
-            let previewText = createOrderText(emailDetail[email], shop, res.data.templateText, res.data.productTemplateText)      
+            let previewText = createOrderText(emailDetail[email], shop, res.data.orderTemplateText, res.data.productTemplateText)      
             this.setState(() => {
                 previewTextsLoading[index] = false
                 if (!previewTexts[index]) {
@@ -68,7 +68,7 @@ class EmailPreview extends React.Component {
                 return {                     
                     previewTexts,
                     previewTextsLoading,
-                    templateText: res.data.templateText,
+                    orderTemplateText: res.data.orderTemplateText,
                     productTemplateText: res.data.productTemplateText
                 };
             })            

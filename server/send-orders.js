@@ -10,11 +10,11 @@ async function sendEmails(shop, emails) {
     try {
         await asyncForEach(Object.keys(emails), async (email) => {
             const emailData = emails[email]
-            const settings = await User.findOne({shop}, {templateText: 1, productTemplateText: 1})
+            const settings = await User.findOne({shop}, {orderTemplateText: 1, productTemplateText: 1})
             const orderText = createOrderText(
                 emailData, 
                 shop, 
-                settings.templateText, 
+                settings.orderTemplateText, 
                 settings.productTemplateText
             )
             //SEND EMAIL orderText
@@ -158,7 +158,7 @@ async function fetchAllOrdersForDay(ctx) {
                 }
             })            
             const callLimitHeader = orders.headers.http_x_shopify_shop_api_call_limit
-            const callLimit = parseInt(callLimitHeader.split('/')[0])
+            const callLimit = parseInt(callLimitHeader.split('/')[0])            
             console.log(`api limit reached: ${callLimitHeader}`)
             if (callLimit > 38) {                
                 console.log(`${shop} get order api limit reached: ${callLimitHeader}`)
@@ -166,7 +166,7 @@ async function fetchAllOrdersForDay(ctx) {
                 await waitFor(2000);
             }
 
-            allOrders = [...allOrders, ...orders.data.orders]            
+            allOrders = [...allOrders, ...orders.data.orders]
             console.log('page', page)
             if (page == totalPages || totalPages == 0) hasNext = false
             page ++

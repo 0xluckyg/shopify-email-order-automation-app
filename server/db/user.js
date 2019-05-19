@@ -59,10 +59,16 @@ const UserSchema = new mongoose.Schema({
             default: 8
         }
     },
-    templateText: {
+    headerTemplateText: {
+        type: String
+    },
+    orderTemplateText: {
         type: String
     },
     productTemplateText: {
+        type: String
+    },
+    footerTemplateText: {
         type: String
     }
 },{

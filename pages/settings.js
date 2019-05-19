@@ -20,10 +20,14 @@ class Settings extends React.Component {
         super(props)       
         
         this.state = {
-            previousTemplateText: keys.TEMPLATE_TEXT,
-            templateText: keys.TEMPLATE_TEXT,
+            previousHeaderTemplateText: keys.HEADER_TEMPLATE_TEXT,
+            headerTemplateText: keys.HEADER_TEMPLATE_TEXT,
+            previousOrderTemplateText: keys.ORDER_TEMPLATE_TEXT,
+            orderTemplateText: keys.ORDER_TEMPLATE_TEXT,
             previousProductTemplateText: keys.PRODUCT_TEMPLATE_TEXT,
             productTemplateText: keys.PRODUCT_TEMPLATE_TEXT,
+            previousFooterTemplateText: keys.FOOTER_TEMPLATE_TEXT,
+            footerTemplateText: keys.FOOTER_TEMPLATE_TEXT,            
             templateTextLoading: false,
             sendMethod: 'manual',  
             sendMethodLoading: false,
@@ -34,28 +38,25 @@ class Settings extends React.Component {
         this.mounted = true      
         axios.get(process.env.APP_URL + '/get-settings')
         .then(res => {            
-            if (!this.mounted) return
-            if (!res.data.templateText && res.data.productTemplateText) {
-                return this.setState({ 
-                    sendMethod:res.data.sendMethod.method,
-                    previousProductTemplateText: res.data.productTemplateText,
-                    productTemplateText: res.data.productTemplateText,
-                })
-            } else if (res.data.templateText && !res.data.productTemplateText) {
-                return this.setState({ 
-                    sendMethod:res.data.sendMethod.method,
-                    previousTemplateText: res.data.templateText,                
-                    templateText: res.data.templateText,
-                })
-            } else if (!res.data.templateText && !res.data.productTemplateText) {
-                return this.setState({ sendMethod:res.data.sendMethod.method })
-            }
+            if (!this.mounted) return      
+            console.log('settings: ',res.data)      
+            const {
+                headerTemplateText, 
+                orderTemplateText, 
+                productTemplateText, 
+                footerTemplateText, 
+                sendMethod
+            } = res.data
             this.setState({
-                previousTemplateText: res.data.templateText,                
-                templateText: res.data.templateText,
-                previousProductTemplateText: res.data.productTemplateText,
-                productTemplateText: res.data.productTemplateText,
-                sendMethod: res.data.sendMethod.method
+                previousHeaderTemplateText: (headerTemplateText) ? headerTemplateText : keys.HEADER_TEMPLATE_TEXT,
+                headerTemplateText: (headerTemplateText) ? headerTemplateText : keys.HEADER_TEMPLATE_TEXT,
+                previousOrderTemplateText: (orderTemplateText) ? orderTemplateText : keys.ORDER_TEMPLATE_TEXT,
+                orderTemplateText: (orderTemplateText) ? orderTemplateText : keys.ORDER_TEMPLATE_TEXT,
+                previousProductTemplateText: (productTemplateText) ? productTemplateText : keys.PRODUCT_TEMPLATE_TEXT,
+                productTemplateText: (productTemplateText) ? productTemplateText : keys.PRODUCT_TEMPLATE_TEXT,
+                previousFooterTemplateText: (footerTemplateText) ? footerTemplateText : keys.FOOTER_TEMPLATE_TEXT,
+                footerTemplateText: (footerTemplateText) ? footerTemplateText : keys.FOOTER_TEMPLATE_TEXT,
+                sendMethod: sendMethod.method
             })
         }).catch(err => {               
             if (!this.mounted) return            
@@ -65,15 +66,25 @@ class Settings extends React.Component {
 
     setEmailTemplate() {
         this.setState({templateTextLoading: true})
+        let {headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText} = this.state
+        headerTemplateText = (headerTemplateText != keys.HEADER_TEMPLATE_TEXT) ? headerTemplateText : null
+        orderTemplateText = (orderTemplateText != keys.ORDER_TEMPLATE_TEXT) ? orderTemplateText : null
+        productTemplateText = (productTemplateText != keys.PRODUCT_TEMPLATE_TEXT) ? productTemplateText : null
+        footerTemplateText = (footerTemplateText != keys.FOOTER_TEMPLATE_TEXT) ? footerTemplateText : null
+
         axios.post(process.env.APP_URL + '/email-template', {
-            templateText: this.state.templateText,
-            productTemplateText: this.state.productTemplateText
+            headerTemplateText,
+            orderTemplateText,
+            productTemplateText,
+            footerTemplateText
         })
         .then(() => {            
             if (!this.mounted) return            
             this.setState({
-                previousTemplateText: this.state.templateText, 
+                previousHeaderTemplateText: this.state.headerTemplateText, 
+                previousOrderTemplateText: this.state.orderTemplateText, 
                 previousProductTemplateText: this.state.productTemplateText,
+                previousFooterTemplateText: this.state.footerTemplateText, 
                 templateTextLoading: false
             })
             this.props.showToastAction(true, 'Saved settings!')
@@ -96,6 +107,20 @@ class Settings extends React.Component {
             this.setState({sendMethodLoading: false})
             this.props.showToastAction(true, "Couldn't save. Please try again later.")
         })   
+    }
+
+    templateIsDefaultMode() {
+        return (this.state.headerTemplateText == keys.HEADER_TEMPLATE_TEXT 
+            && this.state.orderTemplateText == keys.ORDER_TEMPLATE_TEXT 
+            && this.state.productTemplateText == keys.PRODUCT_TEMPLATE_TEXT
+            && this.state.footerTemplateText == keys.FOOTER_TEMPLATE_TEXT) ? true : false
+    }
+
+    templateHasNotChanged() {
+        return (this.state.previousHeaderTemplateText == this.state.headerTemplateText 
+            && this.state.previousOrderTemplateText == this.state.orderTemplateText 
+            && this.state.previousProductTemplateText == this.state.productTemplateText
+            && this.state.previousFooterTemplateText == this.state.footerTemplateText) ? true : false
     }
 
     render() {
@@ -138,9 +163,16 @@ class Settings extends React.Component {
                                 </p>                                                     
                             </div>
                             <div style={{flex:1, margin: '10px'}}>
-                                <TextField                                    
-                                    value={this.state.templateText}
-                                    onChange={templateText => this.setState({templateText})}
+                                <p style={{lineHeight:'35px'}}>Header template:</p>
+                                <TextField
+                                    value={this.state.headerTemplateText}
+                                    onChange={headerTemplateText => this.setState({headerTemplateText})}
+                                    multiline
+                                />
+                                <p style={{lineHeight:'35px'}}>Order template:</p>
+                                <TextField
+                                    value={this.state.orderTemplateText}
+                                    onChange={orderTemplateText => this.setState({orderTemplateText})}
                                     multiline
                                 />
                                 <p style={{lineHeight:'35px'}}>Product template:</p>
@@ -149,24 +181,35 @@ class Settings extends React.Component {
                                     onChange={productTemplateText => this.setState({productTemplateText})}
                                     multiline
                                 />
+                                <p style={{lineHeight:'35px'}}>Footer template:</p>
+                                <TextField
+                                    value={this.state.footerTemplateText}
+                                    onChange={footerTemplateText => this.setState({footerTemplateText})}
+                                    multiline
+                                />
                             </div>
                         </div>
                         <div style={{display:'flex', justifyContent:'flex-end'}}>
                         <div style={{marginRight:'20px'}}>
                         <Button 
-                            disabled={(this.state.templateText == keys.TEMPLATE_TEXT 
-                                && this.state.productTemplateText == keys.PRODUCT_TEMPLATE_TEXT)}
+                            disabled={this.templateIsDefaultMode()}
                             onClick={() => this.setState({
-                                templateText:keys.TEMPLATE_TEXT,
-                                productTemplateText: keys.PRODUCT_TEMPLATE_TEXT
+                                headerTemplateText:keys.HEADER_TEMPLATE_TEXT,
+                                orderTemplateText:keys.ORDER_TEMPLATE_TEXT,
+                                productTemplateText: keys.PRODUCT_TEMPLATE_TEXT,
+                                footerTemplateText:keys.FOOTER_TEMPLATE_TEXT,
                             })}
                         >
                             Reset to default
+                        </Button>                        
+                        </div>
+                        <div style={{marginRight:'20px'}}>
+                        <Button onClick={this.setState({showPreview:true})}>
+                            Preview
                         </Button>
                         </div>
                         <Button 
-                            disabled={(this.state.previousTemplateText == this.state.templateText 
-                                && this.state.previousProductTemplateText == this.state.productTemplateText)}
+                            disabled={this.templateHasNotChanged()}
                             onClick={() => this.setEmailTemplate()}
                             loading={this.state.templateTextLoading}
                         >

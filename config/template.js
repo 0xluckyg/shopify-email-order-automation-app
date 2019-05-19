@@ -27,8 +27,11 @@ const keys = {
     // PRODUCT_TYPE: 'PRODUCT_TYPE',
     // TOTAL_TAX: 'TOTAL_TAX',
 }
+let HEADER_TEMPLATE_TEXT = `{{${keys.SHOP}}}'s orders:
 
-let TEMPLATE_TEXT = 
+`
+
+let ORDER_TEMPLATE_TEXT = 
 `ORDER {{${keys.ORDER_NUMBER}}}
 --------------------
 Shop: {{${keys.SHOP}}}
@@ -63,18 +66,26 @@ Quantity: {{${keys.QUANTITY}}}
 SKU: {{${keys.SKU}}}
 Vendor: {{${keys.VENDOR}}}\n\n`
 
-function createOrderText(data, shop, templateText, productTemplateText) {        
+let FOOTER_TEMPLATE_TEXT = `
+Thank you!`
+
+function createShopName(shop) {
+    let shopName = shop.split('.')[0]
+    return shopName.charAt(0).toUpperCase() + shopName.slice(1)
+}
+
+function createOrderText(data, shop, orderTemplateText, productTemplateText) {        
     let orderText = ''
 
     Object.keys(data).map(orderID => {
-        let orderTemplate = (templateText) ? templateText : TEMPLATE_TEXT    
+        let orderTemplate = (orderTemplateText) ? orderTemplateText : ORDER_TEMPLATE_TEXT    
         
         let order = data[orderID]
         let customer = order.customer
         let shippingAddress = order.shipping_address
 
         let orderNumber = orderID ? orderID : 'Not provided'
-        let shopName = shop ? shop : 'Not provided'
+        let shopName = shop ? createShopName(shop) : 'Not provided'
         let date = order.processed_at ? order.processed_at : 'Not provided'
         let note = order.note ? order.note : 'None'
 
@@ -90,23 +101,22 @@ function createOrderText(data, shop, templateText, productTemplateText) {
         let company = shippingAddress.company ? shippingAddress.company : 'Not provided'
         let address2 = shippingAddress.address2 ? shippingAddress.address2 : 'Not provided'
 
-        orderTemplate = orderTemplate.replace(`{{${keys.ORDER_NUMBER}}}`, orderNumber)
-        orderTemplate = orderTemplate.replace(`{{${keys.SHOP}}}`, shopName)
-        orderTemplate = orderTemplate.replace(`{{${keys.ORDER_NUMBER}}}`, orderNumber)
-        orderTemplate = orderTemplate.replace(`{{${keys.PROCESSED_AT}}}`, date)
-        orderTemplate = orderTemplate.replace(`{{${keys.NOTE}}}`, note)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.ORDER_NUMBER}}}`,"g"), orderNumber)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)        
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.PROCESSED_AT}}}`,"g"), date)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.NOTE}}}`,"g"), note)
 
-        orderTemplate = orderTemplate.replace(`{{${keys.NAME}}}`, customerName)
-        orderTemplate = orderTemplate.replace(`{{${keys.EMAIL}}}`, customerEmail)
-        orderTemplate = orderTemplate.replace(`{{${keys.PHONE}}}`, customerPhone)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.NAME}}}`,"g"), customerName)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.EMAIL}}}`,"g"), customerEmail)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.PHONE}}}`,"g"), customerPhone)
 
-        orderTemplate = orderTemplate.replace(`{{${keys.ADDRESS1}}}`, address1)
-        orderTemplate = orderTemplate.replace(`{{${keys.CITY}}}`, city)
-        orderTemplate = orderTemplate.replace(`{{${keys.ZIP}}}`, zip)
-        orderTemplate = orderTemplate.replace(`{{${keys.PROVINCE}}}`, province)
-        orderTemplate = orderTemplate.replace(`{{${keys.COUNTRY}}}`, country)
-        orderTemplate = orderTemplate.replace(`{{${keys.ADDRESS2}}}`, address2)
-        orderTemplate = orderTemplate.replace(`{{${keys.COMPANY}}}`, company)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.ADDRESS1}}}`,"g"), address1)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.CITY}}}`,"g"), city)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.ZIP}}}`,"g"), zip)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.PROVINCE}}}`,"g"), province)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.COUNTRY}}}`,"g"), country)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.ADDRESS2}}}`,"g"), address2)
+        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.COMPANY}}}`,"g"), company)
         
         if (orderText != '') orderText = orderText + `\n\n`
         orderText = orderText + orderTemplate
@@ -122,11 +132,11 @@ function createOrderText(data, shop, templateText, productTemplateText) {
             let sku = item.sku ? item.sku : 'Not provided'
             let vendor = item.vendor ? item.vendor : 'Not provided'            
 
-            productTemplate = productTemplate.replace(`{{${keys.TITLE}}}`, productTitle)
-            productTemplate = productTemplate.replace(`{{${keys.VARIANT_TITLE}}}`, variantTitle)
-            productTemplate = productTemplate.replace(`{{${keys.QUANTITY}}}`, productQuantity)
-            productTemplate = productTemplate.replace(`{{${keys.SKU}}}`, sku)
-            productTemplate = productTemplate.replace(`{{${keys.VENDOR}}}`, vendor)            
+            productTemplate = productTemplate.replace(new RegExp(`{{${keys.TITLE}}}`,"g"), productTitle)
+            productTemplate = productTemplate.replace(new RegExp(`{{${keys.VARIANT_TITLE}}}`,"g"), variantTitle)
+            productTemplate = productTemplate.replace(new RegExp(`{{${keys.QUANTITY}}}`,"g"), productQuantity)
+            productTemplate = productTemplate.replace(new RegExp(`{{${keys.SKU}}}`,"g"), sku)
+            productTemplate = productTemplate.replace(new RegExp(`{{${keys.VENDOR}}}`,"g"), vendor)            
 
             productText = productText + productTemplate
         })
@@ -139,7 +149,9 @@ function createOrderText(data, shop, templateText, productTemplateText) {
 
 module.exports = {
     ...keys,
-    TEMPLATE_TEXT,
+    HEADER_TEMPLATE_TEXT,
+    ORDER_TEMPLATE_TEXT,
     PRODUCT_TEMPLATE_TEXT,
+    FOOTER_TEMPLATE_TEXT,
     createOrderText
 }

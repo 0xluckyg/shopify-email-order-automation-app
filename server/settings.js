@@ -12,7 +12,13 @@ async function getSettings(ctx) {
     const shop = ctx.session.shop       
     if (shop) {
         try {
-            const settings = await User.findOne({shop}).select({ "sendMethod": 1, "templateText": 1, "productTemplateText": 1})
+            const settings = await User.findOne({shop}).select({ 
+                "sendMethod": 1, 
+                "headerTemplateText": 1,
+                "orderTemplateText": 1, 
+                "productTemplateText": 1,
+                "footerTemplateText": 1
+            })
             ctx.body = settings
         } catch (err) {
             ctx.status = 400
@@ -26,18 +32,15 @@ async function setTemplateText(ctx) {
     const shop = ctx.session.shop       
     const body = JSON.parse(ctx.request.rawBody)
     if (shop) {
-        try {            
-            if (body.templateText != keys.TEMPLATE_TEXT) {
-                await User.findOneAndUpdate({shop}, { $set: { "templateText": body.templateText } })
-            } else {
-                await User.findOneAndUpdate({shop}, { $set: { "templateText": null } })
-            }
-
-            if (body.productTemplateText != keys.PRODUCT_TEMPLATE_TEXT) {
-                await User.findOneAndUpdate({shop}, { $set: { "productTemplateText": body.productTemplateText } })
-            } else {
-                await User.findOneAndUpdate({shop}, { $set: { "productTemplateText": null } })
-            }
+        try {           
+            await User.findOneAndUpdate({shop}, { 
+                $set: { 
+                    "headerTemplateText": body.headerTemplateText, 
+                    "orderTemplateText": body.orderTemplateText,
+                    "productTemplateText": body.productTemplateText,
+                    "footerTemplateText": body.footerTemplateText
+                } 
+            })         
             ctx.body = 'saved template text'
         } catch (err) {
             ctx.status = 400
