@@ -6,11 +6,13 @@ import {
     Tag,
     TextField
 } from '@shopify/polaris';
+import axios from 'axios';
 import Modal from "react-responsive-modal";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
 import emailValidator from "email-validator";
+import EmailPreview from './email-preview'
 
 //A pop up to ask users to write a review
 class OrderDetailModal extends React.Component {    
@@ -19,7 +21,9 @@ class OrderDetailModal extends React.Component {
         this.state = {                                    
             additionalEmails: [],
             emailErrors: [],
-            orderDetail: {}
+            orderDetail: {},
+            isSending: false,
+            showEmailPreview: false
         }
     }    
 
@@ -185,32 +189,118 @@ class OrderDetailModal extends React.Component {
         )
     }
 
-    handleAction() {
+    createEmailObject(emails, order, item, email) {        
+        if (email.sent) return emails    
+    
+        if (!emails[email.email]){ 
+            emails[email.email] = {}
+        }
         
+        if (!emails[email.email][order.order_number]){
+            emails[email.email][order.order_number] = {
+                customer: order.customer,
+                shipping_address: order.shipping_address,
+                created_at: order.created_at,
+                note: order.note,
+                id: order.id,
+                items: {}
+            }
+        }
+    
+        if (!emails[email.email][order.order_number].items[item.variant_id]) {
+            emails[email.email][order.order_number].items[item.variant_id] = item
+        } else {                
+            emails[email.email][order.order_number].items[item.variant_id][quantity] += 1
+        }
+        return emails
+    }
+
+    reformatOrdersByEmail() {
+        let emails = {}
+        const order = this.state.orderDetail        
+        if (!order.line_items) return emails
+        order.line_items.forEach(item => {
+            item.email_rules.forEach(email => {
+                emails = this.createEmailObject(emails, order, item, email)
+            })
+        })
+        return emails
+    }    
+
+    sendEmails() {
+        this.setState({isSending: true})
+        axios.post(process.env.APP_URL + '/send-orders', {
+            orders: this.reformatOrdersByEmail()
+        })
+        .then(() => {
+            this.props.showToastAction(true, 'Orders sent!')
+            this.setState({isSending: false, showEmailPreview: false})
+            this.props.reload()
+        }).catch(err => {
+            this.props.showToastAction(true, "Couldn't send. Please Try Again Later.")
+            this.setState({isSending: false})
+        })
+    }
+
+    hasNothingToSend() {
+        const emails = this.reformatOrdersByEmail()        
+        return (Object.keys(emails).length == 0) ? true : false
     }
 
     render() {        
         return(
             <Modal 
                 open={this.props.open}                
-                onClose={this.props.close}
+                onClose={() => {
+                    this.setState({showEmailPreview:false})
+                    this.props.close()
+                }}
                 showCloseIcon={true}
                 center
             >
-                <div style={modalContentStyle}>
-                    <Layout>
-                        <Layout.Section>                            
-                            <div style={{margin: '0px 10px 15px 0px', float: 'left'}}><Tag>{this.renderCircleMark(true)}Email has been sent</Tag></div>
-                            <div style={{margin: '0px 0px 15px 0px'}}><Tag>{this.renderCircleMark(false)}Email has not been sent</Tag></div> 
-                            {this.showProducts()}
-                            {this.showCustomer()}
-                            {this.showAddress()}
-                            <div style={finalButtonStyle}>
-                                <Button primary size="large" onClick={() => {}}>Send Orders</Button>
-                            </div>
-                        </Layout.Section>  
-                    </Layout>  
-                </div>
+                {(!this.state.showEmailPreview) 
+                ? 
+                    <div style={modalContentStyle}>
+                        <Layout>
+                            <Layout.Section>                            
+                                <div style={{margin: '0px 10px 15px 0px', float: 'left'}}><Tag>{this.renderCircleMark(true)}Email has been sent</Tag></div>
+                                <div style={{margin: '0px 0px 15px 0px'}}><Tag>{this.renderCircleMark(false)}Email has not been sent</Tag></div> 
+                                {this.showProducts()}
+                                {this.showCustomer()}
+                                {this.showAddress()}
+                                <div style={{float:'right', marginTop: '20px'}}>
+                                    <div style={rowButtonStyle}>
+                                        <Button 
+                                            onClick={() => this.setState({showEmailPreview:true})}
+                                            loading={this.state.isSending}
+                                            disabled={this.hasNothingToSend()}
+                                        >
+                                            Preview Orders
+                                        </Button>
+                                    </div>
+                                    <div style={rowButtonStyle}>
+                                        <Button 
+                                            primary onClick={() => this.sendEmails()}
+                                            loading={this.state.isSending}
+                                            disabled={this.hasNothingToSend()}
+                                        >
+                                            Send Orders
+                                        </Button>
+                                    </div>                
+                                </div>
+                            </Layout.Section>  
+                        </Layout>  
+                    </div>
+                :                
+                    <EmailPreview 
+                        loading={false}
+                        detail={this.reformatOrdersByEmail()}
+                        reload={() => {
+                            this.setState({showEmailPreview: false})
+                            this.props.reload()
+                        }}
+                    />
+                }                
             </Modal>
         )
     }
@@ -225,7 +315,7 @@ const modalContentStyle = {
     justifyContent: "center",    
 }
 const productSelectBoxStyle = {minWidth: '650px'}
-const finalButtonStyle = {float:"right", padding: "16px 0px 16px 0px"}
+const rowButtonStyle = {display: "inline", margin:"16px 0px 0px 16px"}
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(

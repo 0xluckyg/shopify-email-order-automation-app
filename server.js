@@ -42,7 +42,7 @@ const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
 const {getOrders} = require('./server/get-orders');
 const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
-const {sendOneOrder, sendAllOrdersForDay, getAllOrdersForDay} = require('./server/send-orders');
+const {sendOrders, getAllOrdersForDay} = require('./server/send-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
@@ -117,8 +117,7 @@ app.prepare().then(() => {
     router.post('/contact-us', contactUs);
     router.post('/email-template', setTemplateText);
     router.post('/send-method', setSendMethod);
-    router.post('/send-day-orders', sendAllOrdersForDay);
-    router.post('/send-order', sendOneOrder);
+    router.post('/send-orders', sendOrders);    
 
     //validates webhook and listens for events in the store
     router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)    

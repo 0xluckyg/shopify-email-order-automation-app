@@ -9,8 +9,8 @@ const ProcessedOrderSchema = new mongoose.Schema({
     title: String,
     order_id: String,
     order_date: Date,
-    product_id: Number,
-    variant_id: Number,    
+    product_id: String,
+    variant_id: String,    
     order_number: Number,    
 },{
     timestamps: true // Saves created

@@ -183,7 +183,7 @@ async function sendOneOrder(ctx) {
     await sendEmails(ctx.session.shop, reformattedOrder)
 }
 
-async function sendAllOrdersForDay(ctx) {
+async function sendOrders(ctx) {
     try {        
         let allOrders = JSON.parse(ctx.request.rawBody).orders;
         const sent = await sendEmails(ctx.session.shop, allOrders)
@@ -192,7 +192,7 @@ async function sendAllOrdersForDay(ctx) {
     } catch (err) {
         console.log('Failed sending all orders for day: ', err)
         ctx.status = 400
-    }    
+    }
 }
 
 //For previewing send
@@ -212,4 +212,4 @@ async function getAllOrdersForDay(ctx) {
     }
 }
 
-module.exports = {sendOneOrder, sendAllOrdersForDay, getAllOrdersForDay}
+module.exports = {sendOneOrder, sendOrders, getAllOrdersForDay}

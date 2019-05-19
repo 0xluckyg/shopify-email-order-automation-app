@@ -10,8 +10,9 @@ import NoContent from '../components/no-content'
 import sentStatus from '../components/order-sent-status'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
+import Modal from "react-responsive-modal";
 import {showToastAction} from '../redux/actions';
-import EmailPreviewModal from '../components/email-preview-modal.js';
+import EmailPreview from '../components/email-preview';
 
 class OrdersByDay extends React.Component {    
     constructor(props) {
@@ -143,16 +144,21 @@ class OrdersByDay extends React.Component {
                         this.setState({showDetail:false})
                     }}
                 />
-                <EmailPreviewModal 
-                    loading={this.state.previewLoading}
-                    open={this.state.showOrderPreview}
-                    detail={this.state.previewDetail}
-                    close={() => this.setState({showOrderPreview:false, previewDetail:{}})}
-                    reload={() => {                        
-                        this.fetchOrders({page: Number(this.state.page), date: this.props.date})
-                        this.setState({showOrderPreview:false})
-                    }}
-                />           
+                <Modal 
+                    open={this.state.showOrderPreview}                
+                    onClose={() => this.setState({showOrderPreview:false, previewDetail:{}})}
+                    showCloseIcon={true}
+                    center
+                >
+                    <EmailPreview 
+                        loading={this.state.previewLoading}                        
+                        detail={this.state.previewDetail}
+                        reload={() => {                        
+                            this.fetchOrders({page: Number(this.state.page), date: this.props.date})
+                            this.setState({showOrderPreview:false})
+                        }}
+                    />
+                </Modal>
                 <div style={{margin: '15px'}}><Button primary onClick={this.getAllOrdersForDay}>
                     Send all orders for {this.formatDate(this.props.date)}
                 </Button></div>     

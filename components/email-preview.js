@@ -3,20 +3,18 @@ import {
     Button,
     Layout,    
     Badge,
-    Collapsible,
-    TextContainer,
+    Collapsible,    
     Spinner
 } from '@shopify/polaris';
-import Modal from "react-responsive-modal";
 import axios from 'axios';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
 import {createOrderText} from '../config/template'
-import NoContent from '../components/no-content'
+import NoContent from './no-content'
 
 //A pop up to ask users to write a review
-class EmailPreviewModal extends React.Component {    
+class EmailPreview extends React.Component {    
     constructor(props){
         super(props)                          
         this.state = {
@@ -122,7 +120,7 @@ class EmailPreviewModal extends React.Component {
 
     sendEmails() {
         this.setState({isSending: true})
-        axios.post(process.env.APP_URL + '/send-day-orders', {
+        axios.post(process.env.APP_URL + '/send-orders', {
             orders: this.state.emailDetail
         })
         .then(() => {
@@ -132,7 +130,7 @@ class EmailPreviewModal extends React.Component {
         }).catch(err => {
             this.props.showToastAction(true, "Couldn't send. Please Try Again Later.")
             this.setState({isSending: false})
-        })    
+        })
     }
 
     hasNothingToSend() {
@@ -140,49 +138,42 @@ class EmailPreviewModal extends React.Component {
     }
 
     render() {        
-        return(
-            <Modal 
-                open={this.props.open}                
-                onClose={this.props.close}
-                showCloseIcon={true}
-                center
-            >
-                <div style={modalContentStyle}>                    
-                    <Layout>
-                        <Layout.Section>                                                            
-                            {(this.props.loading) ? ( 
-                                <div>
-                                    <div style={{width: '650px', display:'flex', justifyContent: 'center'}}>
-                                        <div style={{alignSelf: 'center', margin: '100px 100px 50px 100px'}}>
-                                            <Spinner size="large" color="teal" /><br/>                                        
-                                        </div>
+        return(            
+            <div style={modalContentStyle}>                    
+                <Layout>
+                    <Layout.Section>                                                            
+                        {(this.props.loading) ? ( 
+                            <div>
+                                <div style={{width: '650px', display:'flex', justifyContent: 'center'}}>
+                                    <div style={{alignSelf: 'center', margin: '100px 100px 50px 100px'}}>
+                                        <Spinner size="large" color="teal" /><br/>                                        
                                     </div>
-                                    <p style={{marginBottom: '20px', textAlign: 'center', fontSize: '20px'}}>
-                                        If you have a lot of orders, this may take a while. Please don't close the popup.
-                                    </p>
                                 </div>
-                            ) : null }
-                            {this.hasNothingToSend() ? ( 
-                                <NoContent
-                                    logo='../static/gmail.svg'
-                                    text={`No emails to send!`}
-                                />
-                            ) : null }
-                            {this.showEmails()}
-                            <div style={finalButtonStyle}>
-                                <Button 
-                                    disabled={this.props.loading || this.hasNothingToSend()} 
-                                    loading={this.state.isSending} 
-                                    primary size="large" 
-                                    onClick={() => this.sendEmails()}
-                                >
-                                    Send Orders
-                                </Button>
+                                <p style={{marginBottom: '20px', textAlign: 'center', fontSize: '20px'}}>
+                                    If you have a lot of orders, this may take a while. Please don't close the popup.
+                                </p>
                             </div>
-                        </Layout.Section>
-                    </Layout>  
-                </div>
-            </Modal>
+                        ) : null }
+                        {this.hasNothingToSend() ? ( 
+                            <NoContent
+                                logo='../static/gmail.svg'
+                                text={`No emails to send!`}
+                            />
+                        ) : null }
+                        {this.showEmails()}
+                        <div style={finalButtonStyle}>
+                            <Button 
+                                disabled={this.props.loading || this.hasNothingToSend()} 
+                                loading={this.state.isSending} 
+                                primary size="large" 
+                                onClick={() => this.sendEmails()}
+                            >
+                                Send Orders
+                            </Button>
+                        </div>
+                    </Layout.Section>
+                </Layout>  
+            </div>            
         )
     }
 }
@@ -209,4 +200,4 @@ function mapStateToProps({getUserReducer}) {
     return {getUserReducer};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EmailPreviewModal);
+export default connect(mapStateToProps, mapDispatchToProps)(EmailPreview);

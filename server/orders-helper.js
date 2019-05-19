@@ -104,16 +104,27 @@ async function combineOrdersAndSentHistory(orders) {
 
     await asyncForEach(orders, async (order, i, array) => {
         if (!order.line_items) return
-        await asyncForEach(order.line_items, async (item, j) => {
-            await asyncForEach(processedEmails, (processed) => {
-                item.email_rules.forEach((email, k) => {                    
-                    // product_id and email have to match if the email has already been processed
-                    if (processed.product_id == item.product_id && 
-                        processed.variant_id == item.variant_id &&
-                        processed.email == email.email) {
+        await asyncForEach(order.line_items, async (item, j) => {            
+            await asyncForEach(processedEmails, (processed) => {   
+                // product_id and email have to match if the email has already been processed for item
+                if (processed.product_id != item.product_id || 
+                    processed.variant_id != item.variant_id) return             
+                let unregisteredEmailCount = 0
+                if (item.email_rules.length == 0) unregisteredEmailCount ++
+                item.email_rules.forEach((email, k) => {
+                    if (processed.email == email.email) {
                         array[i].line_items[j].email_rules[k].sent = true
-                    }
-                })
+                    } else {
+                        unregisteredEmailCount++                        
+                    }                            
+                })                                
+                    //case where email rule doesn't exist but user has sent a custom email
+                if ((item.email_rules.length != 0 && unregisteredEmailCount == item.email_rules.length) ||
+                    //case where email rules exist and user has sent a additional custom emails
+                    (item.email_rules.length == 0 && unregisteredEmailCount > item.email_rules.length)) {                    
+                    item.email_rules.push({email:processed.email, sent: true})
+                }                
+                unregisteredEmailCount = 0
             })                      
         })
     })
