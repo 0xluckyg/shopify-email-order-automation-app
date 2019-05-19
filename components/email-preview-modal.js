@@ -13,6 +13,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
 import {createOrderText} from '../config/template'
+import NoContent from '../components/no-content'
 
 //A pop up to ask users to write a review
 class EmailPreviewModal extends React.Component {    
@@ -127,10 +128,15 @@ class EmailPreviewModal extends React.Component {
         .then(() => {
             this.props.showToastAction(true, 'Orders sent!')
             this.setState({isSending: false})
+            this.props.reload()
         }).catch(err => {
             this.props.showToastAction(true, "Couldn't send. Please Try Again Later.")
             this.setState({isSending: false})
         })    
+    }
+
+    hasNothingToSend() {
+        return (!this.props.loading && Object.keys(this.state.emailDetail).length == 0) ? true : false
     }
 
     render() {        
@@ -143,23 +149,35 @@ class EmailPreviewModal extends React.Component {
             >
                 <div style={modalContentStyle}>                    
                     <Layout>
-                        <Layout.Section>       
+                        <Layout.Section>                                                            
                             {(this.props.loading) ? ( 
-                                <div style={{width: '650px', display:'flex', justifyContent: 'center'}}>
-                                    <div style={{alignSelf: 'center', margin: '100px 100px 50px 100px'}}>
-                                        <Spinner size="large" color="teal" /><br/>                                        
+                                <div>
+                                    <div style={{width: '650px', display:'flex', justifyContent: 'center'}}>
+                                        <div style={{alignSelf: 'center', margin: '100px 100px 50px 100px'}}>
+                                            <Spinner size="large" color="teal" /><br/>                                        
+                                        </div>
                                     </div>
+                                    <p style={{marginBottom: '20px', textAlign: 'center', fontSize: '20px'}}>
+                                        If you have a lot of orders, this may take a while. Please don't close the popup.
+                                    </p>
                                 </div>
-                            )
-                            : null}
-                            {(this.props.loading) ? ( 
-                                <p style={{marginBottom: '20px', textAlign: 'center', fontSize: '20px'}}>
-                                    If you have a lot of orders, this may take a while. Please don't close the popup.
-                                </p>
+                            ) : null }
+                            {this.hasNothingToSend() ? ( 
+                                <NoContent
+                                    logo='../static/gmail.svg'
+                                    text={`No emails to send!`}
+                                />
                             ) : null }
                             {this.showEmails()}
                             <div style={finalButtonStyle}>
-                                <Button disabled={this.props.loading} loading={this.state.isSending} primary size="large" onClick={() => this.sendEmails()}>Send Orders</Button>
+                                <Button 
+                                    disabled={this.props.loading || this.hasNothingToSend()} 
+                                    loading={this.state.isSending} 
+                                    primary size="large" 
+                                    onClick={() => this.sendEmails()}
+                                >
+                                    Send Orders
+                                </Button>
                             </div>
                         </Layout.Section>
                     </Layout>  

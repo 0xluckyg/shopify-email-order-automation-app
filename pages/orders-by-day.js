@@ -137,13 +137,21 @@ class OrdersByDay extends React.Component {
                 <OrderDetailModal 
                     open={this.state.showDetail} 
                     detail={this.state.orderDetail} 
-                    close={() => this.setState({showDetail:false})}
+                    close={() => this.setState({showDetail:false})}   
+                    reload={() => {                        
+                        this.fetchOrders({page: Number(this.state.page), date: this.props.date})
+                        this.setState({showDetail:false})
+                    }}
                 />
                 <EmailPreviewModal 
                     loading={this.state.previewLoading}
                     open={this.state.showOrderPreview}
                     detail={this.state.previewDetail}
                     close={() => this.setState({showOrderPreview:false, previewDetail:{}})}
+                    reload={() => {                        
+                        this.fetchOrders({page: Number(this.state.page), date: this.props.date})
+                        this.setState({showOrderPreview:false})
+                    }}
                 />           
                 <div style={{margin: '15px'}}><Button primary onClick={this.getAllOrdersForDay}>
                     Send all orders for {this.formatDate(this.props.date)}

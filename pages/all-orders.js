@@ -49,8 +49,7 @@ class Orders extends React.Component {
     renderItem = (item) => {        
         console.log(item)
         const { id, total_price, currency, created_at, order_number, customer, line_items, shipping_address  } = item;
-        const { email, first_name, last_name, phone, orders_count, total_spent } = customer
-        const { address1, address2, city, company, country, province, province_code, zip } = shipping_address        
+        const { first_name, last_name } = customer        
         const date = new Date(created_at)
         const dateString = `${this.formatDate(date)} ${date.getHours()}:${date.getMinutes()}` 
         return (
@@ -115,6 +114,10 @@ class Orders extends React.Component {
                     open={this.state.showDetail} 
                     detail={this.state.orderDetail} 
                     close={() => this.setState({showDetail:false})}
+                    reload={() => {
+                        this.fetchOrders({page: Number(this.state.page)})
+                        this.setState({showDetail:false})
+                    }}
                 />                
                 <div style={{display:"flex", justifyContent: "space-between", margin: "20px"}}>                                      
                     <div style={{width:"10%"}}><b>Order #</b></div>                    

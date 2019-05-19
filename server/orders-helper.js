@@ -94,20 +94,14 @@ async function getProcessedEmails(orders) {
         orderIds.push(order.id)
     })
     return await ProcessedOrder.find({
-        'order_date': date
+        'order_id': orderIds
     })
 }
 
-async function combineOrdersAndSentHistory(shop, orders, date) { 
-    //If order matches -> if product id matches & if email matches
-    const processedEmails = await ProcessedOrder.find({
-        'shop': shop,
-        'order_date': {
-            '$gte': new Date(date.created_at_min),
-            '$lt': new Date(date.created_at_max)
-        }
-    })    
-    console.log('ye got it: ', processedEmails.length)
+async function combineOrdersAndSentHistory(orders) { 
+    let processedEmails = await getProcessedEmails(orders)
+    console.log('Got processed orders ', processedEmails.length)
+
     await asyncForEach(orders, async (order, i, array) => {
         if (!order.line_items) return
         await asyncForEach(order.line_items, async (item, j) => {
