@@ -97,7 +97,7 @@ app.prepare().then(() => {
     server.use(verifyRequest({
         // path to redirect to if verification fails
         // defaults to '/auth'
-        authRoute: '/authenticate',
+        authRoute: '/auth',
         // path to redirect to if verification fails and there is no shop on the query
         // defaults to '/auth'
         fallbackRoute: '/authenticate',

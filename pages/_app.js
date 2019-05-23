@@ -15,10 +15,7 @@ import * as keys from '../config/keys';
 //_app file overrides Next.js App file.
 // Next.js uses an App component to pass down classes to the other files in your app. This saves us from having to add imports to each file
 // _app.js file that passes down Apollo and Polaris components, styles, and everything else typically found in an index file
-class Boilerplate extends App {
-    state = {
-        shopOrigin: Cookies.get('shopOrigin')
-    }
+class Boilerplate extends App {    
     render() {
         const { Component, pageProps } = this.props;
         return (
@@ -32,7 +29,7 @@ class Boilerplate extends App {
                 {/* Polaris AppProvider must wrap the whole app in order for Polaris React components to function */}
                 {/* We access Shopify App Bridge through Polaris. 
                 The app will use a library called Shopify App Bridge to enable Shopify embeded app by passing in Shopify API key to shopOrigin in Polaris AppProvider */}                
-                <AppProvider theme={theme} shopOrigin={this.state.shopOrigin} apiKey={(keys.EMBEDDED) ? process.env.SHOPIFY_API_KEY : null}>
+                <AppProvider theme={theme} apiKey={(keys.EMBEDDED) ? process.env.SHOPIFY_API_KEY : null}>
                     {/* Wrapping the app with Redux Provider lets components further down the tree access the Redux */}                    
                     <Provider store={store}>                        
                         <PersistGate loading={null} persistor={persistor}>                       
