@@ -23,6 +23,14 @@ const UserSchema = new mongoose.Schema({
         unique: true,
         type: String
     },
+    googleAccessToken: {
+        unique: true,
+        type: String
+    },
+    googleRefreshToken: {
+        unique: true,
+        type: String
+    },
     //recurring subscription model
     payment: {
         accepted: {

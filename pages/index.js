@@ -45,7 +45,7 @@ class Index extends React.Component {
         //Custom router and page status
         page: 0,
         modal: false,        
-        gmailAuthorized: true
+        gmailAuthorized: false
     };
 
     static contextTypes = {

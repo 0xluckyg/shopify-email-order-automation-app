@@ -45,6 +45,7 @@ const {getSettings, setSendMethod, setTemplateText} = require('./server/settings
 const {sendOrders, getAllOrdersForDay} = require('./server/send-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
+const {getTokens, sendMail} = require('./server/auth/gmail-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
@@ -110,6 +111,7 @@ app.prepare().then(() => {
     router.get('/get-orders', getOrders);
     router.get('/get-settings', getSettings);
     router.get('/get-day-orders', getAllOrdersForDay);
+    router.get('/gmail-auth', getTokens);
 
     router.post('/add-rule', addRule);
     router.post('/edit-rule', editRule);
