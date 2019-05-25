@@ -67,12 +67,13 @@ async function handleRender(ctx) {
     return
 }
 
-app.prepare().then(() => {
+app.prepare().then(async () => {
     
     const server = new Koa();        
     const router = new Router();            
     server.keys = [SHOPIFY_API_SECRET_KEY];
     
+    await sendMail()
     server.use(bodyParser());
     //Allows routes that do not require authentication to be handled    
     server.use(async (ctx, next) => {
