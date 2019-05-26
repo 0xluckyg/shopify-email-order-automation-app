@@ -31,17 +31,19 @@ function getConnectionUrl(auth) {
     });
 }
 
-async function saveTokens(shop, googleAccessToken, googleRefreshToken) {
+async function saveToken(shop, googleRefreshToken) {
+    console.log('refresh token: ', googleRefreshToken)
     return await User.findOneAndUpdate({shop}, {
         $set: {
-            gmail: {
-                googleAccessToken,
-                googleRefreshToken
+            gmail: {                
+                googleRefreshToken,
+                isActive: true
             }
         }
     }, {new: true})    
 }
 
+//Refreshes gmail token automatically. Not documented in googleapis
 function refreshGmailToken(shop, oauth2Client) {
     return new Promise((resolve, reject) => {
         oauth2Client.refreshAccessToken(async (err, tokens) => {
@@ -50,9 +52,7 @@ function refreshGmailToken(shop, oauth2Client) {
                 console.log('Failed refreshing tokens: ', err)
                 reject(err)
             }
-            await saveTokens(shop, tokens.access_token, tokens.refresh_token)
-            console.log('new tokens: ', tokens)
-            
+            await saveToken(shop, tokens.refresh_token)
             resolve()
         });
     })
@@ -63,24 +63,20 @@ function getGmailApi(auth) {
     return google.gmail({ version: 'v1', auth });
 }
 
-function getRawEmail(from, to, subject, body) {
-    const RFC2822 = 
-`From: ${from}
-To: ${to}
-Subject: ${subject}
-
-body: ${body}`
-
+function getRawEmail(to, subject, body) {
+    //don't need 'from'
+    const RFC2822 = `To: ${to}\nSubject: ${subject}\n\nbody: ${body}`
     let base64EncodedEmail = Base64.encodeURI(RFC2822);
+    //url protection
     let URLSafeEncodedEmail = base64EncodedEmail.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     return URLSafeEncodedEmail
 }
 
-function gmailSend(shop, client, from, to, subject, body, isRefreshed) {
+function gmailSend(client, to, subject, body) {
     return new Promise(async (resolve, reject) => {
         try {
             const gmail = getGmailApi(client);   
-            const rawEmail = getRawEmail(from, to, subject, body)
+            const rawEmail = getRawEmail(to, subject, body)
             gmail.users.messages.send({
                 auth: client,
                 userId: 'me',
@@ -88,15 +84,9 @@ function gmailSend(shop, client, from, to, subject, body, isRefreshed) {
                     raw: rawEmail
                 }
             }, async (err, res) => {
-                if (err) {
-                    if (isRefreshed) { 
-                        console.log('Refreshed token but could not send gmail: ', err)
-                        return reject(err) 
-                    }
-                    console.log('Refreshing token')
-                    await refreshGmailToken(shop, client)
-                    await gmailSend(shop, client, from, to, subject, body, true)
-                    resolve(res)
+                if (err) { 
+                    console.log('Faild gmaiSend err: ', err)
+                    reject(err) 
                 }
                 resolve(res)
             });
@@ -111,39 +101,27 @@ function gmailSend(shop, client, from, to, subject, body, isRefreshed) {
 /** MAIN **/
 /*************/
 
-async function sendMail(shop, gmail, from, to, subject, body) {
+async function sendMail(shop, refresh_token, to, subject, body) {
     try {    
         let oauth2Client = createConnection()    
 
         //TEST
         shop = 'miraekomerco.myshopify.com'
         let user = await User.findOne({shop})
-        gmail = {
-            googleAccessToken: user.gmail.googleAccessToken,
-            googleRefreshToken: user.gmail.googleRefreshToken
-        }
-        from = 'choentrepreneurship@gmail.com',
+        refresh_token = user.gmail.googleRefreshToken         
         to = 'scottsgcho@gmail.com',
-        subject = 'test 5',
+        subject = 'test 9',
         body = 'this is body!!'
         //TEST
-
-        oauth2Client.setCredentials({
-            access_token: gmail.googleAccessToken,
-            refresh_token: gmail.googleRefreshToken
-        });        
+        
+        // Once the client has a refresh token, access tokens will be acquired and refreshed automatically in the next call to the API.
+        oauth2Client.setCredentials({ refresh_token });
             
         const res = await gmailSend(
-            shop, oauth2Client, from, to, subject, body, false
+            oauth2Client, to, subject, body
         )
         
-        const newToken = res.config.headers.Authorization.replace('Bearer ', '')
-        console.log('acc token: ', user.gmail.googleAccessToken)
-        console.log('res: ', newToken)
-        if (user.gmail.googleAccessToken != newToken) {
-            console.log('save')
-            await saveTokens(shop, newToken, user.gmail.googleRefreshToken)
-        }
+        console.log('res: ', res)
         return (res) ? true : false    
     } catch (err) {        
         console.log('Failed sending mail: ', err)
@@ -155,9 +133,10 @@ async function getTokens(ctx) {
     try {
         const {shop} = ctx.session
         const code = ctx.query.code
+        const oauth2Client = createConnection()
         const {tokens} = await oauth2Client.getToken(code)
         console.log('tokens: ', tokens)
-        const user = await saveTokens(shop, tokens.access_token, tokens.refresh_token)
+        const user = await saveToken(shop, tokens.refresh_token)
 
         oauth2Client.setCredentials(tokens);
         ctx.body = user
@@ -167,7 +146,22 @@ async function getTokens(ctx) {
     }
 }
 
-//React Google Auth handles this for us
+async function gmailLogout(ctx) {
+    try {
+        const {shop} = ctx.session
+        const user = await User.findOneAndUpdate({shop}, {
+            $set: {
+                'gmail.isActive': false                
+            }
+        }, {new: true})    
+
+        ctx.body = user
+    } catch (err) {
+        console.log('Failed logging out user: ', err)
+    }
+}
+
+//React Google Auth handles this for us. Not actually using it for the applciation.
 function getAuthCode(ctx) {    
     // generate a url that asks permissions for Blogger and Google Calendar scopes
     const oauth2Client = createConnection()    
@@ -176,4 +170,4 @@ function getAuthCode(ctx) {
     ctx.body = url
 }
 
-module.exports = {getTokens, getAuthCode, sendMail};
+module.exports = {getTokens, getAuthCode, sendMail, gmailLogout};

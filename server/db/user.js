@@ -23,15 +23,12 @@ const UserSchema = new mongoose.Schema({
         unique: true,
         type: String
     },
-    gmail: {
-        googleAccessToken: {
-            unique: true,
-            type: String
-        },
+    gmail: {        
         googleRefreshToken: {
             unique: true,
             type: String
-        }
+        },
+        isActive: false
     },
     //recurring subscription model
     payment: {

@@ -38,7 +38,14 @@ export const getUserAction = () => {
 }
 const getUserResolveAction = (user) => {
     return {
-        type: keys.GET_USER,
+        type: keys.SET_USER,
+        payload: user
+    }
+}
+
+export const setUserAction = (user) => {
+    return {
+        type: keys.SET_USER,
         payload: user
     }
 }

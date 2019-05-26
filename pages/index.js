@@ -44,8 +44,7 @@ class Index extends React.Component {
         shop: this.props.getUserReducer.shop,
         //Custom router and page status
         page: 0,
-        modal: false,        
-        gmailAuthorized: false
+        modal: false
     };
 
     static contextTypes = {
@@ -79,6 +78,11 @@ class Index extends React.Component {
         if (!this.props.getUserReducer.shop) {            
             this.props.getUserAction();
         }
+    }
+
+    isGmailAuthorized() {
+        if (!this.props.getUserReducer || !this.props.getUserReducer.gmail) return false        
+        return this.props.getUserReducer.gmail.isActive
     }
 
     render() {
@@ -143,7 +147,7 @@ class Index extends React.Component {
             {contextualSaveBarMarkup}
             {loadingMarkup}
             <div style={pageWrapper}>
-                {(this.state.gmailAuthorized) 
+                {(this.isGmailAuthorized()) 
                 ?                
                     pages[this.props.routerReducer]                
                 :

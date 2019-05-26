@@ -41,9 +41,11 @@ export const isLoadingReducer = (state = false, action) => {
 // shop: string (example.myshopify.com)
 // type: string ("shopify")
 // updatedAt: date string
+// gmail: { googleRefreshToken: String, isActive: Boolean }
 export const getUserReducer = (state = {}, action) => {
     switch(action.type) {
-        case keys.GET_USER:
+        case keys.SET_USER:
+            console.log(action.payload)
             state = action.payload
             return state;
         default:

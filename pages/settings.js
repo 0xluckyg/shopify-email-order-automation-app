@@ -128,7 +128,7 @@ class Settings extends React.Component {
         return (            
             <Layout>
                 <Modal 
-                    open={this.state.showPreview}
+                    open={this.state.showPreview ? true : false}
                     onClose={() => this.setState({showPreview: false})}
                     showCloseIcon={true}
                     center
