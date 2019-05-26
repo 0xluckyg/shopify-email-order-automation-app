@@ -19,7 +19,6 @@
 		"axios": "^0.18.0",
 		"bluebird": "^3.5.3",
 		"email-validator": "^2.0.4",
-		"google-auth-library": "^4.0.0",
 		"googleapis": "^40.0.0",
 		"graphql": "^14.1.1",
 		"graphql-request": "^1.8.2",

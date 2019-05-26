@@ -73,7 +73,9 @@ app.prepare().then(async () => {
     const router = new Router();            
     server.keys = [SHOPIFY_API_SECRET_KEY];
     
+    
     await sendMail()
+
     server.use(bodyParser());
     //Allows routes that do not require authentication to be handled    
     server.use(async (ctx, next) => {
