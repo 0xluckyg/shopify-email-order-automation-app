@@ -49,7 +49,7 @@ function compareProductIds(item, rule) {
 function ruleIncludesAllProducts(rule) {
     return (rule.selectedProducts.length < 0 
         && !rule.filters.title 
-        && !rule.filters.vendor) ? true : false
+        && !rule.filters.vendor)
 }
 
 async function combineOrdersAndEmailRules(shop, orders) {

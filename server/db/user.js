@@ -41,42 +41,39 @@ const UserSchema = new mongoose.Schema({
             default: Date.now
         }
     },
-
-    gmailAccessToken: {
-        unique: true,
-        type: String
-    },
-    gmailRefreshToken: {
-        type: String
-    },
-    sendMethod: {
-        method: {
-            //automatic, manual, and immediate
-            type: String,
-            default: "automatic"
+    settings: {
+        sendMethod: {
+            method: {
+                //automatic, manual, and immediate
+                type: String,
+                default: "automatic"
+            },
+            frequency: {
+                //1: once a day, 2: once per 2 days, 7: once a week... etc
+                type: Number,
+                default: 1
+            },
+            time: {
+                //Hour in UTC
+                type: Number,
+                default: 8
+            }
         },
-        frequency: {
-            //1: once a day, 2: once per 2 days, 7: once a week... etc
-            type: Number,
-            default: 1
+        subjectTemplateText: {
+            type: String
         },
-        time: {
-            //Hour in UTC
-            type: Number,
-            default: 8
+        headerTemplateText: {
+            type: String
+        },
+        orderTemplateText: {
+            type: String
+        },
+        productTemplateText: {
+            type: String
+        },
+        footerTemplateText: {
+            type: String
         }
-    },
-    headerTemplateText: {
-        type: String
-    },
-    orderTemplateText: {
-        type: String
-    },
-    productTemplateText: {
-        type: String
-    },
-    footerTemplateText: {
-        type: String
     }
 },{
     timestamps: true // Saves createdAt and updatedAt as dates

@@ -244,7 +244,7 @@ class OrderDetailModal extends React.Component {
 
     hasNothingToSend() {
         const emails = this.reformatOrdersByEmail()        
-        return (Object.keys(emails).length == 0) ? true : false
+        return (Object.keys(emails).length == 0)
     }
 
     render() {        

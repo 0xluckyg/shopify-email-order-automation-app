@@ -21,6 +21,8 @@ class Settings extends React.Component {
         super(props)       
         
         this.state = {
+            previousSubjectTemplateText: keys.SUBJECT_TEMPLATE_TEXT,
+            subjectTemplateText: keys.SUBJECT_TEMPLATE_TEXT,
             previousHeaderTemplateText: keys.HEADER_TEMPLATE_TEXT,
             headerTemplateText: keys.HEADER_TEMPLATE_TEXT,
             previousOrderTemplateText: keys.ORDER_TEMPLATE_TEXT,
@@ -42,6 +44,7 @@ class Settings extends React.Component {
             if (!this.mounted) return      
             console.log('settings: ',res.data)      
             const {
+                subjectTemplateText,
                 headerTemplateText, 
                 orderTemplateText, 
                 productTemplateText, 
@@ -49,6 +52,8 @@ class Settings extends React.Component {
                 sendMethod
             } = res.data
             this.setState({
+                previousSubjectTemplateText: (subjectTemplateText) ? subjectTemplateText : keys.SUBJECT_TEMPLATE_TEXT,
+                subjectTemplateText: (subjectTemplateText) ? subjectTemplateText : keys.SUBJECT_TEMPLATE_TEXT,
                 previousHeaderTemplateText: (headerTemplateText) ? headerTemplateText : keys.HEADER_TEMPLATE_TEXT,
                 headerTemplateText: (headerTemplateText) ? headerTemplateText : keys.HEADER_TEMPLATE_TEXT,
                 previousOrderTemplateText: (orderTemplateText) ? orderTemplateText : keys.ORDER_TEMPLATE_TEXT,
@@ -67,13 +72,15 @@ class Settings extends React.Component {
 
     setEmailTemplate() {
         this.setState({templateTextLoading: true})
-        let {headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText} = this.state
+        let {subjectTemplateText, headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText} = this.state
+        subjectTemplateText = (subjectTemplateText != keys.SUBJECT_TEMPLATE_TEXT) ? subjectTemplateText : null
         headerTemplateText = (headerTemplateText != keys.HEADER_TEMPLATE_TEXT) ? headerTemplateText : null
         orderTemplateText = (orderTemplateText != keys.ORDER_TEMPLATE_TEXT) ? orderTemplateText : null
         productTemplateText = (productTemplateText != keys.PRODUCT_TEMPLATE_TEXT) ? productTemplateText : null
         footerTemplateText = (footerTemplateText != keys.FOOTER_TEMPLATE_TEXT) ? footerTemplateText : null
 
         axios.post(process.env.APP_URL + '/email-template', {
+            subjectTemplateText,
             headerTemplateText,
             orderTemplateText,
             productTemplateText,
@@ -82,6 +89,7 @@ class Settings extends React.Component {
         .then(() => {            
             if (!this.mounted) return            
             this.setState({
+                previousSubjectTemplateText: this.state.subjectTemplateText, 
                 previousHeaderTemplateText: this.state.headerTemplateText, 
                 previousOrderTemplateText: this.state.orderTemplateText, 
                 previousProductTemplateText: this.state.productTemplateText,
@@ -111,31 +119,34 @@ class Settings extends React.Component {
     }
 
     templateIsDefaultMode() {
-        return (this.state.headerTemplateText == keys.HEADER_TEMPLATE_TEXT 
+        return (this.state.subjectTemplateText == keys.SUBJECT_TEMPLATE_TEXT 
+            && this.state.headerTemplateText == keys.HEADER_TEMPLATE_TEXT 
             && this.state.orderTemplateText == keys.ORDER_TEMPLATE_TEXT 
             && this.state.productTemplateText == keys.PRODUCT_TEMPLATE_TEXT
-            && this.state.footerTemplateText == keys.FOOTER_TEMPLATE_TEXT) ? true : false
+            && this.state.footerTemplateText == keys.FOOTER_TEMPLATE_TEXT)
     }
 
     templateHasNotChanged() {
-        return (this.state.previousHeaderTemplateText == this.state.headerTemplateText 
+        return (this.state.previousSubjectTemplateText == this.state.subjectTemplateText
+            && this.state.previousHeaderTemplateText == this.state.headerTemplateText 
             && this.state.previousOrderTemplateText == this.state.orderTemplateText 
             && this.state.previousProductTemplateText == this.state.productTemplateText
-            && this.state.previousFooterTemplateText == this.state.footerTemplateText) ? true : false
+            && this.state.previousFooterTemplateText == this.state.footerTemplateText)
     }
 
     render() {
         return (            
             <Layout>
                 <Modal 
-                    open={this.state.showPreview ? true : false}
+                    open={this.state.showPreview}
                     onClose={() => this.setState({showPreview: false})}
                     showCloseIcon={true}
                     center
                 >
                     <div style={modalContentStyle}>
                         <div style={{width: '90%', margin: '20px', maxHeight:'700px', overflowY: 'auto', whiteSpace: "pre-wrap"}}>
-                            {keys.HEADER_TEMPLATE_TEXT +
+                            {keys.SUBJECT_TEMPLATE_TEXT + `\n\n\n` +
+                            keys.HEADER_TEMPLATE_TEXT +
                             keys.ORDER_TEMPLATE_TEXT +
                             keys.PRODUCT_TEMPLATE_TEXT +
                             keys.FOOTER_TEMPLATE_TEXT}
@@ -151,6 +162,8 @@ class Settings extends React.Component {
                                     This is the template email per product that will be sent to the email you specify. 
                                     A line will be omitted if the information does not exist. <br/>
                                 </p>
+                                <p style={{lineHeight:'35px'}}>Available subject tag:</p>
+                                <Badge status="success">{`{{${keys.SHOP}}}`}</Badge>
                                 <p style={{lineHeight:'35px'}}>Available header tag:</p>
                                 <Badge status="success">{`{{${keys.SHOP}}}`}</Badge>
                                 <p style={{lineHeight:'35px'}}>List of tags you can use:</p>
@@ -183,6 +196,12 @@ class Settings extends React.Component {
                                 </p>                                                     
                             </div>
                             <div style={{flex:1, margin: '10px'}}>
+                                <p style={{lineHeight:'35px'}}>Subject template (Title of the email):</p>
+                                <TextField
+                                    value={this.state.subjectTemplateText}
+                                    onChange={subjectTemplateText => this.setState({subjectTemplateText})}
+                                    multiline
+                                />
                                 <p style={{lineHeight:'35px'}}>Header template:</p>
                                 <TextField
                                     value={this.state.headerTemplateText}
@@ -214,6 +233,7 @@ class Settings extends React.Component {
                         <Button 
                             disabled={this.templateIsDefaultMode()}
                             onClick={() => this.setState({
+                                subjectTemplateText:keys.SUBJECT_TEMPLATE_TEXT,
                                 headerTemplateText:keys.HEADER_TEMPLATE_TEXT,
                                 orderTemplateText:keys.ORDER_TEMPLATE_TEXT,
                                 productTemplateText: keys.PRODUCT_TEMPLATE_TEXT,

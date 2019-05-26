@@ -159,9 +159,15 @@ class OrdersByDay extends React.Component {
                         }}
                     />
                 </Modal>
-                <div style={{margin: '15px'}}><Button primary onClick={this.getAllOrdersForDay}>
-                    Send all orders for {this.formatDate(this.props.date)}
-                </Button></div>     
+                <div style={{margin: '15px'}}>
+                    <Button 
+                        primary 
+                        disabled={(this.state.orders.length == 0)}
+                        onClick={this.getAllOrdersForDay}
+                    >
+                        Send all orders for {this.formatDate(this.props.date)}
+                    </Button>
+                </div>     
                 <div style={{display:"flex", justifyContent: "space-between", margin: "20px"}}>                                      
                     <div style={{width:"10%"}}><b>Order #</b></div>                    
                     <div style={{width:"15%"}}><b>Date Ordered</b></div>

@@ -1,7 +1,8 @@
 const axios = require('axios');
 const {User} = require('./db/user');
 const {ProcessedOrder} = require('./db/processed-order');
-const {createOrderText} = require('../config/template')
+const {createOrderText, createSubjectText} = require('../config/template');
+const {sendGmail} = require('./auth/gmail-auth');
 const {getHeaders, asyncForEach, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory} = require('./orders-helper')
 const _ = require('lodash')
 const version = '2019-04'
@@ -10,14 +11,35 @@ async function sendEmails(shop, emails) {
     try {
         await asyncForEach(Object.keys(emails), async (email) => {
             const emailData = emails[email]
-            const settings = await User.findOne({shop}, {orderTemplateText: 1, productTemplateText: 1})
+            const user = await User.findOne({shop}, {gmail: 1, settings: 1})
+            const {
+                headerTemplateText, 
+                orderTemplateText, 
+                productTemplateText, 
+                footerTemplateText, 
+                subjectTemplateText
+            } = user.settings
+
+            const subjectText = createSubjectText(shop, subjectTemplateText)
             const orderText = createOrderText(
                 emailData, 
                 shop, 
-                settings.orderTemplateText, 
-                settings.productTemplateText
+                headerTemplateText,
+                orderTemplateText, 
+                productTemplateText,
+                footerTemplateText
             )
-            //SEND EMAIL orderText
+
+            //send email through the gmai lapi
+            const sent = await sendGmail(                
+                user.gmail.googleRefreshToken, 
+                email,
+                subjectText,
+                orderText
+            )
+
+            if (!sent) return
+            console.log('SENT: ', true)
 
             let processedOrders = []        
             await asyncForEach(Object.keys(emailData), async (orderNumber) => {                  
@@ -220,4 +242,4 @@ async function getAllOrdersForDay(ctx) {
     }
 }
 
-module.exports = {sendOneOrder, sendOrders, getAllOrdersForDay}
+module.exports = {sendOrders, getAllOrdersForDay}

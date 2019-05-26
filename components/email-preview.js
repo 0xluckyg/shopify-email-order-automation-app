@@ -123,7 +123,7 @@ class EmailPreview extends React.Component {
                 </div>                
             </div>  
             <div style={{width: '90%', margin: '20px', maxHeight:'700px', overflowY: 'auto'}}>
-                <Collapsible open={(this.state.previewTexts[index]) ? true : false} id="basic-collapsible">
+                <Collapsible open={(this.state.previewTexts[index])} id="basic-collapsible">
                     <div style={{whiteSpace: "pre-wrap"}}>
                         {this.state.previewTexts[index]}
                     </div>
@@ -159,7 +159,7 @@ class EmailPreview extends React.Component {
     }
 
     hasNothingToSend() {
-        return (!this.props.loading && Object.keys(this.state.emailDetail).length == 0) ? true : false
+        return (!this.props.loading && Object.keys(this.state.emailDetail).length == 0)
     }
 
     render() {        

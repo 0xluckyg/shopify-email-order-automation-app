@@ -72,7 +72,7 @@ function getRawEmail(to, subject, body) {
     return URLSafeEncodedEmail
 }
 
-function gmailSend(client, to, subject, body) {
+function sendEmail(client, to, subject, body) {
     return new Promise(async (resolve, reject) => {
         try {
             const gmail = getGmailApi(client);   
@@ -91,7 +91,7 @@ function gmailSend(client, to, subject, body) {
                 resolve(res)
             });
         } catch (err) {
-            console.log('Failed gmailSend: ', err)
+            console.log('Failed sendEmail: ', err)
             reject(err)
         }
     })
@@ -101,27 +101,15 @@ function gmailSend(client, to, subject, body) {
 /** MAIN **/
 /*************/
 
-async function sendMail(shop, refresh_token, to, subject, body) {
+async function sendGmail(refresh_token, to, subject, body) {
     try {    
         let oauth2Client = createConnection()    
-
-        //TEST
-        shop = 'miraekomerco.myshopify.com'
-        let user = await User.findOne({shop})
-        refresh_token = user.gmail.googleRefreshToken         
-        to = 'scottsgcho@gmail.com',
-        subject = 'test 9',
-        body = 'this is body!!'
-        //TEST
         
         // Once the client has a refresh token, access tokens will be acquired and refreshed automatically in the next call to the API.
-        oauth2Client.setCredentials({ refresh_token });
-            
-        const res = await gmailSend(
+        oauth2Client.setCredentials({ refresh_token });            
+        const res = await sendEmail(
             oauth2Client, to, subject, body
         )
-        
-        console.log('res: ', res)
         return (res) ? true : false    
     } catch (err) {        
         console.log('Failed sending mail: ', err)
@@ -163,11 +151,11 @@ async function gmailLogout(ctx) {
 
 //React Google Auth handles this for us. Not actually using it for the applciation.
 function getAuthCode(ctx) {    
-    // generate a url that asks permissions for Blogger and Google Calendar scopes
+    // generate a url that asks permissions
     const oauth2Client = createConnection()    
     const url = getConnectionUrl(oauth2Client)
     
     ctx.body = url
 }
 
-module.exports = {getTokens, getAuthCode, sendMail, gmailLogout};
+module.exports = {getTokens, sendGmail, gmailLogout};

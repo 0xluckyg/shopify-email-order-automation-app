@@ -27,6 +27,9 @@ const keys = {
     // PRODUCT_TYPE: 'PRODUCT_TYPE',
     // TOTAL_TAX: 'TOTAL_TAX',
 }
+
+let SUBJECT_TEMPLATE_TEXT = `{{${keys.SHOP}}} customer orders`
+
 let HEADER_TEMPLATE_TEXT = `{{${keys.SHOP}}}'s orders:
 
 `
@@ -72,6 +75,12 @@ Thank you!`
 function createShopName(shop) {
     let shopName = shop.split('.')[0]
     return shopName.charAt(0).toUpperCase() + shopName.slice(1)
+}
+
+function createSubjectText(shop, subjectTemplateText) {
+    let shopName = shop ? createShopName(shop) : 'our store'
+    let subjectTemplate = (subjectTemplateText) ? subjectTemplateText : SUBJECT_TEMPLATE_TEXT
+    return subjectTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
 }
 
 function createOrderText(data, shop, headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText) {        
@@ -157,9 +166,11 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
 
 module.exports = {
     ...keys,
+    SUBJECT_TEMPLATE_TEXT,
     HEADER_TEMPLATE_TEXT,
     ORDER_TEMPLATE_TEXT,
     PRODUCT_TEMPLATE_TEXT,
     FOOTER_TEMPLATE_TEXT,
+    createSubjectText,
     createOrderText
 }

@@ -12,14 +12,10 @@ async function getSettings(ctx) {
     const shop = ctx.session.shop       
     if (shop) {
         try {
-            const settings = await User.findOne({shop}).select({ 
-                "sendMethod": 1, 
-                "headerTemplateText": 1,
-                "orderTemplateText": 1, 
-                "productTemplateText": 1,
-                "footerTemplateText": 1
+            const user = await User.findOne({shop}).select({ 
+                "settings": 1
             })
-            ctx.body = settings
+            ctx.body = user.settings
         } catch (err) {
             ctx.status = 400
         }
@@ -35,10 +31,11 @@ async function setTemplateText(ctx) {
         try {           
             await User.findOneAndUpdate({shop}, { 
                 $set: { 
-                    "headerTemplateText": body.headerTemplateText, 
-                    "orderTemplateText": body.orderTemplateText,
-                    "productTemplateText": body.productTemplateText,
-                    "footerTemplateText": body.footerTemplateText
+                    "settings.subjectTemplateText": body.subjectTemplateText,
+                    "settings.headerTemplateText": body.headerTemplateText, 
+                    "settings.orderTemplateText": body.orderTemplateText,
+                    "settings.productTemplateText": body.productTemplateText,
+                    "settings.footerTemplateText": body.footerTemplateText
                 } 
             })         
             ctx.body = 'saved template text'
