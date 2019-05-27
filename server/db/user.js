@@ -44,18 +44,20 @@ const UserSchema = new mongoose.Schema({
     settings: {
         sendMethod: {
             method: {
-                //automatic, manual, and immediate
+                //automatic / manual
                 type: String,
-                default: "automatic"
+                default: "manual"
             },
+            //unused
             frequency: {
                 //1: once a day, 2: once per 2 days, 7: once a week... etc
                 type: Number,
                 default: 1
             },
+            //unused
             time: {
-                //Hour in UTC
-                type: Number,
+                //Hour in UTC offset format
+                type: String,
                 default: 8
             }
         },

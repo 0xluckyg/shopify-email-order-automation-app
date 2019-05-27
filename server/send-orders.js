@@ -4,7 +4,8 @@ const {ProcessedOrder} = require('./db/processed-order');
 const {createOrderText, createSubjectText} = require('../config/template');
 const {sendGmail} = require('./auth/gmail-auth');
 const {getHeaders, asyncForEach, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory} = require('./orders-helper')
-const _ = require('lodash')
+const schedule = require('node-schedule');
+const moment = require('moment');
 const version = '2019-04'
 
 async function sendEmails(shop, emails) {
@@ -38,8 +39,7 @@ async function sendEmails(shop, emails) {
                 orderText
             )
 
-            if (!sent) return
-            console.log('SENT: ', true)
+            if (!sent) return            
 
             let processedOrders = []        
             await asyncForEach(Object.keys(emailData), async (orderNumber) => {                  
@@ -141,8 +141,8 @@ async function reformatOrdersByEmail(orders) {
     return emails
 }
 
-function returnStartAndEndDate(ctx) {
-    let {date} = ctx.query
+function returnStartAndEndDate(date) {
+    console.log('START END : ', date)
     if (date) {        
         date = new Date(date)
         let endDate = new Date(date).setDate(date.getDate() + 1)        
@@ -155,13 +155,12 @@ function returnStartAndEndDate(ctx) {
     }
 }
 
-async function fetchAllOrdersForDay(ctx) {
-    try {        
-        const {shop, accessToken} = ctx.session        
+async function fetchAllOrdersForDay(shop, accessToken, queryDate) {
+    try {                
         const limit = 250
         let page = 1; let hasNext = true
         const headers = getHeaders(accessToken)
-        const date = returnStartAndEndDate(ctx)
+        const date = returnStartAndEndDate(queryDate)
 
         const total = await axios.get(`https://${shop}/admin/api/${version}/orders/count.json`, {
             headers,
@@ -193,24 +192,11 @@ async function fetchAllOrdersForDay(ctx) {
             if (page == totalPages || totalPages == 0) hasNext = false
             page ++
         }        
+        console.log('all: ', allOrders.length)
         return allOrders
     } catch (err) {
         console.log('Failed getting orders: ', err)        
     }
-}
-
-
-async function sendOneOrder(ctx) {
-    let {shop} = ctx.session
-    let order = JSON.parse(ctx.request.rawBody).order;
-    order = [JSON.parse(body)]
-    order = await cleanOrders(order)
-    order = await combineOrdersAndEmailRules(shop, order)
-    order = await combineOrdersAndSentHistory(order)
-        
-    let reformattedOrder = await reformatOrdersByEmail(order)
-
-    await sendEmails(ctx.session.shop, reformattedOrder)
 }
 
 async function sendOrders(ctx) {
@@ -228,13 +214,15 @@ async function sendOrders(ctx) {
 //For previewing send
 async function getAllOrdersForDay(ctx) {
     try {
-        const {shop} = ctx.session
-        let allOrders = await fetchAllOrdersForDay(ctx)
+        const {shop, accessToken} = ctx.session
+        const {date} = ctx.query
+
+        let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
         allOrders = await cleanOrders(allOrders)
         allOrders = await combineOrdersAndEmailRules(shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
         
-        let reformattedOrders = await reformatOrdersByEmail(allOrders)                        
+        let reformattedOrders = await reformatOrdersByEmail(allOrders)
         ctx.body = reformattedOrders
     } catch (err) {
         console.log('Failed getting all orders for day: ', err)
@@ -242,4 +230,36 @@ async function getAllOrdersForDay(ctx) {
     }
 }
 
-module.exports = {sendOrders, getAllOrdersForDay}
+//For scheduled send
+async function sendOrdersCron() {             
+    return schedule.scheduleJob('8 * * *', async () => {        
+        const users = await User.find({
+            'settings.sendMethod.method': 'manual',
+            'gmail.isActive': true,
+            active: true            
+        })    
+        await asyncForEach(users, async (user) => {
+            const {shop, accessToken} = user
+
+            const headers = getHeaders(accessToken)
+            const shopData = await axios.get(`https://${shop}/admin/api/${version}/shop.json`, {
+                headers
+            })
+        
+            if (!shop || !accessToken) return
+            const shopTimeZoneIANA = shopData.data.shop.iana_timezone
+            let today = moment.tz(shopTimeZoneIANA).startOf('day').subtract(1, 'day')    
+            today = today.format('YYYY-MM-DD[T]HH:mm:ss')                
+            
+            let allOrders = await fetchAllOrdersForDay(shop, accessToken, today)
+            allOrders = await cleanOrders(allOrders)
+            allOrders = await combineOrdersAndEmailRules(shop, allOrders)
+            allOrders = await combineOrdersAndSentHistory(allOrders)    
+            let reformattedOrders = await reformatOrdersByEmail(allOrders)
+            
+            await sendEmails(shop, reformattedOrders)
+        })        
+    })
+}
+
+module.exports = {sendOrders, getAllOrdersForDay, sendOrdersCron}

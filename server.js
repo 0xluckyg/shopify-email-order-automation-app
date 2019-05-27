@@ -42,10 +42,10 @@ const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
 const {getOrders} = require('./server/get-orders');
 const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
-const {sendOrders, getAllOrdersForDay} = require('./server/send-orders');
+const {sendOrders, getAllOrdersForDay, sendOrdersCron} = require('./server/send-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
-const {getTokens, sendGmail, gmailLogout} = require('./server/auth/gmail-auth');
+const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
@@ -71,10 +71,7 @@ app.prepare().then(async () => {
     
     const server = new Koa();        
     const router = new Router();            
-    server.keys = [SHOPIFY_API_SECRET_KEY];
-    
-    
-    // await sendGmail()
+    server.keys = [SHOPIFY_API_SECRET_KEY];    
 
     server.use(bodyParser());
     //Allows routes that do not require authentication to be handled    
@@ -90,6 +87,9 @@ app.prepare().then(async () => {
             await next()
         }
     });
+
+    sendOrdersCron()
+    
     server.use(session({
         //30 days in miliseconds
         maxAge: 2419200000,        
