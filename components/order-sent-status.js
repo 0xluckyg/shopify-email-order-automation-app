@@ -13,8 +13,7 @@ const sentStatus = (line_items) => {
             if (email.sent) sentCount ++
         })
         emailCount += item.email_rules.length
-    })
-    console.log('withoutemail ', itemsWithoutEmail)
+    })    
     if (emailCount == 0) {
         return <Badge progress="incomplete">No emails</Badge>
     }
