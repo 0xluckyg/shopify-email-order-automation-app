@@ -13,8 +13,6 @@ import * as PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import Toast from '../components/toast';
-import ContactUs from './contact-us';
-import Faq from './faq';
 import * as keys from '../config/keys';
 
 class Authenticate extends React.Component {
@@ -24,7 +22,7 @@ class Authenticate extends React.Component {
         this.redirectToReviews = this.redirectToReviews.bind(this);
     }
 
-    state = {         
+    state = {
         searchActive: false,
         searchText: '',
         userMenuOpen: false,
@@ -67,12 +65,6 @@ class Authenticate extends React.Component {
         searchActive,
         searchText,        
     } = this.state;
-
-    const pages = [
-        null,
-        <ContactUs/>,
-        <Faq/>
-    ]
 
     const searchResultsMarkup = (
         <Card>            
@@ -122,8 +114,7 @@ class Authenticate extends React.Component {
                                 </div>
                             </div>
                         </div>
-                    </Card>
-                    {pages[this.props.routerReducer]}
+                    </Card>                    
                 </div>
             </div>
             {toastMarkup}            
@@ -133,7 +124,7 @@ class Authenticate extends React.Component {
 
     authenticate = () => {
         if (!this.state.domain.includes('myshopify.com')) {
-            this.state.fieldError = 'Please provide a valid Shopify domain.'
+            this.setState({fieldError: 'Please provide a valid Shopify domain.'})
             return
         }
         window.location.replace(`${process.env.APP_URL}/auth?shop=${this.state.domain}`)    

@@ -1,0 +1,13 @@
+#docker compose lets you run multiple containers and link them together.
+version: '3'
+services:
+  nextjs:
+    image: 838823345115.dkr.ecr.us-east-1.amazonaws.com/kroco-order-automation:1.6
+    build: .
+    ports:
+      - 89:3000
+    links:
+      #db is a default name      
+      - mongodb:db      
+  mongodb:
+    image: mongo
