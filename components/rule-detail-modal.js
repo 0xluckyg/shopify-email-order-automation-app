@@ -45,6 +45,7 @@ class RulesDetailModal extends React.Component {
 
     convertFiltersForParams(filters) {
         let params = []
+        if (!filters) return params
         Object.keys(filters).map((key) => {
             params.push({key, value: filters[key]}) 
         });         
@@ -57,7 +58,7 @@ class RulesDetailModal extends React.Component {
         const { filters, selectedProducts } = this.props.detail;
         axios.get(process.env.APP_URL + '/get-products', {
             params: {
-                filters: JSON.stringify(this.convertFiltersForParams(filters)), 
+                filters,
                 selectedProducts: JSON.stringify(selectedProducts),
                 page
             },

@@ -74,7 +74,7 @@ class Rules extends React.Component {
         Object.keys(filters).map((key, i) => {
             queryString = queryString + key + ' is ' + filters[key]
             if (i != Object.keys(filters).length - 1) queryString = queryString + ' AND '
-        });                
+        });
         return queryString
     }
     
@@ -103,7 +103,7 @@ class Rules extends React.Component {
     }
 
     renderItem = (item) => {
-        const { _id, filters, selectedProducts, email } = item;
+        const { _id, filters, selectedProducts, email } = item;        
         return (
             <ResourceList.Item
                 id={_id}                                
@@ -143,6 +143,7 @@ class Rules extends React.Component {
     }
 
     renderNoContent() {
+        console.log('rules: ', this.state.rules)
         if (this.state.rules.length != 0 || this.state.rulesLoading) return null
         return (
             <NoContent

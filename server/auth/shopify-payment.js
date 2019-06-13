@@ -4,7 +4,7 @@ const FREE_TRIAL = 7;
 
 //creates a shopify URL that the user will be redirected to to accept payments
 function initiatePayment (ctx, user) {            
-    const { shop, accessToken } = ctx.session;
+    const { shop, accessToken } = ctx.session;    
     const freeTrialLeft = calculateTrialDays(user.payment.date, new Date())    
     //Shopify billing API requires 3 variables: price, name, return_url                
     const stringifiedBillingParams = JSON.stringify({
@@ -37,7 +37,8 @@ function initiatePayment (ctx, user) {
 }
 
 //subscribes the actual payment to Shopify after user has accepted the payment if there is a charge_id
-async function processPayment (ctx, next) {            
+async function processPayment (ctx, next) {    
+    console.log('sess2: ', ctx.session)
     if (ctx.query.charge_id) {
         console.log('process payment called');    
         const chargeId = ctx.query.charge_id;

@@ -3,12 +3,8 @@ const {Rule} = require('./db/rule');
 function convertFiltersIntoParams(filters, selectedProducts) { 
     params = {}
     //params are ignored if there are product ids in selectedProducts
-    if (selectedProducts && selectedProducts.length > 0) return params
-    filters.forEach(filter => {
-        let {key, value} = filter
-        params[key] = value
-    })
-    return params
+    if (selectedProducts && selectedProducts.length > 0) return {}    
+    return filters
 }
 
 //Returns user on the render of the index file on client side
@@ -16,13 +12,12 @@ async function addRule(ctx) {
     try {        
         const shop = ctx.session.shop
         const body = JSON.parse(ctx.request.rawBody)
-        let {filters, selectedProducts, email} = body
+        let {filters, selectedProducts, email} = body        
         filters = convertFiltersIntoParams(filters, selectedProducts)        
         const rule = new Rule({
             shop, filters, selectedProducts, email
         });
-        await rule.save()
-        ctx.status = 200
+        await rule.save()        
         ctx.body = 'rule saved'
     } catch (err) {
         console.log('Failed saving rule: ', err)

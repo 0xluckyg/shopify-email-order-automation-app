@@ -8,10 +8,12 @@ const {User} = require('./db/user');
 
 //Returns user on the render of the index file on client side
 async function getUser(ctx) {
+    console.log('ctx.sess: ', ctx.session)
     const shop = ctx.session.shop       
     if (shop) {
         try {
             const user = await User.findOne({shop})
+            console.log('user: ', user)
             delete user.accessToken
             ctx.body = user
         } catch (err) {

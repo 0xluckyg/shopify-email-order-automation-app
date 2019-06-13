@@ -236,7 +236,7 @@ async function sendOrdersCron() {
         const users = await User.find({
             'settings.sendMethod.method': 'manual',
             'gmail.isActive': true,
-            active: true            
+            active: true
         })    
         await asyncForEach(users, async (user) => {
             const {shop, accessToken} = user

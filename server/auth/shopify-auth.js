@@ -60,6 +60,9 @@ function shopifyAuth() {
 
             //When user is new to the app
             if (!user) {
+                console.log('new: ', shop)
+                console.log('new: ', accessToken)
+                console.log('new: ', payment)
                 const newUser = new User({
                     shop,
                     accessToken,                            
@@ -68,8 +71,10 @@ function shopifyAuth() {
                         date: new Date()
                     }
                 })
+                console.log('newUser: ', newUser)
                 //When new user subscribes to the app
                 const savedUser = await newUser.save()                 
+                console.log('savedUser: ', savedUser)
                 confirmationURL = await initiatePayment(ctx, savedUser)
                 console.log(`${savedUser.shop} user created`)
             

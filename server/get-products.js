@@ -22,23 +22,12 @@ async function getSelectedProducts(selectedProducts, session) {
     }
 }
 
-function convertFiltersIntoParams(filters) {
-    filters = JSON.parse(filters) 
-    params = {}
-    filters.forEach(filter => {
-        let {key, value} = filter
-        params[key] = value
-    })
-    return params
-}
-
-async function getProducts(ctx) {        
+async function getProducts(ctx) {
     try {  
         const { shop, accessToken } = ctx.session;
         const headers = getHeaders(accessToken)        
         let hasPrevious = true; let hasNext = true
         let {page, filters, selectedProducts} = ctx.query                
-
         //For detailed edit history view 
         if (ctx.query.selectedProducts && JSON.parse(selectedProducts).length > 0) {            
             selectedProducts = await getSelectedProducts(JSON.parse(selectedProducts), ctx.session)
@@ -46,9 +35,9 @@ async function getProducts(ctx) {
             return
         }        
 
-        let params = convertFiltersIntoParams(filters)
+        if (filters) filters = JSON.parse(filters)
         params = {
-            ...params,
+            ...filters,
             page,
             limit
         }        

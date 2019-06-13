@@ -47,6 +47,7 @@ const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const shopifyAuth = require('./server/auth/shopify-auth');
 const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
+const {logout, switchSession} = require('./server/auth/auth');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -60,8 +61,8 @@ const whitelist = [
     '/static',
     '/authenticate'
 ]
-async function handleRender(ctx) {    
-    await handle(ctx.req, ctx.res);
+async function handleRender(ctx) {        
+    await handle(ctx.req, ctx.res);    
     ctx.respond = false;
     ctx.res.statusCode = 200;        
     return
@@ -74,9 +75,12 @@ app.prepare().then(async () => {
     server.keys = [SHOPIFY_API_SECRET_KEY];    
 
     server.use(bodyParser());
+    const routerUnauthorized = new Router();
+    server.use(routerUnauthorized.routes());
+    routerUnauthorized.get('/', switchSession)    
+
     //Allows routes that do not require authentication to be handled    
-    server.use(async (ctx, next) => {
-        console.log('request ', ctx.request.url)
+    server.use(async (ctx, next) => {        
         let noAuth = false
         for (i in whitelist) {
             if (ctx.request.url.startsWith(whitelist[i])) noAuth = true
@@ -86,14 +90,14 @@ app.prepare().then(async () => {
         } else {
             await next()
         }
-    });
+    });    
 
     sendOrdersCron()
-    
+
     server.use(session({
         //30 days in miliseconds
         maxAge: 2419200000,        
-        renew: true
+        renew: true,        
     }, server));
     server.use(router.routes());
     server.use(shopifyAuth());
@@ -106,7 +110,7 @@ app.prepare().then(async () => {
         // defaults to '/auth'
         fallbackRoute: '/authenticate',
     }));
-
+    
     router.get('/', processPayment);        
     router.get('/get-user', getUser);        
     router.get('/get-products', getProducts);
