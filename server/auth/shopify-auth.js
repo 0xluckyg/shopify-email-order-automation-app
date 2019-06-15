@@ -1,4 +1,6 @@
 //package exposes "shopifyAuth" by default. We're changing that to "createShopifyAuth"
+const crypto = require('crypto');
+const safeCompare = require('safe-compare');
 const { default: createShopifyAuth } = require('@shopify/koa-shopify-auth');
 const {initiatePayment} = require('./shopify-payment');
 const {registerAppUninstalled} = require('../webhooks/app-uninstalled');
@@ -105,4 +107,48 @@ function shopifyAuth() {
     })
 }
 
-module.exports = shopifyAuth;
+async function switchSession(ctx, next) {
+    try {
+        const {SHOPIFY_API_SECRET_KEY} = process.env;
+        const params = ctx.query
+        const {shop, hmac, timestamp} = ctx.query
+        if (!shop || !hmac) return await next()
+        // var generatedHash = crypto
+        // .createHmac("sha256", SHOPIFY_API_SECRET_KEY)
+        // .update('shop=' + shop + '&timestamp=' + timestamp)
+        // .digest("hex");
+        
+        const message = Object.keys(params).
+        filter(key => ['hmac', 'signature'].indexOf(key) === -1).
+        map(key => {
+            const value = decodeURIComponent(params[key]).
+                replace(/\%/g, '%25' ).
+                replace(/\&/g, '%26' ).
+                replace(/\=/g, '%3D' );
+            return `${key}=${value}`;
+        }).
+        sort().join('&');
+
+        var generatedHash = crypto
+        .createHmac("sha256", SHOPIFY_API_SECRET_KEY)
+        .update(message)
+        .digest("hex");
+                
+        console.log('sec ', SHOPIFY_API_SECRET_KEY)        
+        console.log('shop ', shop)
+        console.log('hmac ', hmac)
+        console.log('hmac2 ', generatedHash)        
+
+        if (safeCompare(generatedHash, hmac)) {            
+            ctx.session = {shop}                        
+            console.log('sess1: ',ctx.session)            
+        }
+        await next()
+    } catch(err) {
+        console.log('Failed switchSession: ',err.message)
+        ctx.status = 400
+        ctx.body = err.message
+    }
+}
+
+module.exports = {shopifyAuth, switchSession};

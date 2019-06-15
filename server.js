@@ -44,10 +44,10 @@ const {getOrders} = require('./server/get-orders');
 const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
 const {sendOrders, getAllOrdersForDay, sendOrdersCron} = require('./server/send-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
-const shopifyAuth = require('./server/auth/shopify-auth');
+const {shopifyAuth, switchSession} = require('./server/auth/shopify-auth');
 const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
-const {logout, switchSession} = require('./server/auth/auth');
+const {logout} = require('./server/auth/auth');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
