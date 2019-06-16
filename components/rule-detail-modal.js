@@ -146,7 +146,7 @@ class RulesDetailModal extends React.Component {
     }
     makeSelectionDescription(filters, selectedItems) {  
         if (!filters || !selectedItems) return null
-        if (filters.length == 0 && selectedItems.length == 0) return 'All products selected'
+        if (!filters && selectedItems.length == 0) return 'All products selected'
         if (selectedItems.length > 0) return `${selectedItems.length} custom items selected`        
         let queryString = 'Products where '
         for (let i = 0; i < filters.length; i ++) {    

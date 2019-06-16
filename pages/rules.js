@@ -68,7 +68,7 @@ class Rules extends React.Component {
     }
 
     makeSelectionDescription(filters, selectedItems) {                   
-        if (filters && filters.length == 0 && selectedItems.length == 0) return 'All products'
+        if (!filters && selectedItems.length == 0) return 'All products'
         if (selectedItems.length > 0) return `${selectedItems.length} custom items`
         let queryString = 'Products where '
         Object.keys(filters).map((key, i) => {
