@@ -121,6 +121,7 @@ async function getTokens(ctx) {
     try {
         const {shop} = ctx.session
         const code = ctx.query.code
+        console.log('code: ', code)
         const oauth2Client = createConnection()
         const {tokens} = await oauth2Client.getToken(code)
         console.log('tokens: ', tokens)
@@ -130,7 +131,7 @@ async function getTokens(ctx) {
         ctx.body = user
     } catch (err) {
         ctx.status = 500
-        console.log('Failed get google tokens')
+        console.log('Failed get google tokens: ', err)
     }
 }
 

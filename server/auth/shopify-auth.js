@@ -64,7 +64,6 @@ function shopifyAuth() {
             if (!user) {
                 console.log('new: ', shop)
                 console.log('new: ', accessToken)
-                console.log('new: ', payment)
                 const newUser = new User({
                     shop,
                     accessToken,                            
