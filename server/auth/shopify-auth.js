@@ -32,7 +32,7 @@ const shopifyScopes = [
     "unauthenticated_read_product_listings",
     "unauthenticated_write_checkouts",
     "unauthenticated_write_customers",
-    // "read_all_orders", //Requires approval from Shopify Partners dashboard
+    "read_all_orders", //Requires approval from Shopify Partners dashboard
     // "read_users", //Only for Shopify Plus
     // "write_users", //Only for Shopify Plus
 ]

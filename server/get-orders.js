@@ -45,6 +45,7 @@ async function getOrders(ctx) {
         orders = await cleanOrders(orders.data.orders)
         orders = await combineOrdersAndEmailRules(shop, orders)
         orders = await combineOrdersAndSentHistory(orders)
+        
 
         ctx.body = {orders, hasPrevious, hasNext, page}
     } catch (err) {
