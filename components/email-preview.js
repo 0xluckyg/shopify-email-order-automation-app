@@ -13,7 +13,6 @@ import {showToastAction, isLoadingAction} from '../redux/actions';
 import {createOrderText} from '../config/template'
 import NoContent from './no-content'
 
-//A pop up to ask users to write a review
 class EmailPreview extends React.Component {    
     constructor(props){
         super(props)                          

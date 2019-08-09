@@ -99,7 +99,7 @@ function createEmailObject(emails, order, item, email) {
     return emails
 }
 
-async function reformatOrdersByEmail(orders) {
+async function reformatOrdersByEmail(orders, date) {
     //  [{
     //     id
     //     shipping_address
@@ -138,6 +138,16 @@ async function reformatOrdersByEmail(orders) {
             })
         })
     })
+    
+    await asyncForEach(Object.keys(emails), async (email) => {
+        console.log('email: ', email)
+        const tooLong = Object.keys(emails[email]).length
+        console.log('toolong: ', tooLong)
+        if (tooLong > 2) {
+            emails[email] = `${date}.pdf`
+        }
+    })
+    
     return emails
 }
 
@@ -222,7 +232,9 @@ async function getAllOrdersForDay(ctx) {
         allOrders = await combineOrdersAndEmailRules(shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
         
-        let reformattedOrders = await reformatOrdersByEmail(allOrders)
+        let reformattedOrders = await reformatOrdersByEmail(allOrders, date)
+        console.log('reformattedOrders: ', reformattedOrders)
+        
         ctx.body = reformattedOrders
     } catch (err) {
         console.log('Failed getting all orders for day: ', err)
