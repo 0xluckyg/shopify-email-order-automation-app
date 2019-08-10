@@ -127,7 +127,6 @@ async function reformatOrdersByEmail(orders, date) {
     //         }
     //     }
     // }
-    // console.log('reform: ', orders.length)
     let emails = {}
 
     await asyncForEach(orders, async (order) => {

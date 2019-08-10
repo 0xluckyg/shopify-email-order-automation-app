@@ -101,7 +101,22 @@ class EmailPreview extends React.Component {
         }
     }
 
-    renderEmails(data, key, index) {        
+    renderEmails(data, key, index) { 
+        console.log('data: ', data)
+        console.log('data: ', typeof data === 'string')
+        if (typeof data === 'string' || data instanceof String) {
+            const downloadURL = `${process.env.APP_URL}/get-order-pdf`
+            return <Card key={key}>            
+                <div style={{width: '90%', margin: '20px', display:"flex", justifyContent: "space-between"}}>                                      
+                    <div><Badge>{key}</Badge></div>
+                    <div onClick={()=>{
+                        axios.get(downloadURL, {
+                            params: {pdfName: data}
+                        })
+                    }}>{data}</div>
+                </div>  
+            </Card>
+        }
         let orderCount = 0; let productCount = 0;        
         Object.keys(data).map((order) => {                        
             orderCount++

@@ -1,9 +1,6 @@
 const {Rule} = require('./db/rule')
 const {ProcessedOrder} = require('./db/processed-order')
 const _ = require('lodash')
-const PDFKit = require('pdfkit')
-const fs = require('fs')
-const UUIDv4 = require('uuid/v4')
 
 function getHeaders(accessToken) {
     return {
@@ -132,48 +129,6 @@ async function combineOrdersAndSentHistory(orders) {
         })
     })
     return orders
-}
-
-async function getOrderPDF(ctx) {
-    // Generate random file name
-    let tempFileName = `${UUIDv4()}.pdf`;
-    
-    // Create the PDF using PDFKit
-    let doc = new PDFKit();
-    let writeStream = fs.createWriteStream(tempFileName);
-    doc.pipe(writeStream);
-    
-    doc.fillColor("blue")
-    .text('Here is a link!', 100, 100)
-    .underline(100, 100, 160, 27, { color: "#0000FF" })
-    .link(100, 100, 160, 27, 'http://google.com/')
-    
-    doc.end();
-    
-    // Read the created file
-    const readStream = fs.createReadStream(tempFileName);
-    // Create an array of buffers 
-    let data = [];
-    readStream.on('data', (d) => data.push(d));
-    
-    // Wait until the read stream finishes
-    await streamEnd(readStream);
-
-    // Set the response headers
-    ctx.response.attachment(tempFileName);
-    
-    // Set the body of the response
-    ctx.body = Buffer.concat(data);
-    
-    // Delete the file
-    fs.unlink(tempFileName);
-}
-
-function streamEnd(stream) {
-  return new Promise(function(resolve, reject) {
-    stream.on('error', reject);
-    stream.on('close', resolve);
-  });
 }
 
 module.exports = {getHeaders, asyncForEach, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory}
