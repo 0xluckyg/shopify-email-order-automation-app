@@ -7,6 +7,7 @@ import {
     Spinner
 } from '@shopify/polaris';
 import axios from 'axios';
+import FileDownload from 'js-file-download';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
@@ -112,6 +113,9 @@ class EmailPreview extends React.Component {
                     <div onClick={()=>{
                         axios.get(downloadURL, {
                             params: {pdfName: data}
+                        }).then(res => {
+                            console.log('data: ', res.data)
+                            FileDownload(res.data, data);
                         })
                     }}>{data}</div>
                 </div>  
