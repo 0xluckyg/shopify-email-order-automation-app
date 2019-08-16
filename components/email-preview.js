@@ -115,7 +115,7 @@ class EmailPreview extends React.Component {
                             params: {pdfName: data}
                         }).then(res => {
                             console.log('data: ', res.data)
-                            FileDownload(res.data, data);
+                            FileDownload(pdfMarkdown, data);
                         })
                     }}>{data}</div>
                 </div>  

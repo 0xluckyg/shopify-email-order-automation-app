@@ -40,7 +40,8 @@ const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
-const {getOrders, getOrderPDF} = require('./server/get-orders');
+const {getOrders} = require('./server/get-orders');
+const {getOrderPDF} = require ('./server/pdf')
 const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
 const {sendOrders, getAllOrdersForDay, sendOrdersCron} = require('./server/send-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
@@ -78,7 +79,6 @@ app.prepare().then(async () => {
     const routerUnauthorized = new Router();
     server.use(routerUnauthorized.routes());
     routerUnauthorized.get('/', switchSession)    
-
     //Allows routes that do not require authentication to be handled    
     server.use(async (ctx, next) => {        
         let noAuth = false
