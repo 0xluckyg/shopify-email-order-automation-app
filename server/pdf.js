@@ -1,6 +1,7 @@
 const PDFKit = require('pdfkit')
 const fs = require('fs')
 const UUIDv4 = require('uuid/v4')
+const {createOrderText} = require('../helper/template')
 
 async function writePDF(tempFileName) {
     return new Promise((resolve, reject) => {

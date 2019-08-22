@@ -1,7 +1,7 @@
 const axios = require('axios');
 const {User} = require('./db/user');
 const {ProcessedOrder} = require('./db/processed-order');
-const {createOrderText, createSubjectText} = require('../config/template');
+const {createOrderText, createSubjectText} = require('../helper/template');
 const {sendGmail} = require('./auth/gmail-auth');
 const {getHeaders, asyncForEach, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory} = require('./orders-helper')
 const schedule = require('node-schedule');
@@ -143,7 +143,12 @@ async function reformatOrdersByEmail(orders, date) {
         const tooLong = Object.keys(emails[email]).length
         console.log('toolong: ', tooLong)
         if (tooLong > 2) {
-            emails[email] = `${date}.pdf`
+            emails[email] = {
+                type: 'pdf',
+                name: `${date}.pdf`,
+                count: tooLong,
+                
+            }
         }
     })
     

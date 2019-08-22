@@ -11,7 +11,7 @@ import FileDownload from 'js-file-download';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
-import {createOrderText} from '../config/template'
+import {createOrderText} from '../helper/template'
 import NoContent from './no-content'
 
 class EmailPreview extends React.Component {    
@@ -105,20 +105,20 @@ class EmailPreview extends React.Component {
     renderEmails(data, key, index) { 
         console.log('data: ', data)
         console.log('data: ', typeof data === 'string')
-        if (typeof data === 'string' || data instanceof String) {
+        if (data.type && data.type == 'pdf') {
             const downloadURL = `${process.env.APP_URL}/get-order-pdf`
             return <Card key={key}>            
                 <div style={{width: '90%', margin: '20px', display:"flex", justifyContent: "space-between"}}>                                      
                     <div><Badge>{key}</Badge></div>
-                    <div onClick={()=>{
+                    <p style={{cursor: 'pointer', textDecoration: 'underline'}} onClick={()=>{
                         axios.get(downloadURL, {
-                            params: {pdfName: data}
+                            params: {pdfName: data.name}
                         }).then(res => {
                             console.log('data: ', res.data)
                             const pdf = new Buffer(res.data, 'base64')
-                            FileDownload(pdf, data);
+                            FileDownload(pdf, data.name);
                         })
-                    }}>{data}</div>
+                    }}>{data.name}</p>
                 </div>  
             </Card>
         }
