@@ -79,10 +79,13 @@ async function getOrderPDF(ctx) {
     
     // Delete the file
     fs.unlinkSync(tempFileName);
+
+    const pdfBinary = Buffer.concat(data)
+    const pdfBase64 = pdfBinary.toString('base64')
     
     ctx.response.attachment(tempFileName);
     ctx.type = 'application/pdf';
-    ctx.body = Buffer.concat(data);
+    ctx.body = pdfBase64;
 }
 
 module.exports = {getOrderPDF}
