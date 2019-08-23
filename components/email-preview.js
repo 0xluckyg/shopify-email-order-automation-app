@@ -112,7 +112,10 @@ class EmailPreview extends React.Component {
                     <div><Badge>{key}</Badge></div>
                     <p style={{cursor: 'pointer', textDecoration: 'underline'}} onClick={()=>{
                         axios.get(downloadURL, {
-                            params: {pdfName: data.name}
+                            params: {
+                                pdfInfo: data,
+                                date: this.props.date
+                            }
                         }).then(res => {
                             console.log('data: ', res.data)
                             const pdf = new Buffer(res.data, 'base64')
@@ -158,7 +161,6 @@ class EmailPreview extends React.Component {
                     if (key) return this.renderEmails(this.state.emailDetail[key], key, index)
                 })}
             </div>
-            
         )               
     }
 

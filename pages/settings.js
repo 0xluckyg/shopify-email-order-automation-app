@@ -13,7 +13,7 @@ import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import pageHeader from '../components/page-header'
 import GmailCard from '../components/gmail-auth'
-import keys from '../config/template'
+import keys from '../helper/template'
 
 class Settings extends React.Component {
     mounted = false

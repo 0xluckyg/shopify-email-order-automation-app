@@ -151,6 +151,7 @@ class OrdersByDay extends React.Component {
                     center
                 >
                     <EmailPreview 
+                        date={this.props.date}
                         loading={this.state.previewLoading}                        
                         detail={this.state.previewDetail}
                         reload={() => {                        

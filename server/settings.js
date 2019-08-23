@@ -5,7 +5,6 @@
 // ctx.cookies.set('example', 1) sets cookie
 
 const {User} = require('./db/user');
-const keys = require('../config/template')
 
 //Returns user on the render of the index file on client side
 async function getSettings(ctx) {
