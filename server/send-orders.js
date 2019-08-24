@@ -81,9 +81,18 @@ async function sendEmails(shop, emails) {
 }
 
 async function sendOrders(ctx) {
-    try {        
-        let allOrders = JSON.parse(ctx.request.rawBody).orders;
-        const sent = await sendEmails(ctx.session.shop, allOrders)
+    try {
+        const {shop, accessToken} = ctx.session
+        const {date} = ctx.query
+
+        let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
+        allOrders = await cleanOrders(allOrders)
+        allOrders = await combineOrdersAndEmailRules(shop, allOrders)
+        allOrders = await combineOrdersAndSentHistory(allOrders)
+        let reformattedOrders = await reformatOrdersByEmail(allOrders, date, true)
+        console.log('rfo ', reformattedOrders)
+
+        const sent = await sendEmails(shop, reformattedOrders)
         ctx.status = 200
         ctx.body = sent
     } catch (err) {
@@ -137,7 +146,7 @@ async function sendOrdersCron() {
             allOrders = await cleanOrders(allOrders)
             allOrders = await combineOrdersAndEmailRules(shop, allOrders)
             allOrders = await combineOrdersAndSentHistory(allOrders)    
-            let reformattedOrders = await reformatOrdersByEmail(allOrders)
+            let reformattedOrders = await reformatOrdersByEmail(allOrders, today, true)
             
             await sendEmails(shop, reformattedOrders)
         })        

@@ -167,7 +167,7 @@ class EmailPreview extends React.Component {
     sendEmails() {
         this.setState({isSending: true})
         axios.post(process.env.APP_URL + '/send-orders', {
-            orders: this.state.emailDetail
+            date: this.props.date
         })
         .then(() => {
             this.props.showToastAction(true, 'Orders sent!')

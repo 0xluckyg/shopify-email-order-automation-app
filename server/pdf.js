@@ -58,10 +58,7 @@ async function createPDFContentFromScratch(ctx) {
 	const {shop} = ctx.session
 	const {pdfInfo} = ctx.query
 	const formattedOrders = await getAllOrdersForDay(ctx)
-	console.log('p; ', pdfInfo)
-	console.log('f; ', formattedOrders)
-	const pdfData = formattedOrders[pdfInfo.email]
-	console.log('d; ', pdfData)
+	const pdfData = formattedOrders[JSON.parse(pdfInfo).email]
 	return await createPDFContent(shop, pdfData)
 }
 
@@ -105,10 +102,8 @@ async function getOrderPDF(ctx) {
 	
 	// Wait until the read stream finishes
 	await streamEnd(readStream);
-	
-	console.log('data: ',Buffer.concat(data))
-	
-	// Delete the file
+		
+	// Delete the pdf file
 	fs.unlinkSync(tempFileName);
 
 	const pdfBinary = Buffer.concat(data)
