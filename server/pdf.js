@@ -78,7 +78,15 @@ async function writePDF(tempFileName, pdfData) {
 	})
 }
 
-async function getOrderPDF(ctx) {
+function getPDFName(data) {
+	const orderNumbers = Object.keys(data) 
+	const name = (orderNumbers.length <= 1) ? 
+	`order-${orderNumbers[0]}.pdf` : 
+	`order-${orderNumbers[0]}-${orderNumbers[orderNumbers.length - 1]}.pdf`
+	return name
+}
+
+async function getOrderPDF(ctx, pdfData) {
 	
 	function streamEnd(stream) {
 		return new Promise(function(resolve, reject) {
@@ -90,7 +98,8 @@ async function getOrderPDF(ctx) {
 	// Generate random file name
 	let tempFileName = `${UUIDv4()}.pdf`;
 
-	const pdfData = await createPDFContentFromScratch(ctx)
+	//If pdf data isn't provided (for preview purpose)
+	if (ctx) pdfData = await createPDFContentFromScratch(ctx)
 
 	await writePDF(tempFileName, pdfData)
 	
@@ -108,10 +117,15 @@ async function getOrderPDF(ctx) {
 
 	const pdfBinary = Buffer.concat(data)
 	const pdfBase64 = pdfBinary.toString('base64')
-	
-	ctx.response.attachment(tempFileName);
+	const pdfName = getPDFName(pdfData)
+
+	return {pdfName, pdfBase64}
+}
+
+async function getOrderPDFPreview(ctx) {
+	const {pdfBase64} = await getOrderPDF(ctx)
 	ctx.type = 'application/pdf';
 	ctx.body = pdfBase64;
 }
 
-module.exports = {getOrderPDF}
+module.exports = {getOrderPDF, getOrderPDFPreview}

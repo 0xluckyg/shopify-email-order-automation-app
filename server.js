@@ -41,7 +41,7 @@ const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
 const {getOrders} = require('./server/get-orders');
-const {getOrderPDF} = require ('./server/pdf')
+const {getOrderPDFPreview} = require ('./server/pdf')
 const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
 const {sendOrders, getAllOrdersForDay, sendOrdersCron} = require('./server/send-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
@@ -119,7 +119,7 @@ app.prepare().then(async () => {
     router.get('/get-settings', getSettings);
     router.get('/get-day-orders', getAllOrdersForDay);
     router.get('/gmail-auth', getTokens);
-    router.get('/get-order-pdf', getOrderPDF);
+    router.get('/get-order-pdf', getOrderPDFPreview);
 
     router.post('/add-rule', addRule);
     router.post('/edit-rule', editRule);

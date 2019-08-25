@@ -117,7 +117,6 @@ class EmailPreview extends React.Component {
                                 date: this.props.date
                             }
                         }).then(res => {
-                            console.log('data: ', res.data)
                             const pdf = new Buffer(res.data, 'base64')
                             FileDownload(pdf, data.name);
                         })

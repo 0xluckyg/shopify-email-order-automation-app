@@ -2,7 +2,8 @@ const axios = require('axios');
 const {User} = require('./db/user');
 const {ProcessedOrder} = require('./db/processed-order');
 const {createOrderText, createSubjectText} = require('../helper/template');
-const {sendGmail} = require('./auth/gmail-auth');
+const {getOrderPDF} = require('./pdf')
+const {sendGmail, formatAttachment} = require('./auth/gmail-auth');
 const {getHeaders, 
     asyncForEach, 
     fetchAllOrdersForDay,
@@ -17,33 +18,47 @@ const version = '2019-04'
 
 async function sendEmails(shop, emails) {
     try {
+        const user = await User.findOne({shop}, {
+            gmail: 1, settings: 1
+        })
+        const {
+            headerTemplateText, 
+            orderTemplateText, 
+            productTemplateText, 
+            footerTemplateText, 
+            subjectTemplateText
+        } = user.settings
+
         await asyncForEach(Object.keys(emails), async (email) => {
             const emailData = emails[email]
-            const user = await User.findOne({shop}, {gmail: 1, settings: 1})
-            const {
-                headerTemplateText, 
-                orderTemplateText, 
-                productTemplateText, 
-                footerTemplateText, 
-                subjectTemplateText
-            } = user.settings
 
+            const tooLong = Object.keys(emailData).length
+            let sent = false
             const subjectText = createSubjectText(shop, subjectTemplateText)
-            const orderText = createOrderText(
-                emailData, 
-                shop, 
-                headerTemplateText,
-                orderTemplateText, 
-                productTemplateText,
-                footerTemplateText
-            )
+            let bodyText = ''
+            let attachments = []
+            if (tooLong > 2) {
+                bodyText = 'Please see the attached PDF for orders.'
+                const {pdfName, pdfBase64} = await getOrderPDF(null, emailData)
+                attachments.push(formatAttachment(pdfName, pdfBase64))
+            } else {
+                bodyText = createOrderText(
+                    emailData, 
+                    shop, 
+                    headerTemplateText,
+                    orderTemplateText, 
+                    productTemplateText,
+                    footerTemplateText
+                )
+            }
 
-            //send email through the gmai lapi
-            const sent = await sendGmail(                
+            //send email through the gmail lapi
+            sent = await sendGmail(                
                 user.gmail.googleRefreshToken, 
                 email,
                 subjectText,
-                orderText
+                bodyText,
+                attachments
             )
 
             if (!sent) return            
@@ -91,7 +106,7 @@ async function sendOrders(ctx) {
         allOrders = await combineOrdersAndSentHistory(allOrders)
         let reformattedOrders = await reformatOrdersByEmail(allOrders, date, true)
 
-        const sent = await sendEmails(shop, reformattedOrders)
+        const sent = await sendEmails(shop, reformattedOrders, date)
         ctx.status = 200
         ctx.body = sent
     } catch (err) {
@@ -147,7 +162,7 @@ async function sendOrdersCron() {
             allOrders = await combineOrdersAndSentHistory(allOrders)    
             let reformattedOrders = await reformatOrdersByEmail(allOrders, today, true)
             
-            await sendEmails(shop, reformattedOrders)
+            await sendEmails(shop, reformattedOrders, today)
         })        
     })
 }

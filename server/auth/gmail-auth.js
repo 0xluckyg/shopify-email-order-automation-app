@@ -2,6 +2,7 @@
 const {google} = require('googleapis');
 const {User} = require('../db/user');
 const {Base64} = require('js-base64');
+const MailComposer = require('nodemailer/lib/mail-composer');
 
 /*************/
 /** HELPERS **/
@@ -43,6 +44,64 @@ async function saveToken(shop, googleRefreshToken) {
     }, {new: true})    
 }
 
+function getGmailApi(auth) {
+    return google.gmail({ version: 'v1', auth });
+}
+
+function sendEmail(client, to, subject, body, attachments) {
+    return new Promise(async (resolve, reject) => {
+        let mail = new MailComposer({
+            to,
+            text: body,
+            // html: " <strong> I hope this works </strong>",
+            subject,
+            textEncoding: "base64",
+            attachments
+        });
+        
+        mail.compile().build( (error, msg) => {
+            if (error) {
+                console.log('Failed compiling email ' + error);
+                reject(error)
+            } 
+        
+            const encodedMessage = Buffer.from(msg)
+                .toString('base64')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+        
+            const gmail = getGmailApi(client);  
+            gmail.users.messages.send({
+                auth: client,
+                userId: 'me',
+                resource: {
+                    raw: encodedMessage,
+                }
+            }, (err, res) => {
+                if (err) {
+                    console.log('Failed send gmail from nodemailer: ' + err);
+                    reject(err) 
+                }
+                resolve(res)
+            });
+        })    
+    })
+}
+
+/*************/
+/** UNUSED **/
+/*************/
+
+//React Google Auth handles this for us. Not actually using it for the applciation.
+function getAuthCode(ctx) {    
+    // generate a url that asks permissions
+    const oauth2Client = createConnection()    
+    const url = getConnectionUrl(oauth2Client)
+    
+    ctx.body = url
+}
+
 //Refreshes gmail token automatically. Not documented in googleapis
 function refreshGmailToken(shop, oauth2Client) {
     return new Promise((resolve, reject) => {
@@ -58,21 +117,16 @@ function refreshGmailToken(shop, oauth2Client) {
     })
 }
 
+function sendEmailRFC2822(client, to, subject, body) {
+    function getRawEmail(to, subject, body) {
+        //don't need 'from'
+        const RFC2822 = `To: ${to}\nSubject: ${subject}\n\nbody: ${body}`
+        let base64EncodedEmail = Base64.encodeURI(RFC2822);
+        //url protection
+        let URLSafeEncodedEmail = base64EncodedEmail.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        return URLSafeEncodedEmail
+    }
 
-function getGmailApi(auth) {
-    return google.gmail({ version: 'v1', auth });
-}
-
-function getRawEmail(to, subject, body) {
-    //don't need 'from'
-    const RFC2822 = `To: ${to}\nSubject: ${subject}\n\nbody: ${body}`
-    let base64EncodedEmail = Base64.encodeURI(RFC2822);
-    //url protection
-    let URLSafeEncodedEmail = base64EncodedEmail.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    return URLSafeEncodedEmail
-}
-
-function sendEmail(client, to, subject, body) {
     return new Promise(async (resolve, reject) => {
         try {
             const gmail = getGmailApi(client);   
@@ -101,14 +155,21 @@ function sendEmail(client, to, subject, body) {
 /** MAIN **/
 /*************/
 
-async function sendGmail(refresh_token, to, subject, body) {
+function formatAttachment(filename, base64Data) {
+    // encoded string as an attachment
+    return {
+        filename, content: base64Data, encoding: 'base64'
+    }
+}
+
+async function sendGmail(refresh_token, to, subject, body, attachments) {
     try {    
         let oauth2Client = createConnection()    
         
         // Once the client has a refresh token, access tokens will be acquired and refreshed automatically in the next call to the API.
         oauth2Client.setCredentials({ refresh_token });            
         const res = await sendEmail(
-            oauth2Client, to, subject, body
+            oauth2Client, to, subject, body, attachments
         )
         return (res) ? true : false    
     } catch (err) {        
@@ -150,13 +211,4 @@ async function gmailLogout(ctx) {
     }
 }
 
-//React Google Auth handles this for us. Not actually using it for the applciation.
-function getAuthCode(ctx) {    
-    // generate a url that asks permissions
-    const oauth2Client = createConnection()    
-    const url = getConnectionUrl(oauth2Client)
-    
-    ctx.body = url
-}
-
-module.exports = {getTokens, sendGmail, gmailLogout};
+module.exports = {getTokens, sendGmail, gmailLogout, formatAttachment};
