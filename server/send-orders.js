@@ -83,14 +83,13 @@ async function sendEmails(shop, emails) {
 async function sendOrders(ctx) {
     try {
         const {shop, accessToken} = ctx.session
-        const {date} = ctx.query
+        const {date} = JSON.parse(ctx.request.rawBody)
 
         let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
         allOrders = await cleanOrders(allOrders)
         allOrders = await combineOrdersAndEmailRules(shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
         let reformattedOrders = await reformatOrdersByEmail(allOrders, date, true)
-        console.log('rfo ', reformattedOrders)
 
         const sent = await sendEmails(shop, reformattedOrders)
         ctx.status = 200
