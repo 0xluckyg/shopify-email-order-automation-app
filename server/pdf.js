@@ -21,14 +21,14 @@ async function getAllOrdersForDay(ctx) {
 		allOrders = await cleanOrders(allOrders)
 		allOrders = await combineOrdersAndEmailRules(shop, allOrders)
 		allOrders = await combineOrdersAndSentHistory(allOrders)
-		let reformattedOrders = await reformatOrdersByEmail(allOrders, date, true)
+		let reformattedOrders = await reformatOrdersByEmail(allOrders, true)
 		return reformattedOrders
 	} catch (err) {
 		console.log('Failed getting all orders for day: ', err)
 	}
 }
 
-async function getTemplateTexts(shop) {
+async function getUserSettings(shop) {
 	const user = await User.findOne({shop}).select({ 
 		"settings": 1
 	})
@@ -42,7 +42,7 @@ async function createPDFContent(shop, pdfData) {
 		orderTemplateText, 
 		productTemplateText, 
 		footerTemplateText
-	} = await getTemplateTexts(shop)
+	} = await getUserSettings(shop)
 	return createOrderText(
 		pdfData, 
 		shop, 
@@ -55,11 +55,9 @@ async function createPDFContent(shop, pdfData) {
 
 //when order data isnt available and must refetch all orders again from shop
 async function createPDFContentFromScratch(ctx) {
-	const {shop} = ctx.session
 	const {pdfInfo} = ctx.query
 	const formattedOrders = await getAllOrdersForDay(ctx)
-	const pdfData = formattedOrders[JSON.parse(pdfInfo).email]
-	return await createPDFContent(shop, pdfData)
+	return formattedOrders[JSON.parse(pdfInfo).email]
 }
 
 async function writePDF(tempFileName, pdfData) {
@@ -97,9 +95,18 @@ async function getOrderPDF(ctx, pdfData) {
 	
 	// Generate random file name
 	let tempFileName = `${UUIDv4()}.pdf`;
-
+	// Default pdf name
+	let pdfName = 'orders.pdf'
+	//If pdf data is provided (for sending purpose) ctx will be shop instead
+	if (typeof ctx === 'string' || ctx instanceof String) {
+		pdfName = getPDFName(pdfData)
+		pdfData = await createPDFContent(ctx, pdfData)
 	//If pdf data isn't provided (for preview purpose)
-	if (ctx) pdfData = await createPDFContentFromScratch(ctx)
+	} else { 
+		const pdfJson = await createPDFContentFromScratch(ctx) 
+		pdfName = getPDFName(pdfJson)
+		pdfData = await createPDFContent(shop, pdfJson)
+	}
 
 	await writePDF(tempFileName, pdfData)
 	
@@ -117,7 +124,6 @@ async function getOrderPDF(ctx, pdfData) {
 
 	const pdfBinary = Buffer.concat(data)
 	const pdfBase64 = pdfBinary.toString('base64')
-	const pdfName = getPDFName(pdfData)
 
 	return {pdfName, pdfBase64}
 }
@@ -128,4 +134,4 @@ async function getOrderPDFPreview(ctx) {
 	ctx.body = pdfBase64;
 }
 
-module.exports = {getOrderPDF, getOrderPDFPreview}
+module.exports = {getOrderPDF, getOrderPDFPreview, getPDFName}

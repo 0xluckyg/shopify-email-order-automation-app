@@ -1,6 +1,7 @@
 const axios = require('axios');
 const {Rule} = require('./db/rule')
 const {ProcessedOrder} = require('./db/processed-order')
+const {getPDFName} = require('./pdf')
 const _ = require('lodash')
 
 function getHeaders(accessToken) {
@@ -217,7 +218,7 @@ function createEmailObject(emails, order, item, email) {
     return emails
 }
 
-async function reformatOrdersByEmail(orders, date, isLongVersion) {
+async function reformatOrdersByEmail(orders, isLongVersion) {
     //  [{
     //     id
     //     shipping_address
@@ -257,14 +258,15 @@ async function reformatOrdersByEmail(orders, date, isLongVersion) {
     })
 
     if (isLongVersion) return emails
-    
+
     await asyncForEach(Object.keys(emails), async (email) => {
         const tooLong = Object.keys(emails[email]).length
         if (tooLong > 2) {
+            const pdfName = getPDFName(emails[email])
             console.log('toolong')
             emails[email] = {
                 type: 'pdf',
-                name: `${date}.pdf`,
+                name: pdfName,
                 count: tooLong,
                 email,
 

@@ -80,7 +80,7 @@ function sendEmail(client, to, subject, body, attachments) {
                 }
             }, (err, res) => {
                 if (err) {
-                    console.log('Failed send gmail from nodemailer: ' + err);
+                    console.log('Failed to send gmail from nodemailer: ' + err);
                     reject(err) 
                 }
                 resolve(res)

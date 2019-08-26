@@ -39,14 +39,14 @@ async function sendEmails(shop, emails) {
             let attachments = []
             if (tooLong > 2) {
                 bodyText = 'Please see the attached PDF for orders.'
-                const {pdfName, pdfBase64} = await getOrderPDF(null, emailData)
+                const {pdfName, pdfBase64} = await getOrderPDF(shop, emailData)
                 attachments.push(formatAttachment(pdfName, pdfBase64))
             } else {
                 bodyText = createOrderText(
                     emailData, 
                     shop, 
                     headerTemplateText,
-                    orderTemplateText, 
+                    orderTemplateText,
                     productTemplateText,
                     footerTemplateText
                 )
@@ -104,7 +104,7 @@ async function sendOrders(ctx) {
         allOrders = await cleanOrders(allOrders)
         allOrders = await combineOrdersAndEmailRules(shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
-        let reformattedOrders = await reformatOrdersByEmail(allOrders, date, true)
+        let reformattedOrders = await reformatOrdersByEmail(allOrders, true)
 
         const sent = await sendEmails(shop, reformattedOrders, date)
         ctx.status = 200
@@ -125,7 +125,7 @@ async function getAllOrdersForDay(ctx) {
         allOrders = await cleanOrders(allOrders)
         allOrders = await combineOrdersAndEmailRules(shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
-        let reformattedOrders = await reformatOrdersByEmail(allOrders, date)
+        let reformattedOrders = await reformatOrdersByEmail(allOrders)
         console.log('reformattedOrders: ', reformattedOrders)
         
         ctx.body = reformattedOrders
@@ -160,7 +160,7 @@ async function sendOrdersCron() {
             allOrders = await cleanOrders(allOrders)
             allOrders = await combineOrdersAndEmailRules(shop, allOrders)
             allOrders = await combineOrdersAndSentHistory(allOrders)    
-            let reformattedOrders = await reformatOrdersByEmail(allOrders, today, true)
+            let reformattedOrders = await reformatOrdersByEmail(allOrders, true)
             
             await sendEmails(shop, reformattedOrders, today)
         })        

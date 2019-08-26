@@ -103,8 +103,6 @@ class EmailPreview extends React.Component {
     }
 
     renderEmails(data, key, index) { 
-        console.log('data: ', data)
-        console.log('data: ', typeof data === 'string')
         if (data.type && data.type == 'pdf') {
             const downloadURL = `${process.env.APP_URL}/get-order-pdf`
             return <Card key={key}>            
