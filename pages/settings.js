@@ -8,6 +8,7 @@ import {
 } from '@shopify/polaris';
 import axios from 'axios';
 import Modal from "react-responsive-modal";
+import FileDownload from 'js-file-download';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
@@ -32,8 +33,14 @@ class Settings extends React.Component {
             previousFooterTemplateText: keys.FOOTER_TEMPLATE_TEXT,
             footerTemplateText: keys.FOOTER_TEMPLATE_TEXT,            
             templateTextLoading: false,
+            
             sendMethod: 'manual',  
             sendMethodLoading: false,
+            
+            PDFOrderLimit: 100,
+            previousPDFOrderLimit: 100,
+            PDFOrderLimitLoading: false,
+            PDFPreviewLoading: false
         }
     }
 
@@ -62,6 +69,7 @@ class Settings extends React.Component {
                 productTemplateText: (productTemplateText) ? productTemplateText : keys.PRODUCT_TEMPLATE_TEXT,
                 previousFooterTemplateText: (footerTemplateText) ? footerTemplateText : keys.FOOTER_TEMPLATE_TEXT,
                 footerTemplateText: (footerTemplateText) ? footerTemplateText : keys.FOOTER_TEMPLATE_TEXT,
+                
                 sendMethod: sendMethod.method
             })
         }).catch(err => {               
@@ -132,6 +140,104 @@ class Settings extends React.Component {
             && this.state.previousOrderTemplateText == this.state.orderTemplateText 
             && this.state.previousProductTemplateText == this.state.productTemplateText
             && this.state.previousFooterTemplateText == this.state.footerTemplateText)
+    }
+
+    renderOrderMethod() {
+        return <Card sectioned title="Order Method">
+                    <div style={{display:'flex', justifyContent:'space-between'}}>
+                    <p style={{lineHeight:'35px'}}>Order email send method (Automatic sends once everyday).</p>
+                    <ButtonGroup segmented>
+                        <Button 
+                            disabled={(this.state.sendMethod == 'manual')}
+                            onClick={() => this.setSendMethod('manual')}
+                            loading={this.state.sendMethodLoading}
+                        >
+                            Manual
+                        </Button>
+                        <Button 
+                            disabled={(this.state.sendMethod == 'automatic')}
+                            onClick={() => this.setSendMethod('automatic')}
+                            loading={this.state.sendMethodLoading}
+                        >
+                            Automatic
+                        </Button>
+                    </ButtonGroup>
+                    </div>
+                </Card>
+    }
+    
+    setPDFOrderLimit(PDFOrderLimit) {
+        if (isNaN(PDFOrderLimit)) return
+        if (PDFOrderLimit < 0 || PDFOrderLimit > 500) return
+        this.setState({PDFOrderLimit})
+    }
+
+    PDFOrderLimitHasNotChanged () {
+        return this.state.previousPDFOrderLimit == this.state.PDFOrderLimit
+    }
+
+    getPDFPreview() {
+        this.setState({PDFPreviewLoading: true})
+        axios.get(process.env.APP_URL + '/pdf-preview')
+        .then(() => {
+            const pdf = new Buffer(res.data, 'base64')
+            FileDownload(pdf, data.name);
+        }).catch(() => {   
+            if (!this.mounted) return            
+            this.setState({PDFPreviewLoading: false})
+            this.props.showToastAction(true, "Couldn't get preview. Please try again later.")
+        })   
+    }
+
+    savePDFOrderLimit() {
+        const PDFOrderLimit = this.state.PDFOrderLimit
+        this.setState({PDFOrderLimitLoading: true})
+        axios.post(process.env.APP_URL + '/pdf-order-limit', {
+            PDFOrderLimit
+        })
+        .then(() => {            
+            if (!this.mounted) return            
+            this.setState({
+                PDFOrderLimit, 
+                previousPDFOrderLimit,
+                PDFOrderLimitLoading: false
+            });
+            this.props.showToastAction(true, 'Saved settings!')
+        }).catch(() => {   
+            if (!this.mounted) return            
+            this.setState({PDFOrderLimitLoading: false})
+            this.props.showToastAction(true, "Couldn't save. Please try again later.")
+        })   
+    }
+
+    renderPDFSettings() {
+        return <Card sectioned title="PDF Settings">
+                    <p style={{lineHeight:'35px', display: 'block', width: '100%'}}><b>Send order emails in PDF format</b></p>
+                    <div style={{display:'flex', justifyContent:'space-between'}}>
+                        <div>
+                            <p style={{lineHeight:'35px'}}>Convert email body into PDF if there are more than</p>
+                            <TextField
+                                value={this.state.PDFOrderLimit}
+                                onChange={PDFOrderLimit => this.setPDFOrderLimit(PDFOrderLimit)}
+                            />
+                            <p style={{lineHeight:'35px'}}>orders in an email.</p>
+                        </div>
+                    </div>
+                    <div style={{display:'flex', justifyContent:'flex-end'}}>
+                        <div style={{marginRight:'20px'}}>
+                            <Button onClick={() => this.getPDFPreview()}>
+                                Preview
+                            </Button>
+                        </div>
+                        <Button 
+                            disabled={this.PDFOrderLimitHasNotChanged()}
+                            onClick={() => this.savePDFOrderLimit()}
+                            loading={this.state.PDFOrderLimitLoading}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                </Card>
     }
 
     render() {
@@ -257,27 +363,8 @@ class Settings extends React.Component {
                         </Button>
                         </div>
                     </Card>                    
-                    <Card sectioned title="Order Method">
-                        <div style={{display:'flex', justifyContent:'space-between'}}>
-                        <p style={{lineHeight:'35px'}}>Order email send method (Automatic sends once everyday).</p>
-                        <ButtonGroup segmented>
-                            <Button 
-                                disabled={(this.state.sendMethod == 'manual')}
-                                onClick={() => this.setSendMethod('manual')}
-                                loading={this.state.sendMethodLoading}
-                            >
-                                Manual
-                            </Button>
-                            <Button 
-                                disabled={(this.state.sendMethod == 'automatic')}
-                                onClick={() => this.setSendMethod('automatic')}
-                                loading={this.state.sendMethodLoading}
-                            >
-                                Automatic
-                            </Button>
-                        </ButtonGroup>
-                        </div>
-                    </Card>
+                    {this.renderOrderMethod()}
+                    {this.renderPDFSettings()}
                     <GmailCard/>           
                 </Layout.Section>
             </Layout>            
