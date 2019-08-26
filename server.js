@@ -41,8 +41,8 @@ const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
 const {getOrders} = require('./server/get-orders');
-const {getOrderPDFPreview} = require ('./server/pdf')
-const {getSettings, setSendMethod, setTemplateText} = require('./server/settings');
+const {getOrderPDFPreview, getPDFPreview} = require ('./server/pdf')
+const {getSettings, setSendMethod, setTemplateText, setPDFOrderLimit} = require('./server/settings');
 const {sendOrders, getAllOrdersForDay, sendOrdersCron} = require('./server/send-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const {shopifyAuth, switchSession} = require('./server/auth/shopify-auth');
@@ -120,6 +120,7 @@ app.prepare().then(async () => {
     router.get('/get-day-orders', getAllOrdersForDay);
     router.get('/gmail-auth', getTokens);
     router.get('/get-order-pdf', getOrderPDFPreview);
+    router.get('/get-pdf-preview', getPDFPreview);
 
     router.post('/add-rule', addRule);
     router.post('/edit-rule', editRule);
@@ -127,6 +128,7 @@ app.prepare().then(async () => {
     router.post('/contact-us', contactUs);
     router.post('/email-template', setTemplateText);
     router.post('/send-method', setSendMethod);
+    router.post('/set-pdf-order-limit', setPDFOrderLimit);
     router.post('/send-orders', sendOrders);    
     router.post('/gmail-logout', gmailLogout);    
 

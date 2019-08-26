@@ -51,7 +51,9 @@ async function setSendMethod(ctx) {
     const body = JSON.parse(ctx.request.rawBody)    
     if (shop) {
         try {
-            await User.findOneAndUpdate({shop}, { $set: { "sendMethod.method": body.sendMethod } })
+            await User.findOneAndUpdate({shop}, { 
+                $set: { "settings.sendMethod.method": body.sendMethod } 
+            })
             ctx.body = 'saved send method'
         } catch (err) {
             ctx.status = 400
@@ -61,4 +63,21 @@ async function setSendMethod(ctx) {
     }
 }
 
-module.exports = {getSettings, setSendMethod, setTemplateText}
+async function setPDFOrderLimit(ctx) {
+    const shop = ctx.session.shop       
+    const body = JSON.parse(ctx.request.rawBody)    
+    if (shop) {
+        try {
+            await User.findOneAndUpdate({shop}, { 
+                $set: { "settings.PDFSettings.PDFOrderLimit": body.PDFOrderLimit } 
+            })
+            ctx.body = 'saved PDF order limit'
+        } catch (err) {
+            ctx.status = 400
+        }
+    } else {
+        ctx.status = 400
+    }
+}
+
+module.exports = {getSettings, setSendMethod, setTemplateText, setPDFOrderLimit}

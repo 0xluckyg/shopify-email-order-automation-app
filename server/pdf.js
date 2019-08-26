@@ -2,7 +2,7 @@ const PDFKit = require('pdfkit')
 const fs = require('fs')
 const UUIDv4 = require('uuid/v4')
 const {User} = require('./db/user');
-const {createOrderText} = require('../helper/template')
+const {createOrderText, getTemplateTexts} = require('../helper/template')
 const { 
 fetchAllOrdersForDay,
 cleanOrders, 
@@ -84,15 +84,15 @@ function getPDFName(data) {
 	return name
 }
 
+function streamEnd(stream) {
+	return new Promise(function(resolve, reject) {
+		stream.on('error', reject);
+		stream.on('close', resolve);
+	});
+}
+
 async function getOrderPDF(ctx, pdfData) {
-	
-	function streamEnd(stream) {
-		return new Promise(function(resolve, reject) {
-			stream.on('error', reject);
-			stream.on('close', resolve);
-		});
-	}
-	
+	try {
 	// Generate random file name
 	let tempFileName = `${UUIDv4()}.pdf`;
 	// Default pdf name
@@ -126,6 +126,10 @@ async function getOrderPDF(ctx, pdfData) {
 	const pdfBase64 = pdfBinary.toString('base64')
 
 	return {pdfName, pdfBase64}
+
+	} catch(err) {
+		console.log('Failed getting order pdf: ', err)
+	}
 }
 
 async function getOrderPDFPreview(ctx) {
@@ -134,4 +138,53 @@ async function getOrderPDFPreview(ctx) {
 	ctx.body = pdfBase64;
 }
 
-module.exports = {getOrderPDF, getOrderPDFPreview, getPDFName}
+//For previewing PDF in settings
+async function getPDFPreview(ctx) {
+	try {
+
+	const {shop} = ctx.session
+	// Generate random file name
+	let tempFileName = `${UUIDv4()}.pdf`;
+	
+	const {
+		headerTemplateText, 
+		orderTemplateText, 
+		productTemplateText, 
+		footerTemplateText
+	} = await getUserSettings(shop)
+
+    const {headerTemplate, orderTemplate, productTemplate, footerTemplate} = 
+    getTemplateTexts(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText)
+
+	const pdfText = 
+	headerTemplate + 
+	orderTemplate + 
+	productTemplate + 
+	footerTemplate
+
+	await writePDF(tempFileName, pdfText)
+	
+	// Read the created file
+	const readStream = fs.createReadStream(tempFileName);
+	// Create an array of buffers 
+	let data = [];
+	readStream.on('data', (d) => data.push(d));
+	
+	// Wait until the read stream finishes
+	await streamEnd(readStream);
+		
+	// Delete the pdf file
+	fs.unlinkSync(tempFileName);
+
+	const pdfBinary = Buffer.concat(data)
+	const pdfBase64 = pdfBinary.toString('base64')
+
+	ctx.type = 'application/pdf';
+	ctx.body = pdfBase64;
+
+	} catch (err) {
+		console.log('Failed getting pdf preview: ', err) 
+	}
+}
+
+module.exports = {getOrderPDF, getOrderPDFPreview, getPDFName, getPDFPreview}

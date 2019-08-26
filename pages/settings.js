@@ -56,7 +56,10 @@ class Settings extends React.Component {
                 orderTemplateText, 
                 productTemplateText, 
                 footerTemplateText, 
-                sendMethod
+
+                sendMethod,
+
+                PDFSettings,
             } = res.data
             this.setState({
                 previousSubjectTemplateText: (subjectTemplateText) ? subjectTemplateText : keys.SUBJECT_TEMPLATE_TEXT,
@@ -70,7 +73,10 @@ class Settings extends React.Component {
                 previousFooterTemplateText: (footerTemplateText) ? footerTemplateText : keys.FOOTER_TEMPLATE_TEXT,
                 footerTemplateText: (footerTemplateText) ? footerTemplateText : keys.FOOTER_TEMPLATE_TEXT,
                 
-                sendMethod: sendMethod.method
+                sendMethod: sendMethod.method,
+                
+                previousPDFOrderLimit: PDFSettings.PDFOrderLimit,
+                PDFOrderLimit: PDFSettings.PDFOrderLimit
             })
         }).catch(err => {               
             if (!this.mounted) return            
@@ -178,13 +184,14 @@ class Settings extends React.Component {
 
     getPDFPreview() {
         this.setState({PDFPreviewLoading: true})
-        axios.get(process.env.APP_URL + '/pdf-preview')
-        .then(() => {
+        axios.get(process.env.APP_URL + '/get-pdf-preview')
+        .then(res => {
             const pdf = new Buffer(res.data, 'base64')
-            FileDownload(pdf, data.name);
-        }).catch(() => {   
+            FileDownload(pdf, 'PDFPreview.pdf');
+        }).catch((err) => {   
             if (!this.mounted) return            
             this.setState({PDFPreviewLoading: false})
+            console.log('err: ',err)
             this.props.showToastAction(true, "Couldn't get preview. Please try again later.")
         })   
     }
@@ -192,20 +199,21 @@ class Settings extends React.Component {
     savePDFOrderLimit() {
         const PDFOrderLimit = this.state.PDFOrderLimit
         this.setState({PDFOrderLimitLoading: true})
-        axios.post(process.env.APP_URL + '/pdf-order-limit', {
+        axios.post(process.env.APP_URL + '/set-pdf-order-limit', {
             PDFOrderLimit
         })
         .then(() => {            
             if (!this.mounted) return            
             this.setState({
                 PDFOrderLimit, 
-                previousPDFOrderLimit,
+                previousPDFOrderLimit: PDFOrderLimit,
                 PDFOrderLimitLoading: false
             });
             this.props.showToastAction(true, 'Saved settings!')
-        }).catch(() => {   
+        }).catch((err) => {   
             if (!this.mounted) return            
             this.setState({PDFOrderLimitLoading: false})
+            console.log('err: ',err)
             this.props.showToastAction(true, "Couldn't save. Please try again later.")
         })   
     }
@@ -215,7 +223,7 @@ class Settings extends React.Component {
                     <p style={{lineHeight:'35px', display: 'block', width: '100%'}}><b>Send order emails in PDF format</b></p>
                     <div style={{display:'flex', justifyContent:'space-between'}}>
                         <div>
-                            <p style={{lineHeight:'35px'}}>Convert email body into PDF if there are more than</p>
+                            <p style={{lineHeight:'35px'}}>Convert email body into PDF if there are more than (500 max)</p>
                             <TextField
                                 value={this.state.PDFOrderLimit}
                                 onChange={PDFOrderLimit => this.setPDFOrderLimit(PDFOrderLimit)}

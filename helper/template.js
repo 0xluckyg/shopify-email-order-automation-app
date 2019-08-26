@@ -83,16 +83,25 @@ function createSubjectText(shop, subjectTemplateText) {
     return subjectTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
 }
 
+function getTemplateTexts(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText) {
+    const headerTemplate = (headerTemplateText) ? headerTemplateText : HEADER_TEMPLATE_TEXT        
+    const orderTemplate = (orderTemplateText) ? orderTemplateText : ORDER_TEMPLATE_TEXT    
+    const productTemplate = (productTemplateText) ? productTemplateText : PRODUCT_TEMPLATE_TEXT            
+    const footerTemplate = (footerTemplateText) ? footerTemplateText : FOOTER_TEMPLATE_TEXT
+
+    return {headerTemplate, orderTemplate, productTemplate, footerTemplate}
+}
+
 function createOrderText(data, shop, headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText) {        
     let orderText = ''
     let shopName = shop ? createShopName(shop) : 'our store'
 
-    let headerTemplate = (headerTemplateText) ? headerTemplateText : HEADER_TEMPLATE_TEXT        
+    const {headerTemplate, orderTemplate, productTemplate, footerTemplate} = 
+    getTemplateTexts(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText)
+    
     headerTemplate = headerTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
 
-    Object.keys(data).map(orderID => {
-        let orderTemplate = (orderTemplateText) ? orderTemplateText : ORDER_TEMPLATE_TEXT    
-        
+    Object.keys(data).map(orderID => {        
         let order = data[orderID]
         let customer = order.customer
         let shippingAddress = order.shipping_address
@@ -136,7 +145,6 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         let productText = PRODUCT_TEMPLATE_HEADER
         Object.keys(order.items).map(itemID => {                     
             let item = order.items[itemID]
-            let productTemplate = (productTemplateText) ? productTemplateText : PRODUCT_TEMPLATE_TEXT            
             
             let productTitle =  item.title ? item.title : 'Not provided'
             let variantTitle = item.variant_title ? item.variant_title : 'Not provided' 
@@ -156,7 +164,6 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         orderText = orderText + productText
     })
 
-    let footerTemplate = (footerTemplateText) ? footerTemplateText : FOOTER_TEMPLATE_TEXT
     footerTemplate = footerTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
 
     orderText = headerTemplate + orderText + footerTemplate
@@ -172,5 +179,6 @@ module.exports = {
     PRODUCT_TEMPLATE_TEXT,
     FOOTER_TEMPLATE_TEXT,
     createSubjectText,
-    createOrderText
+    createOrderText,
+    getTemplateTexts
 }

@@ -60,6 +60,12 @@ const UserSchema = new mongoose.Schema({
                 default: 8
             }
         },
+        PDFSettings: {
+            PDFOrderLimit: {
+                type: Number,
+                default: 100
+            }
+        },
         subjectTemplateText: {
             type: String
         },
