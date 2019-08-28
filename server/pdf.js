@@ -22,7 +22,8 @@ async function getAllOrdersForDay(ctx) {
 		allOrders = await cleanOrders(allOrders)
 		allOrders = await combineOrdersAndEmailRules(shop, allOrders)
 		allOrders = await combineOrdersAndSentHistory(allOrders)
-		let reformattedOrders = await reformatOrdersByEmail(allOrders, true)
+		let reformattedOrders = await reformatOrdersByEmail(allOrders)
+
 		return reformattedOrders
 	} catch (err) {
 		console.log('Failed getting all orders for day: ', err)

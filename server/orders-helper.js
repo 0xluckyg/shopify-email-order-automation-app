@@ -1,5 +1,6 @@
 const axios = require('axios');
 const {Rule} = require('./db/rule')
+const {User} = require('./db/user');
 const {ProcessedOrder} = require('./db/processed-order')
 const _ = require('lodash')
 
@@ -227,7 +228,7 @@ function createEmailObject(emails, order, item, email) {
     return emails
 }
 
-async function reformatOrdersByEmail(orders, isLongVersion) {
+async function reformatOrdersByEmail(orders) {
     //  [{
     //     id
     //     shipping_address
@@ -265,12 +266,18 @@ async function reformatOrdersByEmail(orders, isLongVersion) {
             })
         })
     })
+    
+    return emails
+}
 
-    if (isLongVersion) return emails
+async function reduceLongOrders(shop, emails) {
+    const user = await User.findOne({shop}, { settings: 1 })
+    const { PDFSettings } = user.settings
 
     await asyncForEach(Object.keys(emails), async (email) => {
+        const {PDFOrderLimit} = PDFSettings
         const tooLong = Object.keys(emails[email]).length
-        if (tooLong > 2) {
+        if (tooLong >= PDFOrderLimit) {
             const pdfName = getPDFName(emails[email])
             console.log('toolong')
             emails[email] = {
@@ -282,7 +289,7 @@ async function reformatOrdersByEmail(orders, isLongVersion) {
             }
         }
     })
-    
+
     return emails
 }
 
@@ -294,5 +301,6 @@ module.exports = {
     combineOrdersAndEmailRules, 
     combineOrdersAndSentHistory, 
     reformatOrdersByEmail,
-    getPDFName
+    getPDFName,
+    reduceLongOrders
 }

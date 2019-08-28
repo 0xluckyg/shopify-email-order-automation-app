@@ -11,6 +11,7 @@ const {getHeaders,
     combineOrdersAndEmailRules, 
     combineOrdersAndSentHistory, 
     reformatOrdersByEmail,
+    reduceLongOrders
 } = require('./orders-helper')
 const schedule = require('node-schedule');
 const moment = require('moment');
@@ -26,18 +27,19 @@ async function sendEmails(shop, emails) {
             orderTemplateText, 
             productTemplateText, 
             footerTemplateText, 
-            subjectTemplateText
+            subjectTemplateText,
+            PDFSettings
         } = user.settings
 
         await asyncForEach(Object.keys(emails), async (email) => {
             const emailData = emails[email]
-
+            const {PDFOrderLimit} = PDFSettings
             const tooLong = Object.keys(emailData).length
             let sent = false
             const subjectText = createSubjectText(shop, subjectTemplateText)
             let bodyText = ''
             let attachments = []
-            if (tooLong > 2) {
+            if (tooLong >= PDFOrderLimit) {
                 bodyText = 'Please see the attached PDF for orders.'
                 const {pdfName, pdfBase64} = await getOrderPDF(shop, emailData)
                 attachments.push(formatAttachment(pdfName, pdfBase64))
@@ -104,7 +106,7 @@ async function sendOrders(ctx) {
         allOrders = await cleanOrders(allOrders)
         allOrders = await combineOrdersAndEmailRules(shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
-        let reformattedOrders = await reformatOrdersByEmail(allOrders, true)
+        let reformattedOrders = await reformatOrdersByEmail(allOrders)
 
         const sent = await sendEmails(shop, reformattedOrders, date)
         ctx.status = 200
@@ -125,8 +127,8 @@ async function getAllOrdersForDay(ctx) {
         allOrders = await cleanOrders(allOrders)
         allOrders = await combineOrdersAndEmailRules(shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
-        let reformattedOrders = await reformatOrdersByEmail(allOrders)
-        console.log('reformattedOrders: ', reformattedOrders)
+        allOrders = await reformatOrdersByEmail(allOrders)
+        let reformattedOrders = await reduceLongOrders(shop, allOrders)
         
         ctx.body = reformattedOrders
     } catch (err) {
@@ -160,7 +162,7 @@ async function sendOrdersCron() {
             allOrders = await cleanOrders(allOrders)
             allOrders = await combineOrdersAndEmailRules(shop, allOrders)
             allOrders = await combineOrdersAndSentHistory(allOrders)    
-            let reformattedOrders = await reformatOrdersByEmail(allOrders, true)
+            let reformattedOrders = await reformatOrdersByEmail(allOrders)
             
             await sendEmails(shop, reformattedOrders, today)
         })        
