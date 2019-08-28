@@ -1,31 +1,34 @@
+const {fetchAllOrdersForDay, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory, reformatOrdersByEmail } = require('./orders-helper')
 const PDFKit = require('pdfkit')
 const fs = require('fs')
 const UUIDv4 = require('uuid/v4')
 const {User} = require('./db/user');
 const {createOrderText, getTemplateTexts} = require('../helper/template')
-const { 
-fetchAllOrdersForDay,
-cleanOrders, 
-combineOrdersAndEmailRules, 
-combineOrdersAndSentHistory, 
-reformatOrdersByEmail,
-} = require('./orders-helper')
 
 //For previewing send
 async function getAllOrdersForDay(ctx) {
-	try {
+	// try {
 		const {shop, accessToken} = ctx.session
 		const {date} = ctx.query
+		console.log('got here: ,', fetchAllOrdersForDay)
+		console.log('got here: ,', cleanOrders)
+		console.log('got here: ,', combineOrdersAndEmailRules)
+		console.log('got here: ,', combineOrdersAndSentHistory)
+		console.log('got here: ,', reformatOrdersByEmail)
+		console.log('got here: ,', createOrderText)
+		console.log('got here: ,', getTemplateTexts)
+
 
 		let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
+		console.log('all: ,', allOrders)
 		allOrders = await cleanOrders(allOrders)
 		allOrders = await combineOrdersAndEmailRules(shop, allOrders)
 		allOrders = await combineOrdersAndSentHistory(allOrders)
 		let reformattedOrders = await reformatOrdersByEmail(allOrders, true)
 		return reformattedOrders
-	} catch (err) {
-		console.log('Failed getting all orders for day: ', err)
-	}
+	// } catch (err) {
+	// 	console.log('Failed getting all orders for day: ', err)
+	// }
 }
 
 async function getUserSettings(shop) {

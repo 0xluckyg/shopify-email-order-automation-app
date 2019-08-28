@@ -25,7 +25,9 @@ class EmailPreview extends React.Component {
             headerTemplateText: '',
             orderTemplateText: '',
             productTemplateText: '',
-            footerTemplateText: ''
+            footerTemplateText: '',
+
+            PDFIsLoading: false
         }
     }    
 
@@ -98,27 +100,37 @@ class EmailPreview extends React.Component {
                 };
             })            
         } catch (err) {            
+            console.log('err, ', err)
             this.props.showToastAction(true, "Couldn't get settings. Please try again later.")
         }
     }
 
+    getPDF(data) {
+        this.setState({PDFIsLoading: true})
+        axios.get(`${process.env.APP_URL}/get-order-pdf`, {
+            params: {
+                pdfInfo: data,
+                date: this.props.date
+            }
+        }).then(res => {
+            this.setState({PDFIsLoading: false})
+            const pdf = new Buffer(res.data, 'base64')
+            FileDownload(pdf, data.name);
+        }).catch(err => {
+            this.setState({PDFIsLoading: false})
+            this.props.showToastAction(true, "Couldn't get PDF. Please try again later.")
+        })
+    }
+
     renderEmails(data, key, index) { 
         if (data.type && data.type == 'pdf') {
-            const downloadURL = `${process.env.APP_URL}/get-order-pdf`
             return <Card key={key}>            
                 <div style={{width: '90%', margin: '20px', display:"flex", justifyContent: "space-between"}}>                                      
                     <div><Badge>{key}</Badge></div>
-                    <p style={{cursor: 'pointer', textDecoration: 'underline'}} onClick={()=>{
-                        axios.get(downloadURL, {
-                            params: {
-                                pdfInfo: data,
-                                date: this.props.date
-                            }
-                        }).then(res => {
-                            const pdf = new Buffer(res.data, 'base64')
-                            FileDownload(pdf, data.name);
-                        })
-                    }}>{data.name}</p>
+                    {(this.state.PDFIsLoading) ? 
+                    <p>{data.name}</p> :
+                    <p style={{cursor: 'pointer', textDecoration: 'underline'}} onClick={() => this.getPDF(data)}>{data.name}</p>
+                    }
                 </div>  
             </Card>
         }

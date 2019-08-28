@@ -32,6 +32,7 @@ function returnStartAndEndDate(date) {
 }
 
 async function fetchAllOrdersForDay(shop, accessToken, queryDate) {
+    console.log('called!')
     try {                
         const version = '2019-04'
         const limit = 250

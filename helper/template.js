@@ -96,7 +96,7 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
     let orderText = ''
     let shopName = shop ? createShopName(shop) : 'our store'
 
-    const {headerTemplate, orderTemplate, productTemplate, footerTemplate} = 
+    let {headerTemplate, orderTemplate, productTemplate, footerTemplate} = 
     getTemplateTexts(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText)
     
     headerTemplate = headerTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
