@@ -96,10 +96,11 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
     let orderText = ''
     let shopName = shop ? createShopName(shop) : 'our store'
 
-    let {headerTemplate, orderTemplate, productTemplate, footerTemplate} = 
+    const {headerTemplate, orderTemplate, productTemplate, footerTemplate} = 
     getTemplateTexts(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText)
-    
-    headerTemplate = headerTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
+
+    let headerTemplateTemporary = headerTemplate
+    headerTemplateTemporary = headerTemplateTemporary.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
 
     Object.keys(data).map(orderID => {        
         let order = data[orderID]
@@ -122,25 +123,26 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         let company = shippingAddress.company ? shippingAddress.company : 'Not provided'
         let address2 = shippingAddress.address2 ? shippingAddress.address2 : 'Not provided'
 
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.ORDER_NUMBER}}}`,"g"), orderNumber)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)        
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.PROCESSED_AT}}}`,"g"), date)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.NOTE}}}`,"g"), note)
+        let orderTemplateTemporary = orderTemplate
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.ORDER_NUMBER}}}`,"g"), orderNumber)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)        
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.PROCESSED_AT}}}`,"g"), date)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.NOTE}}}`,"g"), note)
 
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.NAME}}}`,"g"), customerName)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.EMAIL}}}`,"g"), customerEmail)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.PHONE}}}`,"g"), customerPhone)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.NAME}}}`,"g"), customerName)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.EMAIL}}}`,"g"), customerEmail)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.PHONE}}}`,"g"), customerPhone)
 
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.ADDRESS1}}}`,"g"), address1)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.CITY}}}`,"g"), city)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.ZIP}}}`,"g"), zip)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.PROVINCE}}}`,"g"), province)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.COUNTRY}}}`,"g"), country)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.ADDRESS2}}}`,"g"), address2)
-        orderTemplate = orderTemplate.replace(new RegExp(`{{${keys.COMPANY}}}`,"g"), company)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.ADDRESS1}}}`,"g"), address1)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.CITY}}}`,"g"), city)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.ZIP}}}`,"g"), zip)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.PROVINCE}}}`,"g"), province)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.COUNTRY}}}`,"g"), country)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.ADDRESS2}}}`,"g"), address2)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.COMPANY}}}`,"g"), company)
         
         if (orderText != '') orderText = orderText + `\n\n`
-        orderText = orderText + orderTemplate
+        orderText = orderText + orderTemplateTemporary
 
         let productText = PRODUCT_TEMPLATE_HEADER
         Object.keys(order.items).map(itemID => {                     
@@ -152,21 +154,23 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
             let sku = item.sku ? item.sku : 'Not provided'
             let vendor = item.vendor ? item.vendor : 'Not provided'            
 
-            productTemplate = productTemplate.replace(new RegExp(`{{${keys.TITLE}}}`,"g"), productTitle)
-            productTemplate = productTemplate.replace(new RegExp(`{{${keys.VARIANT_TITLE}}}`,"g"), variantTitle)
-            productTemplate = productTemplate.replace(new RegExp(`{{${keys.QUANTITY}}}`,"g"), productQuantity)
-            productTemplate = productTemplate.replace(new RegExp(`{{${keys.SKU}}}`,"g"), sku)
-            productTemplate = productTemplate.replace(new RegExp(`{{${keys.VENDOR}}}`,"g"), vendor)            
+            let productTemplateTemporary = productTemplate
+            productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.TITLE}}}`,"g"), productTitle)
+            productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.VARIANT_TITLE}}}`,"g"), variantTitle)
+            productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.QUANTITY}}}`,"g"), productQuantity)
+            productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.SKU}}}`,"g"), sku)
+            productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.VENDOR}}}`,"g"), vendor)            
 
-            productText = productText + productTemplate
+            productText = productText + productTemplateTemporary
         })        
 
         orderText = orderText + productText
     })
 
-    footerTemplate = footerTemplate.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
+    let footerTemplateTemporary = footerTemplate
+    footerTemplateTemporary = footerTemplateTemporary.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)
 
-    orderText = headerTemplate + orderText + footerTemplate
+    orderText = headerTemplateTemporary + orderText + footerTemplateTemporary
 
     return orderText
 }

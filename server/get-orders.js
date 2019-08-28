@@ -1,7 +1,13 @@
 const axios = require('axios');
-const {getHeaders, cleanOrders, combineOrdersAndEmailRules, combineOrdersAndSentHistory} = require('./orders-helper')
 const _ = require('lodash')
 const version = '2019-04'
+const {
+    getHeaders, 
+    cleanOrders, 
+    combineOrdersAndEmailRules, 
+    combineOrdersAndSentHistory
+} = require('./orders-helper')
+
 
 async function getOrders(ctx) {
     try {        

@@ -1,7 +1,6 @@
 const axios = require('axios');
 const {Rule} = require('./db/rule')
 const {ProcessedOrder} = require('./db/processed-order')
-const {getPDFName} = require('./pdf')
 const _ = require('lodash')
 
 function getHeaders(accessToken) {
@@ -15,6 +14,16 @@ async function asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array);
     }
+}
+
+//this function got placed here due to cyclic dependency problem.
+//https://stackoverflow.com/questions/35534806/module-exports-not-working
+function getPDFName(data) {
+	const orderNumbers = Object.keys(data)
+	const name = (orderNumbers.length <= 1) ?
+		`order-${orderNumbers[0]}.pdf` :
+		`order-${orderNumbers[0]}-${orderNumbers[orderNumbers.length - 1]}.pdf`
+	return name
 }
 
 function returnStartAndEndDate(date) {
@@ -32,7 +41,6 @@ function returnStartAndEndDate(date) {
 }
 
 async function fetchAllOrdersForDay(shop, accessToken, queryDate) {
-    console.log('called!')
     try {                
         const version = '2019-04'
         const limit = 250
@@ -285,5 +293,6 @@ module.exports = {
     fetchAllOrdersForDay,
     combineOrdersAndEmailRules, 
     combineOrdersAndSentHistory, 
-    reformatOrdersByEmail
+    reformatOrdersByEmail,
+    getPDFName
 }
