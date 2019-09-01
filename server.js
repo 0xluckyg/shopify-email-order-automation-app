@@ -85,6 +85,12 @@ app.prepare().then(async () => {
         for (i in whitelist) {
             if (ctx.request.url.startsWith(whitelist[i])) noAuth = true
         }
+        
+         //for shopify, if auth shop is undefined. fallbackRoute below somehow does not work
+        if (ctx.request.url.startsWith('/auth') && ctx.query.shop == 'undefined') {
+            return ctx.redirect('/authenticate')
+        }
+        
         if (noAuth) {               
             return handleRender(ctx)
         } else {

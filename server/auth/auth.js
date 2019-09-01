@@ -1,3 +1,5 @@
+const {User} = require('../db/user');
+
 async function logout(ctx) {    
     try {
         const {shop} = ctx.session        
