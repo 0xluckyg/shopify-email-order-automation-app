@@ -19,6 +19,7 @@ import SaveBar from '../components/save-bar';
 import UserPreviewMarkup from '../components/user-preview';
 import Toast from '../components/toast';
 import ReviewModal from "../components/review-modal";
+import PaymentPlanModal from "../components/payment-plan-modal";
 import GmailAuth from "../components/gmail-auth";
 import AddRule from './add-rule';
 import Rules from './rules';
@@ -156,6 +157,7 @@ class Index extends React.Component {
             </div>
             {toastMarkup}
             <ReviewModal/>
+            <PaymentPlanModal/>
         </Frame>                
     );
     }
