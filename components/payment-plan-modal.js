@@ -55,26 +55,38 @@ class ReviewModal extends React.Component {
                 <div style={modalContentStyle}>
                     {
                         this.renderPaymentCard("COMPLIANCE", "$14.95", 
-                        <ul>
-                            <li>Option 1</li>
-                            <li>Option 2</li>
-                            <li>Option 3</li>
+                        <ul style={planOptionsListStyle}>
+                            <li style={planOptionsTextStyle}>Up to <b>50 orders</b> per day</li>
+                            <li style={planOptionsTextStyle}>Up to <b>10 email rules</b></li>
+                            <li style={planOptionsTextStyle}><b>PDF</b> version available</li>
+                            <li style={planOptionsTextStyle}><b>14 day FREE</b> trial</li>
+                            <li style={planOptionsTextStyle}>Send emails through your <b>private Gmail</b> account</li>
+                            <li style={planOptionsTextStyle}>Fully <b>customizable email</b> format</li>
+                            <li style={planOptionsTextStyle}><b>Full</b> Customer Support (Reply Within a Day)</li>
                         </ul>)
                     }
                     {
                         this.renderPaymentCard("PREMIUM", "$49.95", 
-                        <ul>
-                            <li>Option 1</li>
-                            <li>Option 2</li>
-                            <li>Option 3</li>
+                        <ul style={planOptionsListStyle}>
+                            <li style={planOptionsTextStyle}>Up to <b>300 orders</b> per day</li>
+                            <li style={planOptionsTextStyle}><b>Unlimited</b> email rules</li>
+                            <li style={planOptionsTextStyle}><b>PDF</b> version available</li>
+                            <li style={planOptionsTextStyle}><b>14 day FREE</b> trial</li>
+                            <li style={planOptionsTextStyle}>Send emails through your <b>private Gmail</b> account</li>
+                            <li style={planOptionsTextStyle}>Fully <b>customizable email</b> format</li>
+                            <li style={planOptionsTextStyle}><b>Full</b> Customer Support (Reply Within a Day)</li>
                         </ul>)
                     }
                     {
                         this.renderPaymentCard("ENTERPRISE", "$99.95", 
-                        <ul>
-                            <li>Option 1</li>
-                            <li>Option 2</li>
-                            <li>Option 3</li>
+                        <ul style={planOptionsListStyle}>
+                            <li style={planOptionsTextStyle}><b>Unlimited</b> orders per day</li>
+                            <li style={planOptionsTextStyle}><b>Unlimited</b> email rules</li>
+                            <li style={planOptionsTextStyle}><b>PDF</b> version available</li>
+                            <li style={planOptionsTextStyle}><b>14 day FREE</b> trial</li>
+                            <li style={planOptionsTextStyle}>Send emails through your <b>private Gmail</b> account</li>
+                            <li style={planOptionsTextStyle}>Fully <b>customizable email</b> format</li>
+                            <li style={planOptionsTextStyle}><b>Full</b> Customer Support (Reply Within a Day)</li>
                         </ul>)
                     }
                 </div>
@@ -95,7 +107,7 @@ const paymentCardStyle = {
 const planNameStyle = {
     textAlign: "center",
     fontSize: 25,
-    paddingBottom: 20
+    padding: 20
 }
 
 const planPricingStyle = {
@@ -111,11 +123,21 @@ const planPricingSubtextStyle = {
 }
 
 const planOptionsContainerStyle = {
-    padding: 15
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5
+}
+
+const planOptionsListStyle = {
+    listStyle:'none',
+    padding: 0
 }
 
 const planOptionsTextStyle = {
-    fontSize: 12
+    textAlign: "center",
+    paddingBottom: 8,
+    fontSize: 14
 }
 
 const planButtonStyle = {
@@ -129,7 +151,7 @@ const planButtonContainerStyle = {
 }
 
 const modalContentStyle = {
-    padding: 10,
+    padding: 30,
     display: 'flex',
     overflowY: 'auto',
     overflowX: 'auto',
