@@ -3,19 +3,23 @@ import {
     Button,    
 } from '@shopify/polaris';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {showToastAction, isLoadingAction} from '../redux/actions';
 import Modal from "react-responsive-modal";
+import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Redirect } from '@shopify/app-bridge/actions';
 import * as PropTypes from 'prop-types';
 import * as keys from '../config/keys';
 
 //A pop up to ask users to write a review
-class ReviewModal extends React.Component {
+class PaymentPlanModal extends React.Component {
     constructor(props){
         super(props)
         
         this.state = {
-            isOpen: true
+            isOpen: true,
+            isLoading: false
         }
     }
 
@@ -25,10 +29,24 @@ class ReviewModal extends React.Component {
         polaris: PropTypes.object
     };
     
-    renderPaymentCard(planName, planPricing, options) {
+    changeSubscriptionRequest(plan) {
+        this.setState({isLoading: true})
+        axios.post(process.env.APP_URL + '/change-subscription', {
+            plan
+        })
+        .then(() => {
+            this.props.showToastAction(true, 'Subscribed!')
+            this.setState({isLoading: false})
+        }).catch(err => {
+            this.props.showToastAction(true, "Couldn't subscribe. Please Try Again Later.")
+            this.setState({isLoading: false})
+        })    
+    }
+    
+    renderPaymentCard(plan, planPricing, options) {
         return (
             <div style={paymentCardStyle}>
-                <p style={planNameStyle}>{planName}</p>
+                <p style={planNameStyle}>${plan}</p>
                 <h1 style={planPricingStyle}>{planPricing}</h1>
                 <p style={planPricingSubtextStyle}>per month</p>
                 <hr/>
@@ -36,7 +54,7 @@ class ReviewModal extends React.Component {
                  {options}
                  </div>
                  <div style={planButtonContainerStyle}>
-                    <Button primary>Try Free</Button>
+                    <Button onClick={() => this.changeSubscriptionRequest(plan)} primary>Try Free</Button>
                  </div>
             </div>
         )
@@ -54,7 +72,7 @@ class ReviewModal extends React.Component {
             >
                 <div style={modalContentStyle}>
                     {
-                        this.renderPaymentCard("COMPLIANCE", "$14.95", 
+                        this.renderPaymentCard("COMPLIANCE", "14.95", 
                         <ul style={planOptionsListStyle}>
                             <li style={planOptionsTextStyle}>Up to <b>50 orders</b> per day</li>
                             <li style={planOptionsTextStyle}>Up to <b>10 email rules</b></li>
@@ -66,7 +84,7 @@ class ReviewModal extends React.Component {
                         </ul>)
                     }
                     {
-                        this.renderPaymentCard("PREMIUM", "$49.95", 
+                        this.renderPaymentCard("PREMIUM", "49.95", 
                         <ul style={planOptionsListStyle}>
                             <li style={planOptionsTextStyle}>Up to <b>300 orders</b> per day</li>
                             <li style={planOptionsTextStyle}><b>Unlimited</b> email rules</li>
@@ -78,7 +96,7 @@ class ReviewModal extends React.Component {
                         </ul>)
                     }
                     {
-                        this.renderPaymentCard("ENTERPRISE", "$99.95", 
+                        this.renderPaymentCard("ENTERPRISE", "99.95", 
                         <ul style={planOptionsListStyle}>
                             <li style={planOptionsTextStyle}><b>Unlimited</b> orders per day</li>
                             <li style={planOptionsTextStyle}><b>Unlimited</b> email rules</li>
@@ -93,11 +111,6 @@ class ReviewModal extends React.Component {
             </Modal>
         )
     }
-}
-
-//We need the user from the reducer to get install date
-function mapStateToProps({getUserReducer}) {
-    return {getUserReducer};
 }
 
 const paymentCardStyle = {
@@ -159,4 +172,16 @@ const modalContentStyle = {
     justifyContent: "center",    
 }
 
-export default connect(mapStateToProps, null)(ReviewModal);
+//We need the user from the reducer to get install date
+function mapStateToProps({getUserReducer}) {
+    return {getUserReducer};
+}
+
+function mapDispatchToProps(dispatch){
+    return bindActionCreators(
+        {showToastAction, isLoadingAction},
+        dispatch
+    );
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PaymentPlanModal);

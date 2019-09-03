@@ -35,7 +35,7 @@ const session = require('koa-session');
 const { verifyRequest } = require('@shopify/koa-shopify-auth');
 const next = require('next');
 
-const {processPayment} = require('./server/auth/shopify-payment');
+const {processPayment, changeSubscription} = require('./server/auth/shopify-payment');
 const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
@@ -137,6 +137,7 @@ app.prepare().then(async () => {
     router.post('/set-pdf-order-limit', setPDFOrderLimit);
     router.post('/send-orders', sendOrders);    
     router.post('/gmail-logout', gmailLogout);    
+    router.post('/change-subscription', changeSubscription)
 
     //validates webhook and listens for events in the store
     router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)    

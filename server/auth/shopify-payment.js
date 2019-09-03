@@ -1,16 +1,23 @@
 const {User} = require('../db/user');
-const FEE = 9.99;
-const FREE_TRIAL = 7;
+const keys = require('../../config/keys')
+
+async function changeSubscription(ctx) {
+    const { shop, accessToken } = ctx.session;    
+    const { plan } = JSON.parse(ctx.request.rawBody)
+    const user = await User.findOne({shop})
+    await initiatePayment(ctx, user, plan)
+}
 
 //creates a shopify URL that the user will be redirected to to accept payments
-function initiatePayment (ctx, user) {            
+function initiatePayment (ctx, user, plan) {            
     const { shop, accessToken } = ctx.session;    
     const freeTrialLeft = calculateTrialDays(user.payment.date, new Date())    
-    //Shopify billing API requires 3 variables: price, name, return_url                
+    //Shopify billing API requires 3 variables: price, name, return_url     
+    const fee = (plan) ? plan : keys.FEE_0
     const stringifiedBillingParams = JSON.stringify({
         recurring_application_charge: {
             name: 'Recurring charge', //The name of your charge. For example, “Sample embedded app 30-day fee.”
-            price: FEE,
+            price: keys.FEE_0,
             return_url: process.env.APP_URL, //URL to return to after user accepts payment
             trial_days: freeTrialLeft, //If merchant doesn't uninstall the app within these days, Shopify charges the merchant
             test: true //The Billing API also has a test property that simulates successful charges.
@@ -99,7 +106,7 @@ function calculateTrialDays(a, b) {
     const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
 
     const dayDifference = Math.floor((utc2 - utc1) / _MS_PER_DAY);
-    return (FREE_TRIAL - dayDifference <= 0) ? 0 : (FREE_TRIAL - dayDifference)
+    return (keys.FREE_TRIAL - dayDifference <= 0) ? 0 : (keys.FREE_TRIAL - dayDifference)
 }
 
-module.exports = {initiatePayment, processPayment};
+module.exports = {initiatePayment, processPayment, changeSubscription};
