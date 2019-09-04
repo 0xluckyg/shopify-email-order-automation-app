@@ -77,6 +77,7 @@ app.prepare().then(async () => {
 
     server.use(bodyParser());
     const routerUnauthorized = new Router();
+    
     server.use(routerUnauthorized.routes());
     routerUnauthorized.get('/', switchSession)    
     //Allows routes that do not require authentication to be handled    

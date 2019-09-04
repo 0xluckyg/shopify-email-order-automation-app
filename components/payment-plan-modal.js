@@ -38,6 +38,7 @@ class PaymentPlanModal extends React.Component {
             this.props.showToastAction(true, 'Subscribed!')
             this.setState({isLoading: false})
         }).catch(err => {
+            console.log('err: ', err)
             this.props.showToastAction(true, "Couldn't subscribe. Please Try Again Later.")
             this.setState({isLoading: false})
         })    

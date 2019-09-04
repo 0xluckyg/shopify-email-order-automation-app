@@ -2,10 +2,16 @@ const {User} = require('../db/user');
 const keys = require('../../config/keys')
 
 async function changeSubscription(ctx) {
-    const { shop, accessToken } = ctx.session;    
-    const { plan } = JSON.parse(ctx.request.rawBody)
-    const user = await User.findOne({shop})
-    await initiatePayment(ctx, user, plan)
+    try {
+        const { shop, accessToken } = ctx.session;    
+        const { plan } = JSON.parse(ctx.request.rawBody)
+        const user = await User.findOne({shop})
+        
+        const confirmationURL = await initiatePayment(ctx, user, plan)
+        ctx.redirect(confirmationURL) 
+    } catch (err) {
+        console.log('Failed change subscription: ', err)
+    }
 }
 
 //creates a shopify URL that the user will be redirected to to accept payments
@@ -28,6 +34,7 @@ function initiatePayment (ctx, user, plan) {
         body: stringifiedBillingParams,
         credentials: 'include',
         headers: {
+            "Access-Control-Allow-Origin": "*",
             'X-Shopify-Access-Token': accessToken,
             'Content-Type': 'application/json',
         },
