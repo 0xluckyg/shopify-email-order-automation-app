@@ -8,6 +8,7 @@ async function changeSubscription(ctx) {
         const user = await User.findOne({shop})
         
         const confirmationURL = await initiatePayment(ctx, user, plan)
+        ctx.set('Access-Control-Allow-Origin', '*')
         ctx.redirect(confirmationURL) 
     } catch (err) {
         console.log('Failed change subscription: ', err)
@@ -19,11 +20,11 @@ function initiatePayment (ctx, user, plan) {
     const { shop, accessToken } = ctx.session;    
     const freeTrialLeft = calculateTrialDays(user.payment.date, new Date())    
     //Shopify billing API requires 3 variables: price, name, return_url     
-    const fee = (plan) ? plan : keys.FEE_0
+    const price = (plan) ? plan : keys.FEE_0
     const stringifiedBillingParams = JSON.stringify({
         recurring_application_charge: {
             name: 'Recurring charge', //The name of your charge. For example, “Sample embedded app 30-day fee.”
-            price: keys.FEE_0,
+            price: `$${price}`,
             return_url: process.env.APP_URL, //URL to return to after user accepts payment
             trial_days: freeTrialLeft, //If merchant doesn't uninstall the app within these days, Shopify charges the merchant
             test: true //The Billing API also has a test property that simulates successful charges.
@@ -44,7 +45,8 @@ function initiatePayment (ctx, user, plan) {
         .then((response) => {                        
             return response.json()
         })
-        .then(async (jsonData) => {                         
+        .then(async (jsonData) => {            
+            console.log('cd; ', jsonData)             
             return jsonData.recurring_application_charge.confirmation_url                                                 
         })
         .catch((error) => console.log('error', error));     

@@ -132,9 +132,7 @@ async function switchSession(ctx, next) {
         .createHmac("sha256", SHOPIFY_API_SECRET_KEY)
         .update(message)
         .digest("hex");
-                
-        console.log('sec ', SHOPIFY_API_SECRET_KEY)        
-        console.log('shop ', shop)
+        
         console.log('hmac ', hmac)
         console.log('hmac2 ', generatedHash)        
 
