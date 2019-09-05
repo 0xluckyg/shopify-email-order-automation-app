@@ -4,12 +4,11 @@ const keys = require('../../config/keys')
 async function changeSubscription(ctx) {
     try {
         const { shop, accessToken } = ctx.session;    
-        const { plan } = JSON.parse(ctx.request.rawBody)
+        const { plan } = ctx.query
         const user = await User.findOne({shop})
         
         const confirmationURL = await initiatePayment(ctx, user, plan)
-        ctx.set('Access-Control-Allow-Origin', '*')
-        ctx.redirect(confirmationURL) 
+        ctx.body = confirmationURL
     } catch (err) {
         console.log('Failed change subscription: ', err)
     }
@@ -54,7 +53,6 @@ function initiatePayment (ctx, user, plan) {
 
 //subscribes the actual payment to Shopify after user has accepted the payment if there is a charge_id
 async function processPayment (ctx, next) {    
-    console.log('sess2: ', ctx.session)
     if (ctx.query.charge_id) {
         console.log('process payment called');    
         const chargeId = ctx.query.charge_id;
@@ -74,16 +72,18 @@ async function processPayment (ctx, next) {
         fetch(`https://${shop}/${chargeUrl}/${chargeId}.json`,
         optionsWithGet,)
             .then((response) => response.json())
-            .then((myJson) => {                                                
-                if (myJson.recurring_application_charge.status === 'accepted') {
+            .then((myJson) => {
+                const {price, status, updatedAt} = myJson.recurring_application_charge
+                if (status === 'accepted') {
+                    console.log('myjson: ', myJson)
                     const stringifyMyJSON = JSON.stringify(myJson)                    
                     const optionsWithJSON = { ...optionsWithPost, body: stringifyMyJSON }
                     fetch(`https://${shop}/${chargeUrl}/${chargeId}/activate.json`, optionsWithJSON)
-                        //set payment status to true in our db after Shopify receives payment subscription
-                        .then(() => { 
-                            saveAcceptPayment(shop)                            
-                        })
-                        .catch((error) => console.log('Failed processing payment: ', error));
+                    //set payment status to true in our db after Shopify receives payment subscription
+                    .then(() => { 
+                        saveAcceptPayment(shop, price, updatedAt)                            
+                    })
+                    .catch((error) => console.log('Failed processing payment: ', error));
                 }
                 else return ctx.redirect('/')
             });
@@ -94,10 +94,18 @@ async function processPayment (ctx, next) {
     }
 };
 
-function saveAcceptPayment(shop) {
+function saveAcceptPayment(shop, price, date) {
+    date = new Date(date)
     User.findOneAndUpdate(
         { shop }, 
-        { $set: { "payment.accepted": true } }
+        { $set: { 
+                payment: {
+                    accepted: true,
+                    price,
+                    date
+                }
+            }
+        }
     )
     .then(res => {
         return res

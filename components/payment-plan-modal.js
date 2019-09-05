@@ -31,10 +31,12 @@ class PaymentPlanModal extends React.Component {
     
     changeSubscriptionRequest(plan) {
         this.setState({isLoading: true})
-        axios.post(process.env.APP_URL + '/change-subscription', {
-            plan
+        axios.get(process.env.APP_URL + '/change-subscription', {
+            params: { plan }
         })
-        .then(() => {
+        .then(res => {
+            const redirectUrl = res.data
+            window.location.replace(redirectUrl);
             this.props.showToastAction(true, 'Subscribed!')
             this.setState({isLoading: false})
         }).catch(err => {
@@ -55,7 +57,7 @@ class PaymentPlanModal extends React.Component {
                  {options}
                  </div>
                  <div style={planButtonContainerStyle}>
-                    <Button onClick={() => this.changeSubscriptionRequest(plan)} primary>Try Free</Button>
+                    <Button onClick={() => this.changeSubscriptionRequest(planPricing)} primary>Try Free</Button>
                  </div>
             </div>
         )

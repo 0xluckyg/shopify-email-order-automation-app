@@ -11,7 +11,7 @@ function getHeaders(accessToken) {
 
 async function getSelectedProducts(selectedProducts, session) {
     try {
-        ids = selectedProducts.join(',')        
+        const ids = selectedProducts.join(',')        
         const headers = getHeaders(session.accessToken)
         return await axios.get(`https://${session.shop}/admin/api/${version}/products.json`, {
             headers,
@@ -36,7 +36,7 @@ async function getProducts(ctx) {
         }        
 
         if (filters) filters = JSON.parse(filters)
-        params = {
+        const params = {
             ...filters,
             page,
             limit

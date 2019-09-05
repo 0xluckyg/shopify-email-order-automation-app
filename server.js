@@ -79,9 +79,9 @@ app.prepare().then(async () => {
     const routerUnauthorized = new Router();
     
     server.use(routerUnauthorized.routes());
-    routerUnauthorized.get('/', switchSession)    
+    routerUnauthorized.get('/', switchSession)
     //Allows routes that do not require authentication to be handled    
-    server.use(async (ctx, next) => {        
+    server.use(async (ctx, next) => {
         let noAuth = false
         for (i in whitelist) {
             if (ctx.request.url.startsWith(whitelist[i])) noAuth = true
@@ -128,6 +128,7 @@ app.prepare().then(async () => {
     router.get('/gmail-auth', getTokens);
     router.get('/get-order-pdf', getOrderPDFPreview);
     router.get('/get-pdf-preview', getPDFPreview);
+    router.get('/change-subscription', changeSubscription)
 
     router.post('/add-rule', addRule);
     router.post('/edit-rule', editRule);
@@ -138,8 +139,7 @@ app.prepare().then(async () => {
     router.post('/set-pdf-order-limit', setPDFOrderLimit);
     router.post('/send-orders', sendOrders);    
     router.post('/gmail-logout', gmailLogout);    
-    router.post('/change-subscription', changeSubscription)
-
+    
     //validates webhook and listens for events in the store
     router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)    
 
