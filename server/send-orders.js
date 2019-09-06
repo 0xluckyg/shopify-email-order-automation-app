@@ -74,7 +74,7 @@ async function sendEmails(shop, emails) {
 
                     processedOrder.shop = shop
                     processedOrder.email = email
-                    processedOrder.order_id = order.id;
+                    processedOrder.order_id = order.id
                     processedOrder.order_number = orderNumber
                     processedOrder.order_date = new Date(order.created_at)
                     processedOrder.title = product.title

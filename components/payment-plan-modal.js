@@ -4,7 +4,7 @@ import {
 } from '@shopify/polaris';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {showToastAction, isLoadingAction} from '../redux/actions';
+import {showToastAction, isLoadingAction, getUserAction} from '../redux/actions';
 import Modal from "react-responsive-modal";
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -19,7 +19,7 @@ class PaymentPlanModal extends React.Component {
         
         this.state = {
             isOpen: true,
-            isLoading: false
+            isLoading: false,
         }
     }
 
@@ -37,7 +37,6 @@ class PaymentPlanModal extends React.Component {
         .then(res => {
             const redirectUrl = res.data
             window.location.replace(redirectUrl);
-            this.props.showToastAction(true, 'Subscribed!')
             this.setState({isLoading: false})
         }).catch(err => {
             console.log('err: ', err)
@@ -47,17 +46,35 @@ class PaymentPlanModal extends React.Component {
     }
     
     renderPaymentCard(plan, planPricing, options) {
+        let payment = this.props.getUserReducer.payment
+        if (!payment) {
+            this.props.getUserAction();
+        }
+        
+        let cardStyle = paymentCardStyle
+        let buttonText = 'Try Free'
+        let selected =  (payment && payment.plan == planPricing)
+        if (selected) {
+            cardStyle = paymentCardSelectedStyle
+            buttonText = 'Current Plan'
+        }
+
         return (
-            <div style={paymentCardStyle}>
+            <div style={cardStyle}>
                 <p style={planNameStyle}>${plan}</p>
                 <h1 style={planPricingStyle}>{planPricing}</h1>
                 <p style={planPricingSubtextStyle}>per month</p>
-                <hr/>
+                <hr style={hrStyle}/>
                 <div style={planOptionsContainerStyle}>
                  {options}
                  </div>
                  <div style={planButtonContainerStyle}>
-                    <Button onClick={() => this.changeSubscriptionRequest(planPricing)} primary>Try Free</Button>
+                    <Button 
+                        onClick={() => this.changeSubscriptionRequest(planPricing)} 
+                        primary
+                        disabled={selected}
+                        loading={this.state.loading}
+                    >{buttonText}</Button>
                  </div>
             </div>
         )
@@ -66,6 +83,7 @@ class PaymentPlanModal extends React.Component {
     render() {
         return(
             <Modal 
+                styles={modalStyle}
                 open={this.state.isOpen} 
                 onClose={() => {                    
                     this.setState({isOpen:false})
@@ -75,7 +93,7 @@ class PaymentPlanModal extends React.Component {
             >
                 <div style={modalContentStyle}>
                     {
-                        this.renderPaymentCard("COMPLIANCE", "14.95", 
+                        this.renderPaymentCard("COMPLIANCE", keys.FEE_0, 
                         <ul style={planOptionsListStyle}>
                             <li style={planOptionsTextStyle}>Up to <b>50 orders</b> per day</li>
                             <li style={planOptionsTextStyle}>Up to <b>10 email rules</b></li>
@@ -87,7 +105,7 @@ class PaymentPlanModal extends React.Component {
                         </ul>)
                     }
                     {
-                        this.renderPaymentCard("PREMIUM", "49.95", 
+                        this.renderPaymentCard("PREMIUM", keys.FEE_1, 
                         <ul style={planOptionsListStyle}>
                             <li style={planOptionsTextStyle}>Up to <b>300 orders</b> per day</li>
                             <li style={planOptionsTextStyle}><b>Unlimited</b> email rules</li>
@@ -99,7 +117,7 @@ class PaymentPlanModal extends React.Component {
                         </ul>)
                     }
                     {
-                        this.renderPaymentCard("ENTERPRISE", "99.95", 
+                        this.renderPaymentCard("ENTERPRISE", keys.FEE_2, 
                         <ul style={planOptionsListStyle}>
                             <li style={planOptionsTextStyle}><b>Unlimited</b> orders per day</li>
                             <li style={planOptionsTextStyle}><b>Unlimited</b> email rules</li>
@@ -116,8 +134,27 @@ class PaymentPlanModal extends React.Component {
     }
 }
 
+const modalStyle = {
+  modal: { padding: 0 }
+}
+
+const modalContentStyle = {
+    paddingLeft: 30,
+    paddingRight: 30,
+    display: 'flex',
+    overflowY: 'auto',
+    overflowX: 'auto',
+    alignItems: "center",
+    justifyContent: "center",    
+}
+
 const paymentCardStyle = {
     padding: 20
+}
+
+const paymentCardSelectedStyle = {
+    padding: 20,
+    backgroundColor: '#d1d1d1'
 }
 
 const planNameStyle = {
@@ -142,7 +179,7 @@ const planOptionsContainerStyle = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 5
+    // padding: 5
 }
 
 const planOptionsListStyle = {
@@ -166,13 +203,8 @@ const planButtonContainerStyle = {
     justifyContent: 'center'
 }
 
-const modalContentStyle = {
-    padding: 30,
-    display: 'flex',
-    overflowY: 'auto',
-    overflowX: 'auto',
-    alignItems: "center",
-    justifyContent: "center",    
+const hrStyle = {
+    border: '0.1px solid rgb(128, 128, 128)'
 }
 
 //We need the user from the reducer to get install date
@@ -182,7 +214,7 @@ function mapStateToProps({getUserReducer}) {
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {showToastAction, isLoadingAction},
+        {showToastAction, isLoadingAction, getUserAction},
         dispatch
     );
 }

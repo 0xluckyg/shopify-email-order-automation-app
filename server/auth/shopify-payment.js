@@ -73,15 +73,15 @@ async function processPayment (ctx, next) {
         optionsWithGet,)
             .then((response) => response.json())
             .then((myJson) => {
-                const {price, status, updatedAt} = myJson.recurring_application_charge
+                const {price, status, updated_at} = myJson.recurring_application_charge
                 if (status === 'accepted') {
                     console.log('myjson: ', myJson)
-                    const stringifyMyJSON = JSON.stringify(myJson)                    
+                    const stringifyMyJSON = JSON.stringify(myJson)
                     const optionsWithJSON = { ...optionsWithPost, body: stringifyMyJSON }
                     fetch(`https://${shop}/${chargeUrl}/${chargeId}/activate.json`, optionsWithJSON)
                     //set payment status to true in our db after Shopify receives payment subscription
-                    .then(() => { 
-                        saveAcceptPayment(shop, price, updatedAt)                            
+                    .then(() => {
+                        saveAcceptPayment(shop, price, updated_at)
                     })
                     .catch((error) => console.log('Failed processing payment: ', error));
                 }
@@ -101,7 +101,7 @@ function saveAcceptPayment(shop, price, date) {
         { $set: { 
                 payment: {
                     accepted: true,
-                    price,
+                    plan: price,
                     date
                 }
             }
