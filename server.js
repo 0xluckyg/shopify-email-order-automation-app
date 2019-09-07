@@ -138,7 +138,7 @@ app.prepare().then(async () => {
     router.post('/send-method', setSendMethod);
     router.post('/set-pdf-order-limit', setPDFOrderLimit);
     router.post('/send-orders', sendOrders);    
-    router.post('/gmail-logout', gmailLogout);    
+    router.post('/gmail-logout', gmailLogout);
     
     //validates webhook and listens for events in the store
     router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)    

@@ -11,7 +11,7 @@ import sentStatus from '../components/order-sent-status'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import Modal from "react-responsive-modal";
-import {showToastAction} from '../redux/actions';
+import {showToastAction, showPaymentPlanAction} from '../redux/actions';
 import EmailPreview from '../components/email-preview';
 
 class OrdersByDay extends React.Component {    
@@ -29,7 +29,7 @@ class OrdersByDay extends React.Component {
             hasNext: false,
             ordersLoading: true,
         };
-    }     
+    }
 
     componentDidUpdate(prevProps) {
         if (prevProps.date !== this.props.date) {            
@@ -41,12 +41,12 @@ class OrdersByDay extends React.Component {
         this.fetchOrders({ page: 1, date: this.props.date });
     }
 
-    fetchOrders(params) {               
+    fetchOrders(params) {
         this.setState({ordersLoading: true, hasNext: false, hasPrevious: false}) 
         axios.get(process.env.APP_URL + '/get-orders', {
             params,
             withCredentials: true
-        }).then(res => {            
+        }).then(res => {
             const {orders, page, hasNext, hasPrevious} = res.data            
             this.setState({ orders, page, hasNext, hasPrevious, ordersLoading: false })
         }).catch(err => {
@@ -217,7 +217,7 @@ const rowButtonStyle = {display: "inline", paddingRight:"10px"}
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {showToastAction},
+        {showToastAction, showPaymentPlanAction},
         dispatch
     );
 }

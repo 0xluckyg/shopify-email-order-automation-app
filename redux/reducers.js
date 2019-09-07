@@ -34,6 +34,17 @@ export const isLoadingReducer = (state = false, action) => {
     }
 }
 
+//Reducer that shows the status of the loading screen
+export const showPaymentPlanReducer = (state = false, action) => {    
+    switch (action.type) {
+        case keys.SHOW_PAYMENT_PLAN:
+            state = action.payload
+            return state;        
+        default:            
+            return state;
+    }
+}
+
 //Reducer that gets and saves the user
 // accessToken: string
 // active: boolean
@@ -46,7 +57,6 @@ export const isLoadingReducer = (state = false, action) => {
 export const getUserReducer = (state = {}, action) => {
     switch(action.type) {
         case keys.SET_USER:
-            console.log(action.payload)
             state = action.payload
             return state;
         default:

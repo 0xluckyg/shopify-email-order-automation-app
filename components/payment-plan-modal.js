@@ -4,7 +4,7 @@ import {
 } from '@shopify/polaris';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {showToastAction, isLoadingAction, getUserAction} from '../redux/actions';
+import {showToastAction, isLoadingAction, getUserAction, showPaymentPlanAction} from '../redux/actions';
 import Modal from "react-responsive-modal";
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -18,7 +18,6 @@ class PaymentPlanModal extends React.Component {
         super(props)
         
         this.state = {
-            isOpen: true,
             isLoading: false,
         }
     }
@@ -45,6 +44,15 @@ class PaymentPlanModal extends React.Component {
         })    
     }
     
+    showNeedsUpgradeHeader() {
+        if (!this.props.showPaymentPlanReducer.needsUpgrade) return
+        return (
+            <div style={upgradeNoteContainerStyle}>
+                <h3 style={upgradeNoteTextStyle}>Your plan needs an upgrade!</h3>
+            </div>    
+        )
+    }
+    
     renderPaymentCard(plan, planPricing, options) {
         let payment = this.props.getUserReducer.payment
         if (!payment) {
@@ -52,7 +60,8 @@ class PaymentPlanModal extends React.Component {
         }
         
         let cardStyle = paymentCardStyle
-        let buttonText = 'Try Free'
+        let buttonText = 'Try'
+        if (planPricing == keys.FEE_0) buttonText = 'Downgrade'
         let selected =  (payment && payment.plan == planPricing)
         if (selected) {
             cardStyle = paymentCardSelectedStyle
@@ -84,13 +93,14 @@ class PaymentPlanModal extends React.Component {
         return(
             <Modal 
                 styles={modalStyle}
-                open={this.state.isOpen} 
-                onClose={() => {                    
-                    this.setState({isOpen:false})
-                }} 
+                open={this.props.showPaymentPlanReducer.show} 
+                onClose={() => {
+                    this.props.showPaymentPlanAction(false)
+                }}
                 showCloseIcon={true}
-                center                
+                center
             >
+                {this.showNeedsUpgradeHeader()}
                 <div style={modalContentStyle}>
                     {
                         this.renderPaymentCard("COMPLIANCE", keys.FEE_0, 
@@ -146,6 +156,16 @@ const modalContentStyle = {
     overflowX: 'auto',
     alignItems: "center",
     justifyContent: "center",    
+}
+
+const upgradeNoteContainerStyle = {
+    width: '100%'
+}
+
+const upgradeNoteTextStyle = {
+    fontSize: 25,
+    textAlign: 'center',
+    padding: 20
 }
 
 const paymentCardStyle = {
@@ -208,13 +228,13 @@ const hrStyle = {
 }
 
 //We need the user from the reducer to get install date
-function mapStateToProps({getUserReducer}) {
-    return {getUserReducer};
+function mapStateToProps({getUserReducer, showPaymentPlanReducer}) {
+    return {getUserReducer, showPaymentPlanReducer};
 }
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {showToastAction, isLoadingAction, getUserAction},
+        {showToastAction, isLoadingAction, getUserAction, showPaymentPlanAction},
         dispatch
     );
 }

@@ -3,7 +3,7 @@ import * as keys from '../config/keys';
 
 //Navigation bar on the left panel. Uses custom made router from index file. 
 //Can not use react component because Navigation has to be sent as a prop for frame
-function NavigationMarkup(router) {
+function NavigationMarkup(router, payment) {
     return (
         <Navigation location="/">            
             <Navigation.Section                
@@ -37,6 +37,10 @@ function NavigationMarkup(router) {
                             router(3);                            
                         }
                     },
+                    {
+                        label: 'Subscription Plans',
+                        onClick: () => payment()
+                    }
                 ]}                
             />
         </Navigation>            

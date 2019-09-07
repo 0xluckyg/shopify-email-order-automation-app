@@ -13,7 +13,7 @@ import * as PropTypes from 'prop-types';
 import axios from 'axios';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {showToastAction} from '../redux/actions';
+import {showToastAction, showPaymentPlanAction} from '../redux/actions';
 import pageHeader from '../components/page-header';
 import AddEmail from '../components/add-email';
 
@@ -328,7 +328,7 @@ const finalButtonStyle = {float:"right", padding: "16px 0px 16px 0px", marginBot
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {showToastAction},
+        {showToastAction, showPaymentPlanAction},
         dispatch
     );
 }

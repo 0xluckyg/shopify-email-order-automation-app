@@ -1,4 +1,4 @@
-import * as keys from '../config/keys';
+import keys from '../config/keys';
 import axios from 'axios';
 
 //Action that shows the status of the top bar save button when user is typing something unsaved.
@@ -50,8 +50,15 @@ export const setUserAction = (user) => {
     }
 }
 
+export const showPaymentPlanAction = (show, needsUpgrade) => {
+    return {
+        type: keys.SHOW_PAYMENT_PLAN,
+        payload: {show, needsUpgrade}
+    }
+}
+
 //Action that shows the status of the loading screen
-export const routerAction = (route) => {    
+export const routerAction = (route) => {
     return {
         type: keys.ROUTE,
         payload: route

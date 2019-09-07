@@ -12,7 +12,7 @@ import pageHeader from '../components/page-header'
 import NoContent from '../components/no-content'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {showToastAction, isLoadingAction, routerAction} from '../redux/actions';
+import {showToastAction, isLoadingAction, routerAction, showPaymentPlanAction} from '../redux/actions';
 
 class Rules extends React.Component {   
     mounted = false 
@@ -227,7 +227,7 @@ const rowButtonStyle = {display: "inline", paddingRight:"10px"}
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {showToastAction, isLoadingAction, routerAction},
+        {showToastAction, isLoadingAction, routerAction, showPaymentPlanAction},
         dispatch
     );
 }

@@ -13,7 +13,7 @@ import {connect} from 'react-redux';
 import { Redirect } from '@shopify/app-bridge/actions';
 import * as PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
-import {getUserAction, routerAction, showToastAction, isDirtyAction} from '../redux/actions';
+import {getUserAction, routerAction, showToastAction, isDirtyAction, showPaymentPlanAction} from '../redux/actions';
 import NavigationMarkup from '../components/navigation';
 import SaveBar from '../components/save-bar';
 import UserPreviewMarkup from '../components/user-preview';
@@ -66,6 +66,10 @@ class Index extends React.Component {
         {
             content: 'Leave a Review', 
             onAction: () => this.redirectToReviews()
+        },            
+        {
+            content: 'Subscription Plans', 
+            onAction: () => this.paymentPlan()
         },            
     ]
 
@@ -141,7 +145,7 @@ class Index extends React.Component {
         <Frame
             topBar={topBarMarkup}
             showMobileNavigation={showMobileNavigation}
-            navigation={NavigationMarkup(this.router)}
+            navigation={NavigationMarkup(this.router, this.paymentPlan)}
             //Enables sliding navigation bar on mobile
             onNavigationDismiss={this.toggleState('showMobileNavigation')}            
         >
@@ -215,6 +219,8 @@ class Index extends React.Component {
 
     //Custom router
     router = (n) => this.props.routerAction(n)
+    
+    paymentPlan = () => this.props.showPaymentPlanAction(true)
 
     //For search option action for "write review"
     redirectToReviews() {
@@ -233,7 +239,7 @@ function mapStateToProps({routerReducer, isDirtyReducer, isLoadingReducer, showT
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {getUserAction, routerAction, showToastAction, isDirtyAction},
+        {getUserAction, routerAction, showToastAction, isDirtyAction, routerAction, showPaymentPlanAction},
         dispatch
     );
 }
