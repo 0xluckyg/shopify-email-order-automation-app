@@ -70,8 +70,8 @@ class PaymentPlanModal extends React.Component {
 
         return (
             <div style={cardStyle}>
-                <p style={planNameStyle}>${plan}</p>
-                <h1 style={planPricingStyle}>{planPricing}</h1>
+                <p style={planNameStyle}>{plan}</p>
+                <h1 style={planPricingStyle}>${planPricing}</h1>
                 <p style={planPricingSubtextStyle}>per month</p>
                 <hr style={hrStyle}/>
                 <div style={planOptionsContainerStyle}>
@@ -154,8 +154,6 @@ const modalStyle = {
 }
 
 const modalContentStyle = {
-    paddingLeft: 30,
-    paddingRight: 30,
     display: 'flex',
     overflowY: 'auto',
     overflowX: 'auto',
@@ -164,12 +162,14 @@ const modalContentStyle = {
 }
 
 const upgradeNoteContainerStyle = {
-    width: '100%'
+    width: '100%',
+    backgroundColor: keys.APP_COLOR
 }
 
 const upgradeNoteTextStyle = {
     fontSize: 25,
     textAlign: 'center',
+    color: 'white',
     padding: 20
 }
 
