@@ -1,5 +1,39 @@
 const {User} = require('../db/user');
+const {Rule} = require('../db/rule');
 const keys = require('../../config/keys')
+
+async function needsUpgradeForSendOrders(shop, orders) {
+    const user = await User.findOne({shop}, {payment: 1})
+    const plan = user.payment.plan
+
+    //if lowest plan
+    if (plan <= keys.FEE_0) {
+        return (orders.length > 50)
+    //if plan 2
+    } else if (plan > keys.FEE_0 && plan <= keys.FEE_1) {
+        return (orders.length > 300)
+    //if highest plan
+    } else if (plan >= keys.FEE_2) {
+        false
+    } 
+}
+
+async function needsUpgradeForAddRule(shop) {
+    const rules = await Rule.countDocuments({shop})
+    const user = await User.findOne({shop}, {payment: 1})
+    const plan = user.payment.plan
+    
+    console.log('p: ', plan)
+    console.log('r: ', rules)
+    console.log('k: ', keys.FEE_0)
+    //if lowest plan
+    if (plan <= keys.FEE_0) {
+        return (rules > 10)
+    //if higher than plan 2
+    } else if (plan >= keys.FEE_1) {
+        return false
+    }
+}
 
 async function changeSubscription(ctx) {
     try {
@@ -34,7 +68,6 @@ function initiatePayment (ctx, user, plan) {
         body: stringifiedBillingParams,
         credentials: 'include',
         headers: {
-            "Access-Control-Allow-Origin": "*",
             'X-Shopify-Access-Token': accessToken,
             'Content-Type': 'application/json',
         },
@@ -45,7 +78,6 @@ function initiatePayment (ctx, user, plan) {
             return response.json()
         })
         .then(async (jsonData) => {            
-            console.log('cd; ', jsonData)             
             return jsonData.recurring_application_charge.confirmation_url                                                 
         })
         .catch((error) => console.log('error', error));     
@@ -75,7 +107,6 @@ async function processPayment (ctx, next) {
             .then((myJson) => {
                 const {price, status, updated_at} = myJson.recurring_application_charge
                 if (status === 'accepted') {
-                    console.log('myjson: ', myJson)
                     const stringifyMyJSON = JSON.stringify(myJson)
                     const optionsWithJSON = { ...optionsWithPost, body: stringifyMyJSON }
                     fetch(`https://${shop}/${chargeUrl}/${chargeId}/activate.json`, optionsWithJSON)
@@ -126,4 +157,4 @@ function calculateTrialDays(a, b) {
     return (keys.FREE_TRIAL - dayDifference <= 0) ? 0 : (keys.FREE_TRIAL - dayDifference)
 }
 
-module.exports = {initiatePayment, processPayment, changeSubscription};
+module.exports = {initiatePayment, processPayment, changeSubscription, needsUpgradeForSendOrders, needsUpgradeForAddRule};

@@ -2,7 +2,14 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import { isDirtyReducer, isLoadingReducer, showToastReducer, getUserReducer, routerReducer, showPaymentPlanReducer } from './reducers';
+import { 
+    isDirtyReducer, 
+    isLoadingReducer, 
+    showToastReducer, 
+    getUserReducer, 
+    routerReducer, 
+    showPaymentPlanReducer 
+} from './reducers';
 
 const reducer = combineReducers({ 
     isDirtyReducer, 

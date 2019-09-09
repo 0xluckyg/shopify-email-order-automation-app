@@ -30,7 +30,7 @@ function NavigationMarkup(router, payment) {
                             router(2);                            
                         }
                     },
-                    {                        
+                    {
                         label: 'Settings',
                         // icon: 'home',
                         onClick: () => {

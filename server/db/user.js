@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema({
     },
     //recurring subscription model
     payment: {
+        lock: {
+            type: Boolean,
+            default: false
+        },
         plan: {
             type: Number
         },

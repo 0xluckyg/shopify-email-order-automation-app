@@ -36,6 +36,7 @@ export const getUserAction = () => {
         })
     }
 }
+
 const getUserResolveAction = (user) => {
     return {
         type: keys.SET_USER,

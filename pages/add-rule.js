@@ -168,6 +168,8 @@ class AddRule extends React.Component {
             this.props.showToastAction(true, 'Rule saved!')
             this.fetchProducts({page: 1, filters: []})
         }).catch(err => {            
+            this.setState({buttonIsLoading: false})
+            console.log('errr: ',err )
             this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
         })        
     }

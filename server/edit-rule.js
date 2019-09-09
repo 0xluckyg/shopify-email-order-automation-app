@@ -1,7 +1,8 @@
 const {Rule} = require('./db/rule');
+const {User} = require('./db/user');
+const {needsUpgradeForAddRule} = require('./auth/shopify-payment')
 
 function convertFiltersIntoParams(filters, selectedProducts) { 
-    params = {}
     //params are ignored if there are product ids in selectedProducts
     if (selectedProducts && selectedProducts.length > 0) return {}    
     return filters
@@ -11,6 +12,15 @@ function convertFiltersIntoParams(filters, selectedProducts) {
 async function addRule(ctx) {
     try {        
         const shop = ctx.session.shop
+        
+        const needsUpgrade = await needsUpgradeForAddRule(shop)
+        console.log('needsu: ', needsUpgrade)
+        if (needsUpgrade) {
+            ctx.status = 400
+            ctx.body = 'needs upgrade'
+            return
+        }
+        
         const body = JSON.parse(ctx.request.rawBody)
         let {filters, selectedProducts, email} = body        
         filters = convertFiltersIntoParams(filters, selectedProducts)        

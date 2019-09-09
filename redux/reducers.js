@@ -34,7 +34,7 @@ export const isLoadingReducer = (state = false, action) => {
     }
 }
 
-//Reducer that shows the status of the loading screen
+//Reducer that shows users the payment plans
 export const showPaymentPlanReducer = (state = false, action) => {    
     switch (action.type) {
         case keys.SHOW_PAYMENT_PLAN:
