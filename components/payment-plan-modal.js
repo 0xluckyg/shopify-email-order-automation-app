@@ -90,10 +90,15 @@ class PaymentPlanModal extends React.Component {
     }
 
     render() {
+        //paymentlock true when user enabled automatic send email but payment plan prevented app from auto send
+        let paymentLock = false
+        if (this.props.getUserReducer.payment) {
+            paymentLock = this.props.getUserReducer.payment.lock
+        }
         return(
             <Modal 
                 styles={modalStyle}
-                open={this.props.showPaymentPlanReducer.show} 
+                open={this.props.showPaymentPlanReducer.show && !paymentLock}
                 onClose={() => {
                     this.props.showPaymentPlanAction(false)
                 }}

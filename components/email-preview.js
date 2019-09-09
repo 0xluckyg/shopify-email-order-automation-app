@@ -10,7 +10,7 @@ import axios from 'axios';
 import FileDownload from 'js-file-download';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {showToastAction, isLoadingAction} from '../redux/actions';
+import {showToastAction, isLoadingAction, showPaymentPlanAction} from '../redux/actions';
 import {createOrderText} from '../helper/template'
 import NoContent from './no-content'
 
@@ -100,7 +100,6 @@ class EmailPreview extends React.Component {
                 };
             })            
         } catch (err) {            
-            console.log('err, ', err)
             this.props.showToastAction(true, "Couldn't get settings. Please try again later.")
         }
     }
@@ -116,7 +115,7 @@ class EmailPreview extends React.Component {
             this.setState({PDFIsLoading: false})
             const pdf = new Buffer(res.data, 'base64')
             FileDownload(pdf, data.name);
-        }).catch(err => {
+        }).catch(() => {
             this.setState({PDFIsLoading: false})
             this.props.showToastAction(true, "Couldn't get PDF. Please try again later.")
         })
@@ -183,8 +182,12 @@ class EmailPreview extends React.Component {
             this.setState({isSending: false})
             this.props.reload()
         }).catch(err => {
-            this.props.showToastAction(true, "Couldn't send. Please Try Again Later.")
             this.setState({isSending: false})
+            if (err.response.data == 'needs upgrade') {
+                this.props.showPaymentPlanAction(true, true)
+            } else {
+                this.props.showToastAction(true, "Couldn't send. Please Try Again Later.")
+            }
         })
     }
 
@@ -246,7 +249,7 @@ const finalButtonStyle = {float:"right", padding: "16px 0px 16px 0px"}
 
 function mapDispatchToProps(dispatch){
     return bindActionCreators(
-        {showToastAction, isLoadingAction},
+        {showToastAction, isLoadingAction, showPaymentPlanAction},
         dispatch
     );
 }

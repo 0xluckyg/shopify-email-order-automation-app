@@ -223,7 +223,7 @@ function createEmailObject(emails, order, item, email) {
     if (!emails[email.email][order.order_number].items[item.variant_id]) {
         emails[email.email][order.order_number].items[item.variant_id] = item
     } else {                
-        emails[email.email][order.order_number].items[item.variant_id][quantity] += 1
+        emails[email.email][order.order_number].items[item.variant_id]['quantity'] += 1
     }
     return emails
 }

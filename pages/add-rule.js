@@ -169,8 +169,11 @@ class AddRule extends React.Component {
             this.fetchProducts({page: 1, filters: []})
         }).catch(err => {            
             this.setState({buttonIsLoading: false})
-            console.log('errr: ',err )
-            this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
+            if (err.response.data == 'needs upgrade') {
+                this.props.showPaymentPlanAction(true, true)
+            } else {
+                this.props.showToastAction(true, "Couldn't save. Please Try Again Later.")
+            }
         })        
     }
     
@@ -186,7 +189,7 @@ class AddRule extends React.Component {
             <ResourceList.Item
                 id={id}                
                 media={media}
-                accessibilityLabel={`View details for ${name}`}                
+                accessibilityLabel={`View details for ${title}`}                
             >
             <div style={{display:'flex', justifyContent: 'space-between'}}>
             <div>

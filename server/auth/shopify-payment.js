@@ -13,7 +13,7 @@ async function needsUpgradeForSendOrders(shop, orders) {
     } else if (plan > keys.FEE_0 && plan <= keys.FEE_1) {
         return (orders.length > 300)
     //if highest plan
-    } else if (plan >= keys.FEE_2) {
+    } else {
         false
     } 
 }
@@ -30,7 +30,7 @@ async function needsUpgradeForAddRule(shop) {
     if (plan <= keys.FEE_0) {
         return (rules > 10)
     //if higher than plan 2
-    } else if (plan >= keys.FEE_1) {
+    } else {
         return false
     }
 }
@@ -131,6 +131,7 @@ function saveAcceptPayment(shop, price, date) {
         { shop }, 
         { $set: { 
                 payment: {
+                    lock: false,
                     accepted: true,
                     plan: price,
                     date

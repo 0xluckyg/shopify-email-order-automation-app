@@ -14,7 +14,6 @@ async function addRule(ctx) {
         const shop = ctx.session.shop
         
         const needsUpgrade = await needsUpgradeForAddRule(shop)
-        console.log('needsu: ', needsUpgrade)
         if (needsUpgrade) {
             ctx.status = 400
             ctx.body = 'needs upgrade'

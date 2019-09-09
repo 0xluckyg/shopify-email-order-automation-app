@@ -2,9 +2,11 @@ const axios = require('axios');
 const {User} = require('./db/user');
 const {ProcessedOrder} = require('./db/processed-order');
 const {createOrderText, createSubjectText} = require('../helper/template');
+const {needsUpgradeForSendOrders} = require('./auth/shopify-payment')
 const {getOrderPDF} = require('./pdf')
 const {sendGmail, formatAttachment} = require('./auth/gmail-auth');
-const {getHeaders, 
+const {
+    getHeaders, 
     asyncForEach, 
     fetchAllOrdersForDay,
     cleanOrders, 
@@ -103,6 +105,15 @@ async function sendOrders(ctx) {
         const {date} = JSON.parse(ctx.request.rawBody)
 
         let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
+        
+        //if user needs to upgrade subscription plan
+        const needsUpgrade = await needsUpgradeForSendOrders(shop, allOrders)
+        if (needsUpgrade) {
+            ctx.status = 400
+            ctx.body = 'needs upgrade'
+            return
+        }
+        
         allOrders = await cleanOrders(allOrders)
         allOrders = await combineOrdersAndEmailRules(shop, allOrders)
         allOrders = await combineOrdersAndSentHistory(allOrders)
@@ -141,7 +152,7 @@ async function getAllOrdersForDay(ctx) {
 async function sendOrdersCron() {             
     return schedule.scheduleJob('8 * * *', async () => {        
         const users = await User.find({
-            'settings.sendMethod.method': 'manual',
+            'settings.sendMethod.method': 'automatic',
             'gmail.isActive': true,
             active: true
         })    
@@ -159,6 +170,16 @@ async function sendOrdersCron() {
             today = today.format('YYYY-MM-DD[T]HH:mm:ss')                
             
             let allOrders = await fetchAllOrdersForDay(shop, accessToken, today)
+            
+            //if user needs to upgrade subscription plan
+            const needsUpgrade = await needsUpgradeForSendOrders(shop, allOrders)
+            if (needsUpgrade) {
+                await User.findOneAndUpdate({shop}, {
+                    'payment.lock': true
+                })
+                return
+            }
+            
             allOrders = await cleanOrders(allOrders)
             allOrders = await combineOrdersAndEmailRules(shop, allOrders)
             allOrders = await combineOrdersAndSentHistory(allOrders)    
