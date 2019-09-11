@@ -42,12 +42,11 @@ class Orders extends React.Component {
         }).catch(err => {
             this.setState({ordersLoading: false})
             this.props.showToastAction(true, "Couldn't get orders. Please refresh.")
-            console.log('err getting orders, ', err)
+            console.log('Failed getting orders: ', err)
         })
     }
 
     renderItem = (item) => {        
-        console.log(item)
         const { id, total_price, currency, created_at, order_number, customer, line_items, shipping_address  } = item;
         const { first_name, last_name } = customer        
         const date = new Date(created_at)

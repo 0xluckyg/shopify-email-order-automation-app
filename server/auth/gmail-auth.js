@@ -33,7 +33,6 @@ function getConnectionUrl(auth) {
 }
 
 async function saveToken(shop, googleRefreshToken) {
-    console.log('refresh token: ', googleRefreshToken)
     return await User.findOneAndUpdate({shop}, {
         $set: {
             gmail: {                
@@ -182,10 +181,8 @@ async function getTokens(ctx) {
     try {
         const {shop} = ctx.session
         const code = ctx.query.code
-        console.log('code: ', code)
         const oauth2Client = createConnection()
         const {tokens} = await oauth2Client.getToken(code)
-        console.log('tokens: ', tokens)
         const user = await saveToken(shop, tokens.refresh_token)
 
         oauth2Client.setCredentials(tokens);

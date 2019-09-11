@@ -77,7 +77,7 @@ class AddRule extends React.Component {
             if (!this.mounted) return
             this.setState({productsAreLoading: false})
             this.props.showToastAction(true, "Couldn't get products. Please refresh.")
-            console.log('err getting products, ', err)
+            console.log('Failed getting products: ', err)
         })
     }
 

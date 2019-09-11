@@ -63,7 +63,7 @@ class Rules extends React.Component {
             if (!this.mounted) return
             this.setState({rulesLoading: false})
             this.props.showToastAction(true, "Couldn't get rules. Please refresh.")
-            console.log('err getting rules, ', err)
+            console.log('Failed getting rules: ', err)
         })
     }
 
@@ -143,7 +143,6 @@ class Rules extends React.Component {
     }
 
     renderNoContent() {
-        console.log('rules: ', this.state.rules)
         if (this.state.rules.length != 0 || this.state.rulesLoading) return null
         return (
             <NoContent

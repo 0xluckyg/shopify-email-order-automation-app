@@ -52,7 +52,7 @@ class OrdersByDay extends React.Component {
         }).catch(err => {
             this.setState({ordersLoading: false})
             this.props.showToastAction(true, "Couldn't get orders. Please refresh.")
-            console.log('err getting orders, ', err)
+            console.log('Failed getting orders: ', err)
         })
     }
 
@@ -68,7 +68,7 @@ class OrdersByDay extends React.Component {
         }).catch(err => {
             this.setState({ showOrderPreview: false })
             this.props.showToastAction(true, "Couldn't get order preview. Please refresh.")
-            console.log('err getting preview, ', err)
+            console.log('Failed getting preview: ', err)
         })
     }
 

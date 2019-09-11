@@ -87,8 +87,6 @@ async function sendEmails(shop, emails) {
                 })
             })
 
-            console.log('processed: ', processedOrders.length)
-
             await ProcessedOrder.insertMany(processedOrders)
         })
 

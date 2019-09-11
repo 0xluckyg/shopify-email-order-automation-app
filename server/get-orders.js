@@ -45,9 +45,7 @@ async function getOrders(ctx) {
                 ...date
             }
         })
-        console.log('total: ', totalPages)
-        console.log('orders: ', orders.data.orders.length)
-        
+
         orders = await cleanOrders(orders.data.orders)
         orders = await combineOrdersAndEmailRules(shop, orders)
         orders = await combineOrdersAndSentHistory(orders)

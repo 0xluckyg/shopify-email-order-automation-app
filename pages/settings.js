@@ -49,7 +49,6 @@ class Settings extends React.Component {
         axios.get(process.env.APP_URL + '/get-settings')
         .then(res => {            
             if (!this.mounted) return      
-            console.log('settings: ',res.data)      
             const {
                 subjectTemplateText,
                 headerTemplateText, 
@@ -191,7 +190,7 @@ class Settings extends React.Component {
         }).catch((err) => {   
             if (!this.mounted) return            
             this.setState({PDFPreviewLoading: false})
-            console.log('err: ',err)
+            console.log('Failed getting PDF preview: ',err)
             this.props.showToastAction(true, "Couldn't get preview. Please try again later.")
         })   
     }
@@ -213,7 +212,7 @@ class Settings extends React.Component {
         }).catch((err) => {   
             if (!this.mounted) return            
             this.setState({PDFOrderLimitLoading: false})
-            console.log('err: ',err)
+            console.log('Failed saving PDF order limit: ',err)
             this.props.showToastAction(true, "Couldn't save. Please try again later.")
         })   
     }

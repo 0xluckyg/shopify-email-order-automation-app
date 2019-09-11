@@ -28,7 +28,6 @@ function getPDFName(data) {
 }
 
 function returnStartAndEndDate(date) {
-    console.log('START END : ', date)
     if (date) {        
         date = new Date(date)
         let endDate = new Date(date).setDate(date.getDate() + 1)        
@@ -67,7 +66,6 @@ async function fetchAllOrdersForDay(shop, accessToken, queryDate) {
             })            
             const callLimitHeader = orders.headers.http_x_shopify_shop_api_call_limit
             const callLimit = parseInt(callLimitHeader.split('/')[0])            
-            console.log(`api limit reached: ${callLimitHeader}`)
             if (callLimit > 38) {                
                 console.log(`${shop} get order api limit reached: ${callLimitHeader}`)
                 const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
@@ -75,11 +73,9 @@ async function fetchAllOrdersForDay(shop, accessToken, queryDate) {
             }
 
             allOrders = [...allOrders, ...orders.data.orders]
-            console.log('page', page)
             if (page == totalPages || totalPages == 0) hasNext = false
             page ++
         }        
-        console.log('all: ', allOrders.length)
         return allOrders
     } catch (err) {
         console.log('Failed getting orders: ', err)        
@@ -143,10 +139,6 @@ async function combineOrdersAndEmailRules(shop, orders) {
                     compareProductIds(item, rule) || 
                     ruleIncludesAllProducts(rule)) {
                     
-                    // console.log('title: ', item.title)
-                    // console.log('filter: ', rule.filters)
-                    // console.log('email: ', rule.email)
-                    
                     let emailRules = array[i].line_items[j].email_rules
                     //filter out duplicates
                     if (emailRules.filter(e => e.email === rule.email).length > 0) return
@@ -171,7 +163,6 @@ async function getProcessedEmails(orders) {
 
 async function combineOrdersAndSentHistory(orders) { 
     let processedEmails = await getProcessedEmails(orders)
-    console.log('Got processed orders ', processedEmails.length)
 
     await asyncForEach(orders, async (order, i, array) => {
         if (!order.line_items) return

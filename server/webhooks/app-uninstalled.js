@@ -29,7 +29,7 @@ function registerAppUninstalled(shop, accessToken) {
         .then(() => {
             console.log('app/uninstalled webhook created')            
         })
-        .catch((error) => console.log('webhook error', error));
+        .catch((error) => console.log('Failed creating app/uninstalled webhook', error));
 }
 
 //We put this function in POST webhook/app/uninstalled on our server, and Shopify notifies this endpoint everytime app uninstall triggers
@@ -38,7 +38,6 @@ async function appUninstalled(ctx) {
     
     if (validated) {
         const body = ctx.request.rawBody;   
-        console.log('app/uninstalled webhook response: ',body)                
         const shopifyDomain = JSON.parse(body).myshopify_domain
         if (shopifyDomain) {
             await unregisterUser(shopifyDomain);
@@ -56,7 +55,7 @@ async function unregisterUser(shop) {
             { $set: { "active": false, "payment.accepted": false } }
         )
     } catch (err) {
-        console.log('error saving declined payment', err)
+        console.log('Failed saving declined payment', err)
     }
 }
 

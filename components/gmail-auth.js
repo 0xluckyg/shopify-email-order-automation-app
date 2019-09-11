@@ -99,7 +99,7 @@ class GmailAuth extends React.Component {
                     }}
                     onFailure={err => {
                         this.setState({isLoading: false})
-                        console.log('err ', err)
+                        console.log('Failed Google Login: ', err)
                     }}
                     cookiePolicy='single_host_origin'
                     prompt='consent'

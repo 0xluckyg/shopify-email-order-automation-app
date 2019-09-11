@@ -47,7 +47,7 @@ function shopifyAuth() {
         //After authenticating with Shopify redirects to this app through afterAuth
         //Async returns promise to wait for Shopify billing fetch to complete
         async afterAuth(ctx) {
-            console.log('auth called ', ctx.session)
+            console.log('Shopify auth called: ', ctx.session)
             const { shop, accessToken } = ctx.session;                   
             //The app will use a library called Shopify App Bridge to communicate with Shopify by passing in Shopify API key to shopOrigin in Polaris AppProvider
             //shopOrigin (shop) is the myshopify URL of the store that installs the app
@@ -73,8 +73,7 @@ function shopifyAuth() {
                 //When new user subscribes to the app
                 const savedUser = await newUser.save()                 
                 confirmationURL = await initiatePayment(ctx, savedUser)
-                console.log(`${savedUser.shop} user created`)
-            
+
             //When user has installed the app before
             } else {
                 //REINSTALL: When payment is not accepted and accessToken is different
@@ -86,7 +85,7 @@ function shopifyAuth() {
                 //This step prevents users from not accepting payment, going back to the previous screen, and bypassing the payment step there after
                 } else if (user.payment.accepted == false ) {                        
                     confirmationURL = await initiatePayment(ctx, user)
-                    console.log(`${user.shop} complete payment process`)                    
+                    console.log(`${user.shop} completed payment process`)                    
                 }
             }
 
@@ -95,7 +94,7 @@ function shopifyAuth() {
                 ctx.redirect(confirmationURL) 
             //If the user finished the payment process but still triggered shopify auth
             } else {                    
-                console.log(`${user.shop} auth pass`)
+                console.log(`${user.shop} auth passed`)
                 ctx.redirect("/");                    
             }                
         },
@@ -129,12 +128,11 @@ async function switchSession(ctx, next) {
         .update(message)
         .digest("hex");
         
-        console.log('hmac ', hmac)
-        console.log('hmac2 ', generatedHash)        
+        console.log('hmac original: ', hmac)
+        console.log('hmac compare: ', generatedHash)        
 
         if (safeCompare(generatedHash, hmac)) {            
             ctx.session = {shop}                        
-            console.log('sess1: ',ctx.session)            
         }
         await next()
     } catch(err) {

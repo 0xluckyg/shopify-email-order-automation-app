@@ -38,7 +38,7 @@ class PaymentPlanModal extends React.Component {
             window.location.replace(redirectUrl);
             this.setState({isLoading: false})
         }).catch(err => {
-            console.log('err: ', err)
+            console.log('Failed change subscription request: ', err)
             this.props.showToastAction(true, "Couldn't subscribe. Please Try Again Later.")
             this.setState({isLoading: false})
         })    

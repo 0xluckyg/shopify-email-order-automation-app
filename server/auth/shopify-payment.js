@@ -7,10 +7,10 @@ async function needsUpgradeForSendOrders(shop, orders) {
     const plan = user.payment.plan
 
     //if lowest plan
-    if (plan <= keys.FEE_0) {
+    if (plan < keys.FEE_1) {
         return (orders.length > 50)
     //if plan 2
-    } else if (plan > keys.FEE_0 && plan <= keys.FEE_1) {
+    } else if (plan >= keys.FEE_1 && plan < keys.FEE_2) {
         return (orders.length > 300)
     //if highest plan
     } else {
@@ -23,11 +23,8 @@ async function needsUpgradeForAddRule(shop) {
     const user = await User.findOne({shop}, {payment: 1})
     const plan = user.payment.plan
     
-    console.log('p: ', plan)
-    console.log('r: ', rules)
-    console.log('k: ', keys.FEE_0)
     //if lowest plan
-    if (plan <= keys.FEE_0) {
+    if (plan < keys.FEE_1) {
         return (rules > 10)
     //if higher than plan 2
     } else {
@@ -80,13 +77,12 @@ function initiatePayment (ctx, user, plan) {
         .then(async (jsonData) => {            
             return jsonData.recurring_application_charge.confirmation_url                                                 
         })
-        .catch((error) => console.log('error', error));     
+        .catch((error) => console.log('Failed recurring application charges:',error));     
 }
 
 //subscribes the actual payment to Shopify after user has accepted the payment if there is a charge_id
 async function processPayment (ctx, next) {    
     if (ctx.query.charge_id) {
-        console.log('process payment called');    
         const chargeId = ctx.query.charge_id;
         const shop = ctx.session.shop;
         const accessToken = ctx.session.accessToken;
@@ -142,7 +138,7 @@ function saveAcceptPayment(shop, price, date) {
     .then(res => {
         return res
     }).catch(err => {
-        console.log('error saving accepted payment', err)
+        console.log('Failed saving accepted payment', err)
     })
 }
 
