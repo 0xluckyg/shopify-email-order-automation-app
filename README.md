@@ -1,9 +1,9 @@
-#Kroco Order Email Automation
+# Kroco Order Email Automation
 Didn't write descriptions for the files that I think are self explanatory. (Or I got lazy << most likely it)
 
-##Frontend File Structure
+## File Structure
 
-###components
+### components
 Contains reusable frontend components
 ```
 add-email.js
@@ -75,10 +75,10 @@ user-preview.js
 Avatar on the right corner of topbar header that shows menu when clicked
 ```
 
-###config
+### config
 Contains reusable keys and environment variables
 
-###pages
+### pages
 A default folder structure by Next.js. 
 Next.js will automatically route the files inside this folder to a directory. 
 For example, contact-us.js will become kroco.io/contact-us
@@ -117,16 +117,16 @@ We may change this system in the near future.
 If you want to add new polaris component, go to appurl/polaris to view which components can be used.
 ```
 
-###redux
+### redux
 has all files related to redux. Combined all methods into actions and reducers files for simplicity.
 
-###static
+### static
 A default folder by Next.js
 All static files such as images will be stored and rendered from this folder
 
-##Backend File Structure (Inside Server Folder)
+## Backend File Structure (Inside Server Folder)
 
-###auth
+### auth
 All authentication and external API related code is stored here. 
 Includes authentication and usage of GMAIL api.
 ```
@@ -149,7 +149,7 @@ gmail-auth.js
 Everything related to gmail including gmail auth, send, etc
 ```
 
-###db
+### db
 All db related models
 ```
 mongoose.js
@@ -172,11 +172,11 @@ user.js
 User credentials and info including settings
 ```
 
-###webhooks
+### webhooks
 Webhooks are listners for any Shopify changes. 
 A registered webhook on Shopify (There's a code snippet to register this inside shopify-auth) will notify our app server, and code inside this folder will listen for the event. 
 
-###individual files
+### individual files
 ```
 contact-us.js
 Logic for the contact-us page for users to send email inquiries. 
@@ -200,7 +200,7 @@ pdf.js
 Everything related to pdf, including creating pdf previews, creating pdf orders, etc
 ```
 
-###important files
+### important files
 ```
 orders-helper.js
 We gotta compare rules, processed history, and orders fetched from Shopify everytime we view orders and send orders.
@@ -223,9 +223,9 @@ Logic for getting the user.
 App calls this module on start from the frontend and stores it in reducer
 ```
 
-##Shared Filed Structure
+## Shared Filed Structure
 
-###helper
+### helper
 Contains code that can be reused by both frontend and backend
 ```
 template.js
