@@ -2,11 +2,11 @@
 Didn't write descriptions for the files that I think are self explanatory. (Or I got lazy << most likely it)
 
 ## Useful documentations
-https://polaris.shopify.com/
-https://developers.shopify.com/tutorials/build-a-shopify-app-with-node-and-react
-https://help.shopify.com/en/api/getting-started
-https://nextjs.org/
-https://koajs.com/
+- https://polaris.shopify.com/
+- https://developers.shopify.com/tutorials/build-a-shopify-app-with-node-and-react
+- https://help.shopify.com/en/api/getting-started
+- https://nextjs.org/
+- https://koajs.com/
 
 ## Frontend File Structure
 
