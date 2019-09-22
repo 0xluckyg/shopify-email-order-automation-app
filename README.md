@@ -7,15 +7,18 @@ Didn't write descriptions for the files that I think are self explanatory. (Or I
 Contains reusable frontend components
 ```
 add-email.js
-Component for adding new emails for rules. Used twice; once for editing rules in rule-detail-modal.js and once in add-rule.js
+Component for adding new emails for rules. 
+Used twice; once for editing rules in rule-detail-modal.js and once in add-rule.js
 ```
 ```
 email-preview.js
-Component for previewing email that's about to be sent. Used by order-detail-modal.js
+Component for previewing email that's about to be sent. 
+Used by order-detail-modal.js
 ```
 ```
 gmail-auth.js
-Annoying little view that asks the user to authorize with gmail first. Also can be seen on the bottom of setting.js
+Annoying little view that asks the user to authorize with gmail first. 
+Also can be seen on the bottom of setting.js
 ```
 ```
 navigation.js
@@ -27,11 +30,13 @@ View to show inside tables when there's 0 row
 ```
 ```
 order-detail-modal.js
-A popup modal to view details about an order, or send an individual order. Can be accessed from orders-by-day.js or all-orders.js
+A popup modal to view details about an order, or send an individual order. 
+Can be accessed from orders-by-day.js or all-orders.js
 ```
 ```
 order-sent-status.js
-A small badge that shows if the order has been processed or not. (green if processed, gray if not)
+A small badge that shows if the order has been processed or not. 
+(green if processed, gray if not)
 ```
 ```
 page-header.js
@@ -48,15 +53,18 @@ A popup modal asking user to write a review. Pops up every week
 ```
 ```
 rule-detail-modal.js
-A popoup modal for viewing details about an email rule. Only used in rules.js
+A popoup modal for viewing details about an email rule. 
+Only used in rules.js
 ```
 ```
 save-bar.js
-A savebar that pops up on the top of the app if the user starts editing something. I don't think I implemented this, so possibly a subject to delete.
+A savebar that pops up on the top of the app if the user starts editing something. 
+I don't think I implemented this, so possibly a subject to delete.
 ```
 ```
 skeleton.js
-A gray empty view to show that a page is loading. I don't think I implemented this.
+A gray empty view to show that a page is loading. 
+I don't think I implemented this.
 ```
 ```
 toast.js
@@ -77,23 +85,29 @@ For example, contact-us.js will become kroco.io/contact-us
 ```
 _app.js
 Default filename for Next.js that deals with configurations once the components loads in the frontend.
-This is like the parent component for all components inside pages, and default configurations can be overriden by writing this file.
+This is like the parent component for all components inside pages, 
+and default configurations can be overriden by writing this file.
 ```
 ```
 _document.js
-Default filename for Next.js that deals with configurations while the pages compile on the server. Can add things like scripts in the head.
+Default filename for Next.js that deals with configurations while the pages compile on the server. 
+Can add things like scripts in the head.
 ```
 ```
 index.js
-Parent for all pages, that goes into _app.js. Not a good Next.js practice to put all files in one component, but I forgot why I did this (I think it was related to polaris). I didn't do this for other projects.
+Parent for all pages, that goes into _app.js. Not a good Next.js practice to put all files in one component, 
+but I forgot why I did this (I think it was related to polaris). 
+I didn't do this for other projects.
 ```
 ```
 orders-by-day.js
-For viewing and sending orders by day. This page is implemented into orders.js
+For viewing and sending orders by day. 
+This page is implemented into orders.js
 ```
 ```
 orders.js
-For viewing all orders and orders by day. Implements orders-by-day.js
+For viewing all orders and orders by day. 
+Implements orders-by-day.js
 ```
 ```
 polaris.js
@@ -150,7 +164,8 @@ We fetch the orders from Shopify and compare them with the documents in this mod
 ```
 rule.js
 We store all the rules for whome to send which orders to.
-For example, user will have set up a rule: order containing product vendor "adidas" will be sent to info@adidas.com and the email will be sent to this addres whenever there's an order that matches this rule.
+For example, user will have set up a rule: order containing product vendor "adidas" will be sent to info@adidas.com 
+and the email will be sent to this addres whenever there's an order that matches this rule.
 ```
 ```
 user.js
@@ -164,7 +179,8 @@ A registered webhook on Shopify (There's a code snippet to register this inside 
 ###individual files
 ```
 contact-us.js
-Logic for the contact-us page for users to send email inquiries. Has nothing to do with our Gmail API, and uses nodemailer
+Logic for the contact-us page for users to send email inquiries. 
+Has nothing to do with our Gmail API, and uses nodemailer
 ```
 ```
 edit-rule.js
@@ -176,7 +192,8 @@ Logic for getting and viewing email rules the user created
 ```
 ```
 get-products.js
-Logic for fetching products from Shopify (Not orders). This is used in the create rule page where the user has to browse through the products in the store
+Logic for fetching products from Shopify (Not orders). 
+This is used in the create rule page where the user has to browse through the products in the store
 ```
 ```
 pdf.js
@@ -187,7 +204,8 @@ Everything related to pdf, including creating pdf previews, creating pdf orders,
 ```
 orders-helper.js
 We gotta compare rules, processed history, and orders fetched from Shopify everytime we view orders and send orders.
-This helper module is therefore used by both get-orders.js and send-orders.js, and contains logic for comparing, filtering, and reformatting the three datasets.
+This helper module is therefore used by both get-orders.js and send-orders.js, 
+and contains logic for comparing, filtering, and reformatting the three datasets.
 ```
 ```
 get-orders.js
