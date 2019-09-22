@@ -1,7 +1,7 @@
 # Kroco Order Email Automation
 Didn't write descriptions for the files that I think are self explanatory. (Or I got lazy << most likely it)
 
-## File Structure
+## Frontend File Structure
 
 ### components
 Contains reusable frontend components
