@@ -150,7 +150,10 @@ class PaymentPlanModal extends React.Component {
 }
 
 const modalStyle = {
-  modal: { padding: 0 }
+  modal: { 
+      padding: 0
+  },
+  zIndex: 111
 }
 
 const modalContentStyle = {

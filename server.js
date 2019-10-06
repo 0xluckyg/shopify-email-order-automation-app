@@ -83,7 +83,7 @@ app.prepare().then(async () => {
     //Allows routes that do not require authentication to be handled    
     server.use(async (ctx, next) => {
         let noAuth = false
-        for (i in whitelist) {
+        for (let i in whitelist) {
             if (ctx.request.url.startsWith(whitelist[i])) noAuth = true
         }
         

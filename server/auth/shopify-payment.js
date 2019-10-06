@@ -1,3 +1,4 @@
+const axios = require('axios');
 const {User} = require('../db/user');
 const {Rule} = require('../db/rule');
 const keys = require('../../config/keys')
@@ -60,29 +61,34 @@ function initiatePayment (ctx, user, plan) {
             test: true //The Billing API also has a test property that simulates successful charges.
         }
     })    
+    
     const options = {
-        method: 'POST',
-        body: stringifiedBillingParams,
         credentials: 'include',
         headers: {
             'X-Shopify-Access-Token': accessToken,
             'Content-Type': 'application/json',
-        },
-    };
-    //Make Shopify billing request using await
-    return fetch(`https://${shop}/admin/recurring_application_charges.json`, options)
-        .then((response) => {                        
-            return response.json()
-        })
-        .then(async (jsonData) => {            
-            return jsonData.recurring_application_charge.confirmation_url                                                 
-        })
-        .catch((error) => console.log('Failed recurring application charges:',error));     
+        }
+    }
+    
+    return axios.post(
+        `https://${shop}/admin/recurring_application_charges.json`, 
+        stringifiedBillingParams, 
+        options
+    )
+    .then(res => {
+        return res.data.recurring_application_charge.confirmation_url
+    })
+    .catch(err => {
+        console.log('Failed shopify billing request', err)
+    })  
 }
 
 //subscribes the actual payment to Shopify after user has accepted the payment if there is a charge_id
 async function processPayment (ctx, next) {    
-    if (ctx.query.charge_id) {
+    try {
+        
+        if (!ctx.query.charge_id) return await next();
+        
         const chargeId = ctx.query.charge_id;
         const shop = ctx.session.shop;
         const accessToken = ctx.session.accessToken;
@@ -94,30 +100,23 @@ async function processPayment (ctx, next) {
                 'Content-Type': 'application/json',
             },
         };
-        const optionsWithGet = { ...options, method: 'GET' };
-        const optionsWithPost = { ...options, method: 'POST' }
-
-        fetch(`https://${shop}/${chargeUrl}/${chargeId}.json`,
-        optionsWithGet,)
-            .then((response) => response.json())
-            .then((myJson) => {
-                const {price, status, updated_at} = myJson.recurring_application_charge
-                if (status === 'accepted') {
-                    const stringifyMyJSON = JSON.stringify(myJson)
-                    const optionsWithJSON = { ...optionsWithPost, body: stringifyMyJSON }
-                    fetch(`https://${shop}/${chargeUrl}/${chargeId}/activate.json`, optionsWithJSON)
-                    //set payment status to true in our db after Shopify receives payment subscription
-                    .then(() => {
-                        saveAcceptPayment(shop, price, updated_at)
-                    })
-                    .catch((error) => console.log('Failed processing payment: ', error));
-                }
-                else return ctx.redirect('/')
-            });
-
-        return ctx.redirect('/');
-    } else {
-        await next();
+        
+        const res = await axios.get(`https://${shop}/${chargeUrl}/${chargeId}.json`, options)
+        const {price, status, updated_at} = res.data.recurring_application_charge
+        if (status === 'accepted') { 
+            const stringifyData = JSON.stringify(res.data)
+            await axios.post(
+                `https://${shop}/${chargeUrl}/${chargeId}/activate.json`, 
+                stringifyData,
+                options
+            )
+            saveAcceptPayment(shop, price, updated_at)
+        }
+        
+        return ctx.redirect('/')
+            
+    } catch(err) {
+        console.log('Failed processing payment: ', err)   
     }
 };
 

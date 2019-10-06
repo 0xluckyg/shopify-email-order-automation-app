@@ -1,9 +1,10 @@
+const axios = require('axios');
 const validateWebhook = require('./validate-webhook');
 const {User} = require('../db/user');
 
 //We send a post request to Shopify upon authentication, to tell Shopify to notify us through webhook when app uninstall happens.
 function registerAppUninstalled(shop, accessToken) {
-    //Subscribing to webhook event 'products/create'
+        //Subscribing to webhook event 'products/create'
     //In a production app, you would need to store the webhook in a database to access the response on the frontend.
     const stringifiedWebhookParams = JSON.stringify({
         webhook: {
@@ -12,24 +13,22 @@ function registerAppUninstalled(shop, accessToken) {
             format: 'json',
         },
     });
-    const webhookOptions = {
-        method: 'POST',
-        body: stringifiedWebhookParams,
+    
+    const options = {
         credentials: 'include',
         headers: {
             'X-Shopify-Access-Token': accessToken,
             'Content-Type': 'application/json',
-        },
-    };
-    //Registers the webhook to shopify through a post request                
-    fetch(`https://${shop}/admin/webhooks.json`, webhookOptions)
-        .then((response) => {                         
-            return response.json()
-        })
-        .then(() => {
-            console.log('app/uninstalled webhook created')            
-        })
-        .catch((error) => console.log('Failed creating app/uninstalled webhook', error));
+        }
+    }
+    
+    axios.post(
+        `https://${shop}/admin/webhooks.json`, 
+        stringifiedWebhookParams, 
+        options
+    ).catch(err => {
+        console.log('Failed reigster app uninstalled webhook: ', err)
+    })
 }
 
 //We put this function in POST webhook/app/uninstalled on our server, and Shopify notifies this endpoint everytime app uninstall triggers

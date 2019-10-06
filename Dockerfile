@@ -15,7 +15,3 @@ RUN npm run build
 
 #the starting script
 ENTRYPOINT node server.js
-
-
-
-
