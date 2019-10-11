@@ -26,9 +26,7 @@ function registerAppUninstalled(shop, accessToken) {
         `https://${shop}/admin/webhooks.json`, 
         stringifiedWebhookParams, 
         options
-    ).catch(err => {
-        console.log('Failed reigster app uninstalled webhook: ', err)
-    })
+    )
 }
 
 //We put this function in POST webhook/app/uninstalled on our server, and Shopify notifies this endpoint everytime app uninstall triggers

@@ -1,6 +1,7 @@
 const axios = require('axios');
-const version = '2019-04'
-const limit = 10
+const keys = require('../config/keys')
+const version = keys.SHOPIFY_API_VERSION
+const limit = keys.PAGE_SIZE
 
 function getHeaders(accessToken) {
     return {

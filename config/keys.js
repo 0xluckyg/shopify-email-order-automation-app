@@ -6,6 +6,8 @@ const LOGO = '../static/logo-white.svg';
 const REVIEW_URL = 'https://google.com';
 const EMBEDDED = false;
 
+const SHOPIFY_API_VERSION = '2019-04'
+const PAGE_SIZE = 10
 const CONTACT_US_INDEX = 4;
 const FAQ_INDEX = 5;
 
@@ -32,6 +34,8 @@ module.exports = {
     REVIEW_URL,
     EMBEDDED,
     
+    SHOPIFY_API_VERSION,
+    PAGE_SIZE,
     CONTACT_US_INDEX,
     FAQ_INDEX,
     

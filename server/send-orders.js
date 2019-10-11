@@ -15,9 +15,10 @@ const {
     reformatOrdersByEmail,
     reduceLongOrders
 } = require('./orders-helper')
+const keys = require('../config/keys')
 const schedule = require('node-schedule');
 const moment = require('moment');
-const version = '2019-04'
+const version = keys.SHOPIFY_API_VERSION
 
 async function sendEmails(shop, emails) {
     try {

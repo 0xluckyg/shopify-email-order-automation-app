@@ -5,12 +5,11 @@ import '@shopify/polaris/styles.css';
 import { AppProvider } from '@shopify/polaris';
 import App from 'next/app';
 import Head from 'next/head';
-import Cookies from 'js-cookie';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import configureStore from '../redux/store';
 let { store, persistor } = configureStore()
-import * as keys from '../config/keys';
+import keys from '../config/keys';
 
 //_app file overrides Next.js App file.
 // Next.js uses an App component to pass down classes to the other files in your app. This saves us from having to add imports to each file

@@ -1,6 +1,8 @@
 const axios = require('axios');
 const _ = require('lodash')
-const version = '2019-04'
+const keys = require('../config/keys')
+const version = keys.SHOPIFY_API_VERSION
+
 const {
     getHeaders, 
     cleanOrders, 
@@ -11,9 +13,9 @@ const {
 
 async function getOrders(ctx) {
     try {        
+        const limit = keys.PAGE_SIZE
         const {shop, accessToken} = ctx.session
         let {page, date} = ctx.query     
-        const limit = 10
         let hasPrevious = true; let hasNext = true
         const headers = getHeaders(accessToken)
         

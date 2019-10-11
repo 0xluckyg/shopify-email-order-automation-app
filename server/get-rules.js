@@ -5,6 +5,7 @@
 // ctx.cookies.set('example', 1) sets cookie
 
 const {Rule} = require('./db/rule');
+const keys = require('../config/keys')
 
 async function getRules(ctx) {               
     try {        
@@ -14,7 +15,7 @@ async function getRules(ctx) {
         const rules = await Rule.find({shop}, {products: 0})
         .sort({email: 1})
         .skip(skip)
-        .limit(10)        
+        .limit(keys.PAGE_SIZE)        
         ctx.body = {rules, total}
     } catch (err) {
         console.log('Failed getting rules: ', err)

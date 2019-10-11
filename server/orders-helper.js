@@ -2,6 +2,7 @@ const axios = require('axios');
 const {Rule} = require('./db/rule')
 const {User} = require('./db/user');
 const {ProcessedOrder} = require('./db/processed-order')
+const keys = require('../config/keys')
 const _ = require('lodash')
 
 function getHeaders(accessToken) {
@@ -42,7 +43,7 @@ function returnStartAndEndDate(date) {
 
 async function fetchAllOrdersForDay(shop, accessToken, queryDate) {
     try {                
-        const version = '2019-04'
+        const version = keys.SHOPIFY_API_VERSION
         const limit = 250
         let page = 1; let hasNext = true
         const headers = getHeaders(accessToken)
