@@ -10,11 +10,16 @@ import { PersistGate } from 'redux-persist/lib/integration/react';
 import configureStore from '../redux/store';
 let { store, persistor } = configureStore()
 import keys from '../config/keys';
+import setupChatra from '../scripts/chat-support'
 
 //_app file overrides Next.js App file.
 // Next.js uses an App component to pass down classes to the other files in your app. This saves us from having to add imports to each file
 // _app.js file that passes down Apollo and Polaris components, styles, and everything else typically found in an index file
 class Boilerplate extends App {    
+    componentDidMount() {
+        setupChatra(window, document)
+    }
+    
     render() {
         const { Component, pageProps } = this.props;
         return (
