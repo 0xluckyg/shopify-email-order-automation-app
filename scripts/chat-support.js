@@ -2,7 +2,7 @@ import keys from '../config/keys'
 
 function setupChatra(window, document) {
     let chatScript = (function(d, w, c) {
-        w.ChatraID = 'LNvYvevSBf74hKcsi';
+        w.ChatraID = 'Fcy6YwtRWuZxPoMLB';
         var s = d.createElement('script');
         w[c] = w[c] || function() {
             (w[c].q = w[c].q || []).push(arguments);

@@ -34,6 +34,8 @@ const session = require('koa-session');
 //package exposes "shopifyAuth" by default. We're changing that to "createShopifyAuth"
 const { verifyRequest } = require('@shopify/koa-shopify-auth');
 const next = require('next');
+const compression = require('compression')
+const koaConnect = require('koa-connect');
 
 const {processPayment, changeSubscription} = require('./server/auth/shopify-payment');
 const getUser = require('./server/get-user');
@@ -74,7 +76,7 @@ app.prepare().then(async () => {
     const server = new Koa();        
     const router = new Router();            
     server.keys = [SHOPIFY_API_SECRET_KEY];    
-
+    server.use(koaConnect(compression()))
     server.use(bodyParser());
     const routerUnauthorized = new Router();
     
