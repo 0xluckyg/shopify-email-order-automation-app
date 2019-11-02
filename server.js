@@ -24,6 +24,7 @@
 // koa uses async/await. Using the original promises will not work
 
 require('isomorphic-fetch');
+require('./config/config');
 require('./server/db/mongoose'); //If using DB
 //koa and koa-session will take care of Shopify OAuth and create a custom server
 const Koa = require('koa');
@@ -61,6 +62,7 @@ const { SHOPIFY_API_SECRET_KEY } = process.env;
 const whitelist = [    
     '/_next',
     '/static',
+    '/home',
     '/authenticate'
 ]
 async function handleRender(ctx) {        
