@@ -35,7 +35,7 @@ async function needsUpgradeForAddRule(shop) {
 
 async function changeSubscription(ctx) {
     try {
-        const { shop, accessToken } = ctx.session;    
+        const { shop } = ctx.session;    
         const { plan } = ctx.query
         const user = await User.findOne({shop})
         
@@ -103,6 +103,7 @@ async function processPayment (ctx, next) {
         
         const res = await axios.get(`https://${shop}/${chargeUrl}/${chargeId}.json`, options)
         const {price, status, updated_at} = res.data.recurring_application_charge
+        console.log('payment status: ', status)
         if (status === 'accepted') { 
             const stringifyData = JSON.stringify(res.data)
             await axios.post(

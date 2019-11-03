@@ -1,5 +1,3 @@
-import { withStyles } from '@material-ui/core/styles';
-
 import React from 'react';
 
 class Main extends React.Component {
@@ -17,7 +15,6 @@ class Main extends React.Component {
         const bkg3 = {
             backgroundImage: 'url(../../static/landing-page/images/wave-shape/wave3.png)',
         };
-        const {classes} = this.props
 
         return (
             <section className="section bg-home home-half" id="home" data-image-src="images/bg-home.jpg">
@@ -27,12 +24,19 @@ class Main extends React.Component {
                         <div className="container">
                             <div className="row">
                                 <div className="col-lg-8 offset-lg-2 text-white text-center">
-                                    <img className={classes.logo} src='../../static/logo-big.png'/>
-                                    <h1 className="home-title">YOUR HOLIDAY MARKETING APP</h1>
-                                    <p className="padding-t-15 home-desc">We make your customers happy for every holiday out there.</p>
-                                    {/* <p className="play-shadow margin-t-30 margin-l-r-auto">                                             
-                                        <a href="http://vimeo.com/99025203"  className="play-btn video-play-icon"><i className="mdi mdi-play text-center"></i></a>
-                                    </p>   */}
+                                    <img style={{width: '100%'}} src='../../static/logo-color.svg'/>
+                                    <h1 className="home-title">
+                                        Kroco Order Gmail Automation
+                                    </h1>
+                                    <p className="padding-t-15 home-desc">
+                                        <b>Automate Your Shopify Order Pipeline Through Gmail</b>
+                                    </p>
+                                    <button 
+                                        onClick={() => this.props.showAuthorizeModalAction(true)} 
+                                        className="btn btn-custom margin-t-30 waves-effect waves-light">
+                                            Get Started Now!
+                                            <i className="mdi mdi-arrow-right"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -54,11 +58,4 @@ class Main extends React.Component {
     }
 }
 
-
-const useStyles = theme => ({
-    logo: {
-        width: '100%'
-    },    
-});
-
-export default withStyles(useStyles)(Main);
+export default Main;

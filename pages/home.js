@@ -1,17 +1,11 @@
 import React from 'react';
-import Navbar from '../components/landing-page/nav-bar';
 import Main from '../components/landing-page/main';
 import Services from '../components/landing-page/services';
 import Features from '../components/landing-page/features';
 import Descriptions from '../components/landing-page/descriptions';
 import Pricing from '../components/landing-page/pricing';
-import Team from '../components/landing-page/team';
 import Process from '../components/landing-page/process';
-import Testi from '../components/landing-page/testimonials';
-import Started from '../components/landing-page/started';
-import Blog from '../components/landing-page/blog';
 import Contact from '../components/landing-page/contact';
-import SocialMedia from '../components/landing-page/social-media';
 import Footer from '../components/landing-page/footer';
 import FooterLinks from '../components/landing-page/footer-links';
 import Toast from '../components/toast'
@@ -26,8 +20,6 @@ class Home extends React.Component {
     render() {        
         return (
             <div>
-                {/* Navbar Component*/}
-
                 {/* Main view */}
                 <Main />
 
@@ -53,7 +45,7 @@ class Home extends React.Component {
                 {/* <Testi /> */}
 
                 {/* Started Component*/}
-                <Started />
+                {/* <Started /> */}
 
                 {/* Blog Component*/}
                 {/* <Blog /> */}

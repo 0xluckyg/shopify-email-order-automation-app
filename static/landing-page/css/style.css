@@ -36,19 +36,19 @@
 .navbar-custom.navbar-white .navbar-nav li a:focus,
 .navbar-custom.navbar-white .navbar-nav li a:active,
 .play-btn,.blog-title:hover,.social-icon:hover i{
-    color: #a13fc4 !important;
+    color: #8AB274 !important;
 }
 
 
 .section-title-border, .services-box:hover i, .bg-custom,.btn-custom,.features-item-list li:before,.process-left-icon-1 i,
 .process-left-icon-2 i{
-    background-color: #a13fc4;
+    background-color: #8AB274;
 }
 
 
 
 .btn-custom,.play-btn{
-    border-color:#a13fc4 !important;
+    border-color:#8AB274 !important;
 }
 
 .btn-custom:hover,
@@ -60,7 +60,7 @@
 .btn-custom:focus,
 .btn-custom:hover,
 .open > .dropdown-toggle.btn-custom{
-	background-color: #80329c;
+	background-color: #8AB274;
 }
 
 
@@ -73,7 +73,7 @@
 .btn-custom:focus,
 .btn-custom:hover,
 .open > .dropdown-toggle.btn-custom{
-	border-color: #80329c !important;
+	border-color: #8AB274 !important;
 }
 
 /* ==========
@@ -195,8 +195,8 @@ b {
 }
 
 .bg-overlay {
-    background: #80329c;
-    background: linear-gradient(to right, #000 40%, #80329c);
+    background: #8AB274;
+    background: linear-gradient(to right, #000 40%, #8AB274);
     /* background: linear-gradient(to right, #8AB274, #FFA500); */
     opacity: 0.7;
     position: absolute;
@@ -723,7 +723,7 @@ iframe {
 }
 
 .services-box:hover i {
-    background-color: #a13fc4 !important;
+    background-color: #8AB274 !important;
     color: #ffffff !important;
     transition: all .3s ease-in-out;
 }
@@ -1082,7 +1082,7 @@ textarea.form-control {
 ====================================*/
 
 .bg-account-pages {
-    background: linear-gradient(to right, #000, #80329c);
+    background: linear-gradient(to right, #000, #8AB274);
     opacity: 0.7;
 }
 
@@ -1106,8 +1106,8 @@ textarea.form-control {
 }
 
 .account-card .custom-control-input:checked~.custom-control-label::before{
-    background: #a13fc4;
-    border-color: #a13fc4;
+    background: #8AB274;
+    border-color: #8AB274;
 }
 
 .account-card .alert{
@@ -1340,7 +1340,7 @@ ul.pattern li a {
 }
 
 ul.pattern .color1 {
-    background-color: #a13fc4;
+    background-color: #8AB274;
 }
 
 @media only screen and (max-width: 479px) {

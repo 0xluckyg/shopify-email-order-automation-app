@@ -7,11 +7,10 @@ import {bindActionCreators} from 'redux';
 import {showToastAction, setUserAction} from '../redux/actions';
 import { GoogleLogin } from 'react-google-login';
 import axios from 'axios';
+import React from 'react';
 
 const scopes= [
-    'https://mail.google.com/',
-    'https://www.googleapis.com/auth/gmail.compose',
-    'https://www.googleapis.com/auth/gmail.modify',
+    // 'https://mail.google.com/',
     'https://www.googleapis.com/auth/gmail.send',
     'profile',
     'email'
