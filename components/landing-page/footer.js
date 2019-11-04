@@ -1,4 +1,5 @@
 import React from 'react';
+import keys from '../../config/keys'
 
 class Footer extends React.Component {
   render() {
@@ -14,7 +15,6 @@ class Footer extends React.Component {
                                 <li><a href="/home#services">Services</a></li>                                
                                 <li><a href="/home#features">Features</a></li>
                                 <li><a href="/home#pricing">Pricing</a></li>
-                                <li><a href="/home#contact">Contact</a></li>
                             </ul>
                         </div>
                     </div>
@@ -22,8 +22,8 @@ class Footer extends React.Component {
                         <h4>Information</h4>
                         <div className="text-muted margin-t-20">
                             <ul className="list-unstyled footer-list">
-                                <li><a href="https://kroco.io/terms-of-service">Terms & Conditions</a></li>
-                                <li><a href="https://kroco.io/privacy-policy">Privacy Policy</a></li>
+                                <li><a href={process.env.APP_URL+"/terms-of-service"}>Terms & Conditions</a></li>
+                                <li><a href={process.env.APP_URL+"/privacy-policy"}>Privacy Policy</a></li>
                             </ul>
                         </div>
                     </div>

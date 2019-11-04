@@ -7,9 +7,11 @@ class Services extends React.Component {
             <div className="container">
                 <div className="row">
                     <div className="col-lg-8 offset-lg-2">
-                        <h1 className="section-title text-center">Automatic Email Order Sends!</h1>
+                        <h1 className="section-title text-center">Never Send An Order Fulfillment Email Ever Again!</h1>
                         <div className="section-title-border margin-t-20"></div>
-                        <p className="section-subtitle text-muted text-center padding-t-30 font-secondary">We use Gmail Send API to safely and precisely send your order emails to your suppliers automatically everyday through your Gmail account.</p>
+                        <p className="section-subtitle text-muted text-center padding-t-30 font-secondary">
+                            Did you ever get tired of sending order fulfillment emails to your supply providers or departments? We solved that problem for you by partering with Gmail! Never write a order fulfillment email again.
+                        </p>
                     </div>
                 </div>
                 <div className="row margin-t-30">

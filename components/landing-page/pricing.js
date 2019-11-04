@@ -1,5 +1,4 @@
 import React from 'react';
-
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showAuthorizeModalAction} from '../../redux/actions';
@@ -19,34 +18,51 @@ class Pricing extends React.Component {
             <div className="row margin-t-30" style={{display: 'flex', justifyContent: 'center'}}>
                 <div className="col-lg-4">
                     <div className="text-center pricing-box bg-white hover-effect price-active">
-                        <h4 className="text-uppercase">FREE TRIAL</h4>
-                        <h1>$0.00</h1>
-                        <h6 className="text-uppercase text-muted">For 14 days</h6>
+                        <h4 className="text-uppercase">COMPIANCE</h4>
+                        <h1>$14.95</h1>
+                        <h6 className="text-uppercase text-muted">BILLING PER MONTH</h6>
                         <div className="pricing-border"></div>
                         <div className="plan-features margin-t-30">
-                            <p>Features: <b className="text-custom">All</b></p>
-                            <p>Support: <b className="text-custom">Yes</b></p>
-                            <p>Cancelation: <b className="text-custom">Anytime</b></p>
-                            <p><b className="text-custom">42</b> Holidays</p>
-                            <p><b className="text-custom">4</b> Seasons</p>
-                            <p><b className="text-custom">No</b> Hidden Fees</p>
+                            <p>Up to <b className="text-custom">50</b> orders per day</p>
+                            <p>Up to <b className="text-custom">10</b> email order rules</p>
+                            <p><b className="text-custom">PDF Version</b> available</p>
+                            <p><b className="text-custom">14 Day</b> FREE Trial</p>
+                            <p>Send emails through your private <b className="text-custom">Gmail</b> account</p>
+                            <p>Full <b className="text-custom">customer support </b></p>
                         </div>
                         <button onClick={() => this.props.showAuthorizeModalAction(true)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
                     </div>
                 </div>
                 <div className="col-lg-4">
                     <div className="text-center pricing-box hover-effect">
-                        <h4 className="text-uppercase">DELUXE</h4>
-                        <h1>$9.90</h1>
-                        <h6 className="text-uppercase text-muted">Billing Per Month</h6>
+                        <h4 className="text-uppercase">PREMIUM</h4>
+                        <h1>$49.95</h1>
+                        <h6 className="text-uppercase text-muted">BILLING PER MONTH</h6>
                         <div className="pricing-border"></div>
                         <div className="plan-features margin-t-30">
-                            <p>Features : <b className="text-custom">All</b></p>
-                            <p>Support: <b className="text-custom">24/7</b></p>
-                            <p>Cancelation: <b className="text-custom">Anytime</b></p>
-                            <p><b className="text-custom">42</b> Holidays</p>
-                            <p><b className="text-custom">4</b> Seasons</p>
-                            <p><b className="text-custom">No</b> Hidden Fees</p>
+                            <p>Up to <b className="text-custom">300</b> orders per day</p>
+                            <p><b className="text-custom">UNLIMITED</b> email order rules</p>
+                            <p><b className="text-custom">PDF Version</b> available</p>
+                            <p><b className="text-custom">14 Day</b> FREE Trial</p>
+                            <p>Send emails through your private <b className="text-custom">Gmail</b> account</p>
+                            <p>Full <b className="text-custom">customer support </b></p>
+                        </div>
+                        <button onClick={() => this.props.showAuthorizeModalAction(true)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
+                    </div>
+                </div>
+                <div className="col-lg-4">
+                    <div className="text-center pricing-box hover-effect">
+                        <h4 className="text-uppercase">ENTERPRISE</h4>
+                        <h1>$99.95</h1>
+                        <h6 className="text-uppercase text-muted">BILLING PER MONTH</h6>
+                        <div className="pricing-border"></div>
+                        <div className="plan-features margin-t-30">
+                            <p><b className="text-custom">UNLIMITED</b> orders per day</p>
+                            <p><b className="text-custom">UNLIMITED</b> email order rules</p>
+                            <p><b className="text-custom">PDF Version</b> available</p>
+                            <p><b className="text-custom">14 Day</b> FREE Trial</p>
+                            <p>Send emails through your private <b className="text-custom">Gmail</b> account</p>
+                            <p>Full <b className="text-custom">customer support </b></p>
                         </div>
                         <button onClick={() => this.props.showAuthorizeModalAction(true)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
                     </div>

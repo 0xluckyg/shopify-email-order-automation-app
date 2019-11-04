@@ -28,22 +28,22 @@ class Process extends React.Component {
                 <div className="col-lg-4 plan-line">
                     <div className="text-center process-box">
                         <i className="fas fa-user-plus text-custom"></i>
-                        <h4 className="padding-t-15">Signup</h4>
-                        <p className="text-muted">Authorize with Shopify in one click!</p>
+                        <h4 className="padding-t-15">Easy Signup and Authorization</h4>
+                        <p className="text-muted">Authorize with Shopify and Gmail in just clicks! We only need "send" approval for your Gmail account.</p>
                     </div>
                 </div>
                 <div className="col-lg-4 plan-line">
                     <div className="text-center process-box">
-                        <i className="fas fa-sitemap text-custom"></i>
-                        <h4 className="padding-t-15">1 Click Setup</h4>
-                        <p className="text-muted">Automatically set up our holiday designs and marketing in 1 click!</p>
+                        <i className="fas fa-tools text-custom"></i>
+                        <h4 className="padding-t-15">Easy Setup</h4>
+                        <p className="text-muted">Set up your email templates and rules on whom to send your automated fulfillment emails to.</p>
                     </div>
                 </div>
                 <div className="col-lg-4">
                     <div className="text-center process-box">
-                        <i className="fas fa-tools text-custom"></i>
-                        <h4 className="padding-t-15">Customize</h4>
-                        <p className="text-muted">Edit, remove or add any holidays or seasonal marketing tools you need!</p>
+                        <i className="fas fa-sitemap text-custom"></i>
+                        <h4 className="padding-t-15">Easy Gmail Send</h4>
+                        <p className="text-muted">Sit back, watch your order get fulfilled everyday automatically.</p>
                     </div>
                 </div>
                 <div className="text-center mx-auto">
