@@ -1,9 +1,5 @@
 import React from 'react';
 
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {showAuthorizeModalAction} from '../../redux/actions';
-
 class Features extends React.Component {
   render() {
   	return (
@@ -41,11 +37,4 @@ class Features extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch){
-    return bindActionCreators(
-        {showAuthorizeModalAction},
-        dispatch
-    );
-}
-
-export default connect(null, mapDispatchToProps)(Features);
+export default Features;

@@ -1,7 +1,4 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {showAuthorizeModalAction} from '../../redux/actions';
 
 class Pricing extends React.Component {
   render() {
@@ -30,7 +27,7 @@ class Pricing extends React.Component {
                             <p>Send emails through your private <b className="text-custom">Gmail</b> account</p>
                             <p>Full <b className="text-custom">customer support </b></p>
                         </div>
-                        <button onClick={() => this.props.showAuthorizeModalAction(true)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
+                        <button onClick={() => window.location.replace(`${process.env.APP_URL}/authenticate`)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
                     </div>
                 </div>
                 <div className="col-lg-4">
@@ -47,7 +44,7 @@ class Pricing extends React.Component {
                             <p>Send emails through your private <b className="text-custom">Gmail</b> account</p>
                             <p>Full <b className="text-custom">customer support </b></p>
                         </div>
-                        <button onClick={() => this.props.showAuthorizeModalAction(true)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
+                        <button onClick={() => window.location.replace(`${process.env.APP_URL}/authenticate`)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
                     </div>
                 </div>
                 <div className="col-lg-4">
@@ -64,7 +61,7 @@ class Pricing extends React.Component {
                             <p>Send emails through your private <b className="text-custom">Gmail</b> account</p>
                             <p>Full <b className="text-custom">customer support </b></p>
                         </div>
-                        <button onClick={() => this.props.showAuthorizeModalAction(true)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
+                        <button onClick={() => window.location.replace(`${process.env.APP_URL}/authenticate`)} className="btn btn-custom waves-effect waves-light margin-t-30">Join Now</button>
                     </div>
                 </div>
             </div>            
@@ -74,11 +71,4 @@ class Pricing extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch){
-    return bindActionCreators(
-        {showAuthorizeModalAction},
-        dispatch
-    );
-}
-
-export default connect(null, mapDispatchToProps)(Pricing);
+export default Pricing;

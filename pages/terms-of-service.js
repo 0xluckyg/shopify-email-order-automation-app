@@ -1,10 +1,11 @@
 import {             
     TextContainer,
-    Heading,
     Layout,
-    Card
+    Card,
+    Button
 } from '@shopify/polaris';
 import React from 'react';
+import PageHeader from '../components/page-header'
 
 const tos = `These Terms of Service (“Terms of Service“), together with the EU Data Protection Addendum, if applicable pursuant to Section 6.3 below, and any on-line or written order form for the purchase of the Services (as herein defined) (each, a “Service Order“), collectively constitute a binding agreement between Kroco Inc. (“Kroco“) and you or the legal entity you represent (“Customer” or “you“). These Terms of Service also apply if you purchase a right to use the Services (as defined below) pursuant to a Service Order entered into between you and a Kroco-authorized agent, vendor, or reseller of the Services (an “Authorized Reseller“).
 
@@ -179,16 +180,24 @@ class TermsOfService extends React.Component {
     render() {
         return (                
             <Layout>
+            <div style={{margin: '20px 100px 20px 100px'}}>
                 <Layout.Section>
+                    {PageHeader("Terms Of Service")}
                     <Card sectioned>
                         <TextContainer>
-                            <Heading>Terms of Service</Heading>
                             <div style={{whiteSpace: "pre-wrap"}}>
                                 {tos}
                             </div>  
                         </TextContainer>
                     </Card>
+                    <br/>
+                    <Button
+                        onClick={() => window.location.replace(`${process.env.APP_URL}`)}
+                        style={{margin: 10}}>
+                        Go Back
+                    </Button>
                 </Layout.Section>
+            </div>
             </Layout>
         )
     }

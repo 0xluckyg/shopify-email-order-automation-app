@@ -25,10 +25,18 @@ function UserPrevewMarkup(state, toggleState, router, redirect) {
                     content: 'FAQs', 
                     onAction: () => router(keys.FAQ_INDEX)
                 },
-                {
-                    content: 'Leave a Review', 
-                    onAction: redirect
-                },            
+                { 
+                    content: 'Privacy Policy', 
+                    onAction: () => router(keys.PRIVACY_POLICY_INDEX)
+                },
+                { 
+                    content: 'Terms Of Service', 
+                    onAction: () => router(keys.TERMS_OF_SERVICE_INDEX)
+                },
+                // {
+                //     content: 'Leave a Review', 
+                //     onAction: redirect
+                // },            
             ],
         },
     ];

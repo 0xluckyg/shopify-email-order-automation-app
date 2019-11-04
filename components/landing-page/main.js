@@ -32,7 +32,7 @@ class Main extends React.Component {
                                         <b>Automate Your Shopify Order Pipeline Through Gmail</b>
                                     </p>
                                     <button 
-                                        onClick={() => this.props.showAuthorizeModalAction(true)} 
+                                        onClick={() => window.location.replace(`${process.env.APP_URL}/authenticate`)} 
                                         className="btn btn-custom margin-t-30 waves-effect waves-light">
                                             Get Started Now!
                                             <i className="mdi mdi-arrow-right"></i>

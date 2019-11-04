@@ -14,6 +14,7 @@ import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import Toast from '../components/toast';
 import * as keys from '../config/keys';
+import React from 'react';
 
 class Authenticate extends React.Component {
     constructor(props) {

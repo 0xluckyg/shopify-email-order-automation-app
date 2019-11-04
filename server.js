@@ -92,7 +92,7 @@ app.prepare().then(async () => {
         
          //for shopify, if auth shop is undefined. fallbackRoute below somehow does not work
         if (ctx.request.url.startsWith('/auth') && ctx.query.shop == 'undefined') {
-            return ctx.redirect('/authenticate')
+            return ctx.redirect('/home')
         }
         
         if (noAuth) {               

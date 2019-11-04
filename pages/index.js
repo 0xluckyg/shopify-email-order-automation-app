@@ -1,7 +1,7 @@
 // https://polaris.shopify.com/components/get-started
 // document.getElementById('html5').ondragstart = function () { return false; };
 // https://medium.com/@marzouk/how-to-prevent-saving-image-as-or-dragging-image-to-download-it-in-a-web-page-f0ee4121b32f
-
+import React from 'react'
 import {     
     TopBar,        
     Card, 
@@ -27,6 +27,8 @@ import Orders from './orders';
 import Settings from './settings';
 import ContactUs from './contact-us';
 import Faq from './faq';
+import PrivacyPolicy from './privacy-policy';
+import TermsOfService from './terms-of-service';
 import * as keys from '../config/keys';
 
 class Index extends React.Component {
@@ -64,9 +66,17 @@ class Index extends React.Component {
             onAction: () => this.router(keys.FAQ_INDEX)
         },
         {
-            content: 'Leave a Review', 
-            onAction: () => this.redirectToReviews()
-        },            
+            content: 'Privacy Policy',
+            onAction: () => this.router(keys.PRIVACY_POLICY_INDEX)
+        },
+        {
+            content: 'Terms of Service',  
+            onAction: () => this.router(keys.TERMS_OF_SERVICE_INDEX) 
+        },
+        // {
+        //     content: 'Leave a Review', 
+        //     onAction: () => this.redirectToReviews()
+        // },            
         {
             content: 'Subscription Plans', 
             onAction: () => this.paymentPlan()
@@ -104,7 +114,9 @@ class Index extends React.Component {
         <AddRule/>,        
         <Settings/>,
         <ContactUs/>,
-        <Faq/>
+        <Faq/>,
+        <PrivacyPolicy/>,
+        <TermsOfService/>
     ]
 
     const searchResultsMarkup = (

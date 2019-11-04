@@ -1,16 +1,27 @@
 import {             
     TextContainer,
-    Heading,
     Layout,
-    Card
+    Card,
+    Button
 } from '@shopify/polaris';
 import React from 'react';
+import PageHeader from '../components/page-header'
 
 const pp = `This Privacy Notice (“Privacy Notice“) describes the privacy practices of Kroco Inc. and its subsidiaries and affiliates (collectively, “Kroco” or “us” or “we“).
 Kroco provides marketing technology services to other businesses – our clients. To take advantage of our services, our clients share with us information about their individual consumers, including contact details and shopping histories. We analyze that information and develop and send communications to the consumers only at the direction of the client who provided the information, and only on that client’s behalf. We may also collect personal data for our own business purposes in connection with our business, such as business contact details of potential customers or job applicants’ resumes. We do not collect employee or HR related data in the EU or Switzerland, or transfer such information either into or out of the EU or Switzerland.
 This Privacy Notice applies to:
 The kroco.io website and any other websites or online services controlled by us and which display this Privacy Notice, and
 Marketing technology services that we provide to our clients.
+
+DISCLOSUER OF PERSONAL INFORMATION TO THIRD PARTIES
+
+We do not disclose your personal information to third parties except in the following situations:
+
+- It is necessary to comply with applicable law
+- It is necessary for security purposes such as investigating and fixing a bug or abuse
+- Communicated to you in advance and specifically agreed upon by you
+
+We don't use or transfer your data for serving ads (such as retargeting, personalized, or interest based advertising)
 
 INFORMATION WE COLLECT
 
@@ -153,16 +164,24 @@ class PrivacyPolicy extends React.Component {
     render() {
         return (                
             <Layout>
+            <div style={{margin: '20px 100px 20px 100px'}}>
                 <Layout.Section>
+                    {PageHeader("Privacy Policy")}
                     <Card sectioned>
                         <TextContainer>
-                            <Heading>Privacy Policy</Heading>
                             <div style={{whiteSpace: "pre-wrap"}}>
                                 {pp}
                             </div>  
                         </TextContainer>
                     </Card>
+                    <br/>
+                    <Button
+                        onClick={() => window.location.replace(`${process.env.APP_URL}`)}
+                        style={{margin: 10}}>
+                        Go Back
+                    </Button>
                 </Layout.Section>
+            </div>
             </Layout>
         )
     }

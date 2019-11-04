@@ -5,11 +5,8 @@ import Features from '../components/landing-page/features';
 import Descriptions from '../components/landing-page/descriptions';
 import Pricing from '../components/landing-page/pricing';
 import Process from '../components/landing-page/process';
-import Contact from '../components/landing-page/contact';
 import Footer from '../components/landing-page/footer';
 import FooterLinks from '../components/landing-page/footer-links';
-import Toast from '../components/toast'
-import Authorization from '../components/landing-page/authorize-modal';
 
 //landing page component. uses bootstrap
 class Home extends React.Component {
@@ -35,35 +32,14 @@ class Home extends React.Component {
                 {/* Pricing Component*/}
                 <Pricing />
 
-                {/* Team Component*/}
-                {/* <Team /> */}
-
                 {/* Process Component*/}
                 <Process />
-
-                {/* Testi Component*/}
-                {/* <Testi /> */}
-
-                {/* Started Component*/}
-                {/* <Started /> */}
-
-                {/* Blog Component*/}
-                {/* <Blog /> */}
-
-                {/* Contact Component*/}
-
-                {/* SocialMedia Component*/}
-                {/* <SocialMedia /> */}
 
                 {/* Footer Component*/}
                 <Footer />
 
                 {/* FooterLinks Component*/}
                 <FooterLinks />
-
-                {/* Switcher Component*/}
-                {/* <Switcher />  */}
-               
             </div>
         );
     }

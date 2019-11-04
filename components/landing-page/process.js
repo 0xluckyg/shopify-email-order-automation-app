@@ -1,9 +1,5 @@
 import React from 'react';
 
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {showAuthorizeModalAction} from '../../redux/actions';
-
 class Process extends React.Component {
   render() {
   	return (
@@ -47,7 +43,7 @@ class Process extends React.Component {
                     </div>
                 </div>
                 <div className="text-center mx-auto">
-                <button onClick={() => this.props.showAuthorizeModalAction(true)} className="btn btn-custom waves-light waves-effect margin-t-50">Get Started <i className="mdi mdi-arrow-right"></i></button>
+                <button onClick={() => window.location.replace(`${process.env.APP_URL}/authenticate`)} className="btn btn-custom waves-light waves-effect margin-t-50">Get Started <i className="mdi mdi-arrow-right"></i></button>
                 </div>
             </div>
         </div>
@@ -56,11 +52,4 @@ class Process extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch){
-    return bindActionCreators(
-        {showAuthorizeModalAction},
-        dispatch
-    );
-}
-
-export default connect(null, mapDispatchToProps)(Process);
+export default Process;

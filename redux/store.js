@@ -8,7 +8,7 @@ import {
     showToastReducer, 
     getUserReducer, 
     routerReducer, 
-    showPaymentPlanReducer 
+    showPaymentPlanReducer
 } from './reducers';
 
 const reducer = combineReducers({ 
