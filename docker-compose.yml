@@ -1,8 +1,8 @@
 #docker compose lets you run multiple containers and link them together.
 version: '3'
 services:
-  koea:
-    image: 838823345115.dkr.ecr.us-east-1.amazonaws.com/koea-ecr:1.0
+  koa:
+    image: 838823345115.dkr.ecr.us-east-1.amazonaws.com/koa-ecr:1.0
     build: .
     ports:
       - "80:3000"

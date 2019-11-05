@@ -1,9 +1,5 @@
 import React from 'react';
 
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {showAuthorizeModalAction} from '../../redux/actions';
-
 class Descriptions extends React.Component {
   render() {
   	return (
@@ -15,7 +11,7 @@ class Descriptions extends React.Component {
                         <h2 className="text-white">Get Started For Free!</h2>
                         <p className="padding-t-15 home-desc">We offer you 14 day trial! Cancel anytime and you won't be charged.</p>
                         <button 
-                            onClick={() => this.props.showAuthorizeModalAction(true)}
+                            onClick={() => window.location.replace(`${process.env.APP_URL}/authenticate`)}
                             className="btn btn-bg-white margin-t-30 waves-effect waves-light mb-5"
                         >                            
                             Get Started!
@@ -31,11 +27,4 @@ class Descriptions extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch){
-    return bindActionCreators(
-        {showAuthorizeModalAction},
-        dispatch
-    );
-}
-
-export default connect(null, mapDispatchToProps)(Descriptions);
+export default Descriptions;
