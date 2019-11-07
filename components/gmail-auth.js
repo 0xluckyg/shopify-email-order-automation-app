@@ -10,7 +10,6 @@ import axios from 'axios';
 import React from 'react';
 
 const scopes= [
-    // 'https://mail.google.com/',
     'https://www.googleapis.com/auth/gmail.send',
     'profile',
     'email'

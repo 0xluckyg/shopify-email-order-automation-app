@@ -147,9 +147,24 @@ async function getAllOrdersForDay(ctx) {
     }
 }
 
+function logSend(shop, date, reformattedOrders) {
+    const emails = Object.keys(reformattedOrders)
+    let emailString = ''
+    emails.map(email => {
+        emailString += email + ':'
+        const customerCount = Object.keys(reformattedOrders[email]).length
+        emailString += customerCount + ', '
+    })
+    
+    console.log(`
+        (${date}) Orders for ${shop} to ${emails.length} destinations:\n
+        ${emailString}
+    `)
+}
+
 //For scheduled send
 async function sendOrdersCron() {             
-    return schedule.scheduleJob('8 * * *', async () => {        
+    return schedule.scheduleJob('8 * * *', async () => {  
         const users = await User.find({
             'settings.sendMethod.method': 'automatic',
             'gmail.isActive': true,
@@ -185,6 +200,8 @@ async function sendOrdersCron() {
             let reformattedOrders = await reformatOrdersByEmail(allOrders)
             
             await sendEmails(shop, reformattedOrders, today)
+            
+            logSend(shop, today, reformattedOrders)
         })        
     })
 }

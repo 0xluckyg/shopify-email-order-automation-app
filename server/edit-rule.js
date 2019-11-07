@@ -1,5 +1,4 @@
 const {Rule} = require('./db/rule');
-const {User} = require('./db/user');
 const {needsUpgradeForAddRule} = require('./auth/shopify-payment')
 
 function convertFiltersIntoParams(filters, selectedProducts) { 

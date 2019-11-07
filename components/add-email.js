@@ -5,6 +5,7 @@ import {
     Tag,    
 } from '@shopify/polaris';
 import emailValidator from "email-validator";
+import React from 'react'
 
 //Props: 
 //emails (array)
