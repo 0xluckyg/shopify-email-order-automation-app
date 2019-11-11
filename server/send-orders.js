@@ -169,7 +169,7 @@ async function sendOrdersCron() {
             'settings.sendMethod.method': 'automatic',
             'gmail.isActive': true,
             active: true
-        })    
+        })
         await asyncForEach(users, async (user) => {
             const {shop, accessToken} = user
 

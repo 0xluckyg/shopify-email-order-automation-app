@@ -63,7 +63,9 @@ const whitelist = [
     '/_next',
     '/static',
     '/home',
-    '/authenticate'
+    '/authenticate',
+    '/privacy-policy',
+    '/terms-of-service'
 ]
 async function handleRender(ctx) {        
     await handle(ctx.req, ctx.res);    
@@ -118,7 +120,7 @@ app.prepare().then(async () => {
         authRoute: '/auth',
         // path to redirect to if verification fails and there is no shop on the query
         // defaults to '/auth'
-        fallbackRoute: '/authenticate',
+        fallbackRoute: '/home',
     }));
     
     router.get('/', processPayment);        

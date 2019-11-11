@@ -27,7 +27,7 @@ class Features extends React.Component {
                 </div>
                 <div className="col-lg-7">
                     <div className="features-img features-right text-right">
-                        <iframe width="560" height="315" src="https://www.youtube.com/embed/Qc9c12q3mrc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>                    
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/D_hzn4gaKHU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>                    
                     </div>
                 </div>
             </div>
