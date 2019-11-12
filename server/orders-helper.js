@@ -18,7 +18,7 @@ async function asyncForEach(array, callback) {
     }
 }
 
-//this function got placed here due to cyclic dependency problem.
+//this function got placed here due to cyclic dependency problem. Do not remove
 //https://stackoverflow.com/questions/35534806/module-exports-not-working
 function getPDFName(data) {
 	const orderNumbers = Object.keys(data)
@@ -28,6 +28,7 @@ function getPDFName(data) {
 	return name
 }
 
+//TODO: TEST
 function returnStartAndEndDate(date) {
     if (date) {        
         date = new Date(date)
@@ -83,6 +84,7 @@ async function fetchAllOrdersForDay(shop, accessToken, queryDate) {
     }
 }
 
+//TODO: TEST
 async function cleanOrders(orders) {    
     await asyncForEach(orders, async (order, i, array) => {        
         if (!order.customer || !order.shipping_address || !order.line_items) return 
@@ -120,6 +122,7 @@ function ruleIncludesAllProducts(rule) {
         && !rule.filters.vendor)
 }
 
+//TODO: TEST
 async function combineOrdersAndEmailRules(shop, orders) {
     const rules = await Rule.find({shop})
     await asyncForEach(orders, async (order, i, array) => {
@@ -152,6 +155,7 @@ async function combineOrdersAndEmailRules(shop, orders) {
     return orders
 }
 
+//TODO: TEST
 async function getProcessedEmails(orders) {
     const orderIds = []
     await asyncForEach(orders, async (order) => {
@@ -162,6 +166,7 @@ async function getProcessedEmails(orders) {
     })
 }
 
+//TODO: TEST
 async function combineOrdersAndSentHistory(orders) { 
     let processedEmails = await getProcessedEmails(orders)
 
@@ -194,6 +199,7 @@ async function combineOrdersAndSentHistory(orders) {
     return orders
 }
 
+//TODO: TEST
 function createEmailObject(emails, order, item, email) {        
     if (email.sent) return emails    
 
@@ -220,7 +226,10 @@ function createEmailObject(emails, order, item, email) {
     return emails
 }
 
+//TODO: TEST
 async function reformatOrdersByEmail(orders) {
+    // ORIGINAL
+    
     //  [{
     //     id
     //     shipping_address
@@ -262,7 +271,8 @@ async function reformatOrdersByEmail(orders) {
     return emails
 }
 
-async function reduceLongOrders(shop, emails) {
+//TODO: TEST
+async function markLongOrdersAsPdf(shop, emails) {
     const user = await User.findOne({shop}, { settings: 1 })
     const { PDFSettings } = user.settings
 
@@ -285,6 +295,16 @@ async function reduceLongOrders(shop, emails) {
     return emails
 }
 
+//TODO: TEST
+async function formatOrders(shop, allOrders) {
+    allOrders = await cleanOrders(allOrders)
+    allOrders = await combineOrdersAndEmailRules(shop, allOrders)
+    allOrders = await combineOrdersAndSentHistory(allOrders)
+    allOrders = await reformatOrdersByEmail(allOrders)
+    
+    return allOrders
+}
+
 module.exports = {
     getHeaders, 
     asyncForEach, 
@@ -294,5 +314,8 @@ module.exports = {
     combineOrdersAndSentHistory, 
     reformatOrdersByEmail,
     getPDFName,
-    reduceLongOrders
+    markLongOrdersAsPdf,
+    
+    //FINAL FORMAT
+    formatOrders
 }

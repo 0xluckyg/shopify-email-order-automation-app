@@ -45,12 +45,12 @@ const getRules = require('./server/get-rules');
 const {getOrders} = require('./server/get-orders');
 const {getOrderPDFPreview, getPDFPreview} = require ('./server/pdf')
 const {getSettings, setSendMethod, setTemplateText, setPDFOrderLimit} = require('./server/settings');
-const {sendOrders, getAllOrdersForDay, sendOrdersCron} = require('./server/send-orders');
+const {sendOrders, getAllOrdersForDay} = require('./server/send-orders');
+const {sendOrdersCron} = require('./server/cron-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const {shopifyAuth, switchSession} = require('./server/auth/shopify-auth');
 const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
-const {logout} = require('./server/auth/auth');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';

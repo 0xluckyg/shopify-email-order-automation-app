@@ -5,11 +5,8 @@ const { User } = require('./db/user');
 const { createOrderText, getTemplateTexts } = require('../helper/template')
 const { 
 	fetchAllOrdersForDay, 
-	cleanOrders, 
-	combineOrdersAndEmailRules, 
-	combineOrdersAndSentHistory, 
-	getPDFName, 
-	reformatOrdersByEmail 
+	formatOrders,
+	getPDFName
 } = require('./orders-helper')
 
 //For previewing send
@@ -19,10 +16,7 @@ async function getAllOrdersForDay(ctx) {
 		const { date } = ctx.query
 
 		let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
-		allOrders = await cleanOrders(allOrders)
-		allOrders = await combineOrdersAndEmailRules(shop, allOrders)
-		allOrders = await combineOrdersAndSentHistory(allOrders)
-		let reformattedOrders = await reformatOrdersByEmail(allOrders)
+		const reformattedOrders = formatOrders(shop, allOrders)
 
 		return reformattedOrders
 	} catch (err) {
