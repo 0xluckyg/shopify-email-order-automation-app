@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const safeCompare = require('safe-compare');
 const { default: createShopifyAuth } = require('@shopify/koa-shopify-auth');
 const {initiatePayment} = require('./shopify-payment');
-const {registerAppUninstalled} = require('../webhooks/app-uninstalled');
+const {registerWebhook} = require('../webhooks');
 const {User} = require('../db/user');
 //app refers to the Next.js app, which is the react build
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY } = process.env;
@@ -55,8 +55,14 @@ function shopifyAuth() {
             await ctx.cookies.set('shopOrigin', shop, { httpOnly: false })
 
             //Webhook for detecting when the app unisntalls from the store            
-            registerAppUninstalled(shop, accessToken);
+            registerWebhook(shop, accessToken, 'app/uninstalled');
             
+            //GDPR
+            //https://help.shopify.com/en/api/guides/gdpr-resources
+            registerWebhook(shop, accessToken, 'customers/redact');
+            registerWebhook(shop, accessToken, 'shop/redact');
+            registerWebhook(shop, accessToken, 'customers/data_request');
+
             const user = await User.findOne({shop})
             let confirmationURL = undefined
 
