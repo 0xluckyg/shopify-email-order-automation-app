@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
     shop: {
         //shop-name.myshopify.com
         unique: true,
-        type: String,        
+        type: String,
     },
     //unique access token for each store from Shopify.
     //When access mode is set to "offline", Shopify returns the same accessToken until uninstalled

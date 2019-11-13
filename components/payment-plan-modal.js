@@ -95,10 +95,11 @@ class PaymentPlanModal extends React.Component {
         if (this.props.getUserReducer.payment) {
             paymentLock = this.props.getUserReducer.payment.lock
         }
+
         return(
             <Modal 
                 styles={modalStyle}
-                open={this.props.showPaymentPlanReducer.show && !paymentLock}
+                open={this.props.showPaymentPlanReducer && !paymentLock}
                 onClose={() => {
                     this.props.showPaymentPlanAction(false)
                 }}

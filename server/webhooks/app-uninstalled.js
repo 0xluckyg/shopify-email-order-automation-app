@@ -3,9 +3,9 @@ const {User} = require('../db/user');
 
 //We put this function in POST webhook/app/uninstalled on our server, and Shopify notifies this endpoint everytime app uninstall triggers
 async function appUninstalled(ctx) {
-    const validated = validateWebhook(ctx)
-    
-    if (validated) {
+    try {
+        if (!validateWebhook(ctx)) return
+        
         const body = ctx.request.rawBody;   
         const shopifyDomain = JSON.parse(body).myshopify_domain
         if (shopifyDomain) {
@@ -13,6 +13,8 @@ async function appUninstalled(ctx) {
             ctx.status = 200
             ctx.body = 'app uninstalled'
         } 
+    } catch(err) {
+        console.log('Failed appUninstalled webhook: ', err)
     }
 }
 

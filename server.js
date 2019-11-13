@@ -50,7 +50,9 @@ const {sendOrdersCron} = require('./server/cron-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const {shopifyAuth, switchSession} = require('./server/auth/shopify-auth');
 const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
+
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
+const {dataRequest, customerRedact, shopRedact} = require('./server/webhooks/gdpr');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -146,7 +148,12 @@ app.prepare().then(async () => {
     router.post('/gmail-logout', gmailLogout);
     
     //validates webhook and listens for events in the store
-    router.post('/webhooks/app/uninstalled', bodyParser(), appUninstalled)    
+    router.post('/webhooks/app/uninstalled', appUninstalled) 
+    //gdpr requirements
+    router.post('/webhooks/customers/data_request', dataRequest)    
+    router.post('/webhooks/customers/redact', customerRedact)    
+    router.post('/webhooks/shop/redact', shopRedact)    
+
 
     //Lets next.js prepare all the requests on the React side
     server.use(handleRender);   

@@ -55,13 +55,13 @@ function shopifyAuth() {
             await ctx.cookies.set('shopOrigin', shop, { httpOnly: false })
 
             //Webhook for detecting when the app unisntalls from the store            
-            registerWebhook(shop, accessToken, 'app/uninstalled');
+            await registerWebhook(shop, accessToken, 'app/uninstalled');
             
             //GDPR
             //https://help.shopify.com/en/api/guides/gdpr-resources
-            registerWebhook(shop, accessToken, 'customers/redact');
-            registerWebhook(shop, accessToken, 'shop/redact');
-            registerWebhook(shop, accessToken, 'customers/data_request');
+            await registerWebhook(shop, accessToken, 'customers/redact');
+            await registerWebhook(shop, accessToken, 'shop/redact');
+            await registerWebhook(shop, accessToken, 'customers/data_request');
 
             const user = await User.findOne({shop})
             let confirmationURL = undefined
