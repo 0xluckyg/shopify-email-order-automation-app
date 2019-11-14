@@ -155,7 +155,6 @@ async function combineOrdersAndEmailRules(shop, orders) {
     return orders
 }
 
-//TODO: TEST
 async function getProcessedEmails(orders) {
     const orderIds = []
     await asyncForEach(orders, async (order) => {
@@ -199,7 +198,6 @@ async function combineOrdersAndSentHistory(orders) {
     return orders
 }
 
-//TODO: TEST
 function createEmailObject(emails, order, item, email) {        
     if (email.sent) return emails    
 

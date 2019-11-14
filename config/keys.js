@@ -4,7 +4,6 @@ const APP_COLOR = '#8AB274';
 const APP_COLOR_LIGHT = '#A6D38D';
 const LOGO = '../static/logo-white.svg';
 const REVIEW_URL = 'https://google.com';
-const APP_URL = 'https://kroco.ngrok.io'
 const EMBEDDED = false;
 
 const SHOPIFY_API_VERSION = '2019-04'

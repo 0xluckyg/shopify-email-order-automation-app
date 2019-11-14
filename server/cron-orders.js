@@ -28,6 +28,7 @@ function logSend(shop, date, reformattedOrders) {
     `)
 }
 
+//TODO: TEST
 async function checkStoreNeedsUpgrade(shop, allOrders) {
     //if user needs to upgrade subscription plan
     const needsUpgrade = await needsUpgradeForSendOrders(shop, allOrders)
@@ -41,6 +42,7 @@ async function checkStoreNeedsUpgrade(shop, allOrders) {
     }
 }
 
+//TODO: TEST
 async function getUsers() {
     const users = await User.find({
         'settings.sendMethod.method': 'automatic',
@@ -60,6 +62,7 @@ async function getShopData(shop, accessToken) {
     return shopData
 }
 
+//TODO: TEST
 function getShopTimezone(shopData) {
     const shopTimeZoneIANA = shopData.data.shop.iana_timezone
     let today = moment.tz(shopTimeZoneIANA).startOf('day').subtract(1, 'day')    
@@ -67,7 +70,7 @@ function getShopTimezone(shopData) {
     return today.format('YYYY-MM-DD[T]HH:mm:ss')
 }
 
-//For scheduled send
+//For scheduled send orders per day
 async function sendOrdersCron() {             
     return schedule.scheduleJob('8 * * *', async () => {  
         const users = await getUsers()
