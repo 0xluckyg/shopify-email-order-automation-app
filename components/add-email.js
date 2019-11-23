@@ -37,7 +37,7 @@ class AddEmail extends React.Component {
     render() {         
         return (
             <Card sectioned>
-                <p style={{marginBottom: '10px'}}>Add an email to send orders to when customer purchases the products you've specified above</p>
+                <p style={{marginBottom: '10px'}}>Add an email to send orders to when your customer purchases the products you've specified above</p>
                 <div style={{display:'flex', justifyContent: 'space-between'}}>
                 <div style={{width:'80%'}}>                
                     <TextField     

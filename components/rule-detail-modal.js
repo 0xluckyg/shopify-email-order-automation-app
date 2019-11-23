@@ -53,7 +53,7 @@ class RulesDetailModal extends React.Component {
     }
 
     fetchProducts(page) {
-        // const { addText, removeText, filters, selectedProducts, completed, count, editType, editMethod, editContentType, updatedAt } = this.props.detail;
+        // const { mainText, supportText, filters, selectedProducts, completed, count, editType, editMethod, editContentType, updatedAt } = this.props.detail;
         this.setState({hasNext: false, hasPrevious: false})
         const { filters, selectedProducts } = this.props.detail;
         axios.get(process.env.APP_URL + '/get-products', {

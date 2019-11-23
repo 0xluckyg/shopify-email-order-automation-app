@@ -128,7 +128,9 @@ class Authenticate extends React.Component {
             this.setState({fieldError: 'Please provide a valid Shopify domain.'})
             return
         }
-        window.location.replace(`${process.env.APP_URL}/auth?shop=${this.state.domain}`)    
+        let domain = this.state.domain.replace(/(^\w+:|^)\/\//, '');
+        domain = domain.replace('www.', '')
+        window.location.replace(`${process.env.APP_URL}/auth?shop=${domain}`)    
     }
 
     toggleState = (key) => {
