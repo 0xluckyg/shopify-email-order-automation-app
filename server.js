@@ -46,7 +46,7 @@ const {getOrders} = require('./server/get-orders');
 const {getOrderPDFPreview, getPDFPreview} = require ('./server/pdf')
 const {getSettings, setSendMethod, setTemplateText, setPDFOrderLimit} = require('./server/settings');
 const {sendOrders, getAllOrdersForDay} = require('./server/send-orders');
-const {sendOrdersCron} = require('./server/cron-orders');
+const {sendOrdersForShops, sendOrdersCron} = require('./server/cron-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const {shopifyAuth, switchSession} = require('./server/auth/shopify-auth');
 const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
@@ -75,6 +75,8 @@ async function handleRender(ctx) {
     ctx.res.statusCode = 200;        
     return
 }
+
+sendOrdersCron()
 
 app.prepare().then(async () => {
     
@@ -105,8 +107,6 @@ app.prepare().then(async () => {
             await next()
         }
     });    
-
-    sendOrdersCron()
 
     server.use(session({
         //30 days in miliseconds
@@ -154,6 +154,11 @@ app.prepare().then(async () => {
     router.post('/webhooks/customers/redact', customerRedact)    
     router.post('/webhooks/shop/redact', shopRedact)    
 
+    //TEST inner function of cron job send order
+    router.post('/test-cron-send', async (ctx) => {
+        await sendOrdersForShops()
+        ctx.body = 'test cron send'
+    })
 
     //Lets next.js prepare all the requests on the React side
     server.use(handleRender);   

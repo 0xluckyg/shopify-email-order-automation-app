@@ -70,39 +70,42 @@ function getShopTimezone(shopData) {
     return today.format('YYYY-MM-DD[T]HH:mm:ss')
 }
 
-//For scheduled send orders per day
-async function sendOrdersCron() {             
-    return schedule.scheduleJob('8 * * *', async () => {  
-        const users = await getUsers()
-        
-        await asyncForEach(users, async (user) => {
-            const {shop, accessToken} = user
-            if (!shop || !accessToken) return
+async function sendShopOrder(shop, accessToken) {
+    const shopData = await getShopData(shop, accessToken)
             
-            try {
+    const today = getShopTimezone(shopData)
+    
+    let allOrders = await fetchAllOrdersForDay(shop, accessToken, today)
+    
+    const needsUpgrade = await checkStoreNeedsUpgrade(shop, allOrders)
+    if (needsUpgrade) return
+    
+    const reformattedOrders = await formatOrders(shop, allOrders)
+    
+    await sendEmails(shop, reformattedOrders, today)
+    
+    logSend(shop, today, reformattedOrders)
+}
 
-                const shopData = await getShopData(shop, accessToken)
-            
-                const today = getShopTimezone(shopData)
-                
-                let allOrders = await fetchAllOrdersForDay(shop, accessToken, today)
-                
-                const needsUpgrade = await checkStoreNeedsUpgrade(shop, allOrders)
-                if (needsUpgrade) return
-                
-                const reformattedOrders = await formatOrders(shop, allOrders)
-                
-                await sendEmails(shop, reformattedOrders, today)
-                
-                logSend(shop, today, reformattedOrders)
-            
-            } catch(err) {
-                
-                console.log('Failed cron orders: ', err)
-                
-            }
-        })        
+async function sendOrdersForShops() {
+    const users = await getUsers()
+        
+    await asyncForEach(users, async (user) => {
+        const {shop, accessToken} = user
+        if (!shop || !accessToken) return
+        try {
+            await sendShopOrder(shop, accessToken)
+        } catch(err) {
+            console.log('Failed cron orders: ', err)
+        }
     })
 }
 
-module.exports = {sendOrdersCron}
+//For scheduled send orders per day
+async function sendOrdersCron() {             
+    return schedule.scheduleJob('8 * * *', async () => {  
+        await sendOrdersForShops()
+    })
+}
+
+module.exports = {sendOrdersForShops, sendOrdersCron}
