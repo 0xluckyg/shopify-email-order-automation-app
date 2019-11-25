@@ -22,10 +22,7 @@ function logSend(shop, date, reformattedOrders) {
         emailString += customerCount + ', '
     })
     
-    console.log(`
-        (${date}) Orders for ${shop} to ${emails.length} destinations:\n
-        ${emailString}
-    `)
+    console.log(`(${date}) Orders for ${shop} to ${emails.length} destinations:\n${emailString}`)
 }
 
 //TODO: TEST
@@ -65,22 +62,29 @@ async function getShopData(shop, accessToken) {
 //TODO: TEST
 function getShopTimezone(shopData) {
     const shopTimeZoneIANA = shopData.data.shop.iana_timezone
-    let today = moment.tz(shopTimeZoneIANA).startOf('day').subtract(1, 'day')    
-  
+    let today = moment.tz(shopTimeZoneIANA).startOf('day')
+    //  moment.tz(shopTimeZoneIANA).startOf('day').subtract(1, 'day')    
+    console.log('today: ', today.format('YYYY-MM-DD[T]HH:mm:ss'))
     return today.format('YYYY-MM-DD[T]HH:mm:ss')
 }
 
 async function sendShopOrder(shop, accessToken) {
     const shopData = await getShopData(shop, accessToken)
             
+    console.log('Shop Data: ', shopData.data.shop)
+            
     const today = getShopTimezone(shopData)
     
     let allOrders = await fetchAllOrdersForDay(shop, accessToken, today)
+    
+    console.log('All Orders: ', allOrders)
     
     const needsUpgrade = await checkStoreNeedsUpgrade(shop, allOrders)
     if (needsUpgrade) return
     
     const reformattedOrders = await formatOrders(shop, allOrders)
+    
+    console.log('Reformatted orders: ', reformattedOrders)
     
     await sendEmails(shop, reformattedOrders, today)
     
@@ -89,11 +93,12 @@ async function sendShopOrder(shop, accessToken) {
 
 async function sendOrdersForShops() {
     const users = await getUsers()
-        
+    
     await asyncForEach(users, async (user) => {
         const {shop, accessToken} = user
         if (!shop || !accessToken) return
         try {
+            console.log('User: ', user)
             await sendShopOrder(shop, accessToken)
         } catch(err) {
             console.log('Failed cron orders: ', err)

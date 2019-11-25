@@ -150,6 +150,7 @@ app.prepare().then(async () => {
     //validates webhook and listens for events in the store
     router.post('/webhooks/app/uninstalled', appUninstalled) 
     //gdpr requirements
+    
     router.post('/webhooks/customers/data_request', dataRequest)    
     router.post('/webhooks/customers/redact', customerRedact)    
     router.post('/webhooks/shop/redact', shopRedact)    
