@@ -62,7 +62,7 @@ async function getShopData(shop, accessToken) {
 //TODO: TEST
 function getShopTimezone(shopData) {
     const shopTimeZoneIANA = shopData.data.shop.iana_timezone
-    let today = moment.tz(shopTimeZoneIANA).startOf('day')
+    let today = moment.tz(shopTimeZoneIANA).startOf('day').subtract(1, 'day')   
     //  moment.tz(shopTimeZoneIANA).startOf('day').subtract(1, 'day')    
     console.log('today: ', today.format('YYYY-MM-DD[T]HH:mm:ss'))
     return today.format('YYYY-MM-DD[T]HH:mm:ss')
@@ -71,7 +71,7 @@ function getShopTimezone(shopData) {
 async function sendShopOrder(shop, accessToken) {
     const shopData = await getShopData(shop, accessToken)
             
-    console.log('Shop Data: ', shopData.data.shop)
+    console.log('Shop Data: ', shopData.data.shop.iana_timezone)
             
     const today = getShopTimezone(shopData)
     

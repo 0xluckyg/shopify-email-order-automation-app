@@ -5,8 +5,7 @@ const { User } = require('./db/user');
 const { createOrderText, getTemplateTexts } = require('../helper/template')
 const { 
 	fetchAllOrdersForDay, 
-	formatOrders,
-	getPDFName
+	formatOrders
 } = require('./orders-helper')
 
 //For previewing send
@@ -29,6 +28,16 @@ async function getUserSettings(shop) {
 		"settings": 1
 	})
 	return user.settings
+}
+
+//this function got placed here due to cyclic dependency problem. Do not remove
+//https://stackoverflow.com/questions/35534806/module-exports-not-working
+function getPDFName(data) {
+	const orderNumbers = Object.keys(data)
+	const name = (orderNumbers.length <= 1) ?
+		`order-${orderNumbers[0]}.pdf` :
+		`order-${orderNumbers[0]}-${orderNumbers[orderNumbers.length - 1]}.pdf`
+	return name
 }
 
 //when order data is available and just need to convert it into right format
@@ -176,4 +185,4 @@ async function getPDFPreview(ctx) {
 	}
 }
 
-module.exports = { getOrderPDF, getOrderPDFPreview, getPDFName, getPDFPreview }
+module.exports = { getOrderPDF, getOrderPDFPreview, getPDFPreview }

@@ -5,7 +5,7 @@ const {ProcessedOrder} = require('./db/processed-order')
 const keys = require('../config/keys')
 const _ = require('lodash')
 const {createOrderText, createSubjectText} = require('../helper/template');
-const {getOrderPDF} = require('./pdf')
+const {getPDFName, getOrderPDF} = require('./pdf')
 const {sendGmail, formatAttachment} = require('./auth/gmail-auth');
 
 function getHeaders(accessToken) {
@@ -19,16 +19,6 @@ async function asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array);
     }
-}
-
-//this function got placed here due to cyclic dependency problem. Do not remove
-//https://stackoverflow.com/questions/35534806/module-exports-not-working
-function getPDFName(data) {
-	const orderNumbers = Object.keys(data)
-	const name = (orderNumbers.length <= 1) ?
-		`order-${orderNumbers[0]}.pdf` :
-		`order-${orderNumbers[0]}-${orderNumbers[orderNumbers.length - 1]}.pdf`
-	return name
 }
 
 //TODO: TEST
@@ -393,7 +383,6 @@ module.exports = {
     combineOrdersAndEmailRules, 
     combineOrdersAndSentHistory, 
     reformatOrdersByEmail,
-    getPDFName,
     markLongOrdersAsPdf,
     sendEmails,
     
