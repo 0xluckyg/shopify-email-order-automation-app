@@ -77,6 +77,7 @@ async function handleRender(ctx) {
 }
 
 sendOrdersCron()
+sendOrdersForShops()
 
 app.prepare().then(async () => {
     
@@ -154,12 +155,6 @@ app.prepare().then(async () => {
     router.post('/webhooks/customers/data_request', dataRequest)    
     router.post('/webhooks/customers/redact', customerRedact)    
     router.post('/webhooks/shop/redact', shopRedact)    
-
-    //TEST inner function of cron job send order
-    router.post('/test-cron-send', async (ctx) => {
-        await sendOrdersForShops()
-        ctx.body = 'test cron send'
-    })
 
     //Lets next.js prepare all the requests on the React side
     server.use(handleRender);   

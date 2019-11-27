@@ -87,19 +87,12 @@ class Index extends React.Component {
         const shop = nextProps.getUserReducer.shop                        
         return ({shop})
     }
-    
-    testCronOrderSend() {
-        const axios = require('axios')
-        axios.post(process.env.APP_URL + '/test-cron-send')
-    }
 
     componentDidMount() {
         //get user and save it to the reducer on app mount        
         if (!this.props.getUserReducer.shop) {            
             this.props.getUserAction();
         }
-        
-        this.testCronOrderSend()
     }
 
     isGmailAuthorized() {

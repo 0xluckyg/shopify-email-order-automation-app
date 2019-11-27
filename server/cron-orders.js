@@ -109,7 +109,8 @@ async function sendOrdersForShops() {
 //For scheduled send orders per day
 async function sendOrdersCron() {             
     return schedule.scheduleJob('8 * * *', async () => {  
-        await sendOrdersForShops()
+        console.log('RAN!')
+        // await sendOrdersForShops()
     })
 }
 
