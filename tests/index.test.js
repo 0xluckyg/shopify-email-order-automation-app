@@ -13,6 +13,10 @@ const {
     getUsersTest,
     getShopTimezoneTest
 } = require('./cron-orders.test');
+const {User} = require('../server/db/user')
+require('../config/config');
+require('../server/db/mongoose'); //If using DB
+
 
 cronJobTest()
 // getStartAndEndDateForOrderQueryTest()
@@ -23,6 +27,6 @@ cronJobTest()
 // markLongOrdersAsPdfTest()
 // formatOrdersTest()
 
-// checkStoreNeedsUpgradeTest()
+checkStoreNeedsUpgradeTest()
 // getUsersTest()
 // getShopTimezoneTest()

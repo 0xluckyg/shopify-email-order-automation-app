@@ -1,4 +1,4 @@
-const expect = require('expect');
+const expect = require('chai').expect;
 const {
     sendOrdersCron,
     checkStoreNeedsUpgrade,
@@ -6,18 +6,28 @@ const {
     getShopTimezone
 } = require('../server/cron-orders')
 const sinon = require('sinon')
+const {User} = require('../server/db/user')
+
+const testShop = 'krocoio.myshopify.com'
+async function getTestShop() {
+    const accessToken = await User.findOne({shop: testShop}, {accessToken: 1})
+    return {
+        shop: testShop,
+        accessToken
+    }
+}
 
 function cronJobTest() {
-    describe('clock works', () => {
+    describe('send orders cron job works', () => {
         it ('should match time', (done) => {
             const clock = sinon.useFakeTimers();
             
             sendOrdersCron()
-            console.log('current date" ', new Date())
-            clock.tick(1000 * 60 * 60 * 24)
             
-            console.log('next date: ', new Date())
-            
+            console.log('start virtual date" ', new Date())
+            clock.tick(1000 * 60 * 60 * 24 * 2) //2 days
+            console.log('end virtual date: ', new Date())
+        
             clock.restore()
             
             done()
@@ -27,10 +37,8 @@ function cronJobTest() {
 
 function checkStoreNeedsUpgradeTest() {
     describe('description', () => {        
-
-        it('condition', (done) => {
-            
-            done()
+        it('condition', async () => {
+            const shop = await getTestShop()
         });
     });
 }

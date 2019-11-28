@@ -107,10 +107,19 @@ async function sendOrdersForShops() {
 }
 
 //For scheduled send orders per day
-async function sendOrdersCron() {             
-    return schedule.scheduleJob('8 * * *', async () => {  
-        console.log('RAN!')
-        // await sendOrdersForShops()
+async function sendOrdersCron() {
+    
+    var rule = new schedule.RecurrenceRule();
+    rule.hour = 8;
+    rule.minute = 0;
+
+    let cronCounter = 0
+
+    schedule.scheduleJob(rule, async () => {  
+        console.log('Ran cron: ', new Date())
+        if (process.env.NODE_ENV == 'test') return cronCounter++
+        
+        await sendOrdersForShops()
     })
 }
 
