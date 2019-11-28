@@ -28,5 +28,5 @@ cronJobTest()
 // formatOrdersTest()
 
 checkStoreNeedsUpgradeTest()
-// getUsersTest()
+getUsersTest()
 // getShopTimezoneTest()

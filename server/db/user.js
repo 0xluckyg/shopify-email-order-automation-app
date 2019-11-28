@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
     },
     shop: {
         //shop-name.myshopify.com
-        unique: true,
+        sparse: true,
         type: String,
     },
     //unique access token for each store from Shopify.

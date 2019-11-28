@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"test": "export NODE_ENV=test || \"SET NODE_ENV=test\" && mocha tests/index.test.js",
+		"test": "export NODE_ENV=test || \"SET NODE_ENV=test\" && mocha --exit tests/index.test.js",
 		"dev": "node server.js",
 		"build": "next build",
 		"start": "next start"
