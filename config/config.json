@@ -1,0 +1,17 @@
+{
+    "development" : {
+        "APP_URL": "https://kroco.ngrok.io",
+        "SHOPIFY_API_KEY": "8122a5f860129de28286622343c24c46",
+        "GMAIL_API_CLIENT_ID": "373824479147-4cmj2oo2t38lnr4jmudp2o7hgu1sdki1.apps.googleusercontent.com"
+    },
+    "test": {
+        "APP_URL": "https://kroco.ngrok.io",
+        "SHOPIFY_API_KEY": "8122a5f860129de28286622343c24c46",
+        "GMAIL_API_CLIENT_ID": "373824479147-4cmj2oo2t38lnr4jmudp2o7hgu1sdki1.apps.googleusercontent.com"
+    },
+    "production": {
+        "APP_URL": "https://koa.kroco.io",
+        "SHOPIFY_API_KEY": "5b7472e47f22e17e32f52a90b0ba96b7",
+        "GMAIL_API_CLIENT_ID": "373824479147-4cmj2oo2t38lnr4jmudp2o7hgu1sdki1.apps.googleusercontent.com"
+    }
+}

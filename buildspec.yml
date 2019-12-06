@@ -1,0 +1,62 @@
+version: 0.2
+
+env:
+    variables:
+        NODE_ENV: "production"
+    #parameter-store:
+        # key: "value"
+        # key: "value"
+    #secrets-manager:
+        # key: secret-id:json-key:version-stage:version-id
+        # key: secret-id:json-key:version-stage:version-id
+    #exported-variables:
+        # - variable
+        # - variable
+    #git-credential-helper: yes
+
+phases:
+    install:
+        #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+        #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+        runtime-versions:
+            nodejs: 10
+            docker: 18
+        # commands:
+            # - command
+    pre_build:
+        commands:
+            - echo Logging in to AWS ECR on `date`
+            # log in to ecr
+            - aws --version
+            - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+            - REPOSITORY_URI=012345678910.dkr.ecr.us-east-1.amazonaws.com/base-image
+            - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+            - IMAGE_TAG=${COMMIT_HASH:=latest}
+            #so that build doesn't fail due to non existent module. All .env variables are configured on AWS for prod
+            - touch .env
+            - npm install
+    build:
+        commands:
+            - echo Build started on `date`
+            - docker-compose build
+    post_build:
+        commands:
+            - echo Pushing the Docker images on `date`
+            - docker-compose push
+    #reports:
+        #enter-report-name-here:
+        #files:
+            # - location
+            # - location
+        #base-directory: location
+        #discard-paths: yes
+        #file-format: JunitXml | CucumberJson
+# artifacts:
+#     files:
+#         - imagedefinitions.json
+    #name: $(date +%Y-%m-%d)
+    #discard-paths: yes
+    #base-directory: location
+#cache:
+    #paths:
+        # - paths

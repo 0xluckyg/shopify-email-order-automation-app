@@ -25,6 +25,10 @@
 
 require('isomorphic-fetch');
 require('./config/config');
+if (process.env.NODE_ENV != 'production') {
+    require('dotenv').config()
+    console.log('Running on environment: ', process.env.NODE_ENV)
+}
 require('./server/db/mongoose'); //If using DB
 //koa and koa-session will take care of Shopify OAuth and create a custom server
 const Koa = require('koa');

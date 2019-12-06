@@ -2,19 +2,5 @@
 version: '3'
 services:
   koa:
-    image: 838823345115.dkr.ecr.us-east-1.amazonaws.com/koa-ecr:1.0
+    image: 838823345115.dkr.ecr.us-east-1.amazonaws.com/koa-ecr:latest
     build: .
-    ports:
-      - "80:3000"
-    depends_on:
-      - mongodb
-    env_file:
-      - .env
-  mongodb:
-    image: mongo
-    ports: 
-      - "27017:27017"
-    volumes:
-      - data-volume:/data/db
-volumes:
-  data-volume:
