@@ -58,7 +58,13 @@ const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
 const {dataRequest, customerRedact, shopRedact} = require('./server/webhooks/gdpr');
 
+console.log('port: ', process.env.PORT)
+
 const port = parseInt(process.env.PORT, 10) || 3000;
+
+console.log('port: ', port)
+
+
 const dev = process.env.NODE_ENV !== 'production';
 //app refers to the Next.js app, which is the react build
 const app = next({ dev });
@@ -81,7 +87,8 @@ async function handleRender(ctx) {
 }
 
 sendOrdersCron()
-sendOrdersForShops()
+// only for test
+// sendOrdersForShops()
 
 app.prepare().then(async () => {
     
