@@ -23,12 +23,13 @@
 
 // koa uses async/await. Using the original promises will not work
 
-require('isomorphic-fetch');
-require('./config/config');
 if (process.env.NODE_ENV != 'production') {
     require('dotenv').config()
-    console.log('Running on environment: ', process.env.NODE_ENV)
+    // process.env.PORT = 3000
+    // console.log('Running on environment: ', process.env.NODE_ENV)
 }
+require('isomorphic-fetch');
+require('./config/config');
 require('./server/db/mongoose'); //If using DB
 //koa and koa-session will take care of Shopify OAuth and create a custom server
 const Koa = require('koa');
