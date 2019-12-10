@@ -58,7 +58,7 @@ function initiatePayment (ctx, user, plan) {
             price: `$${price}`,
             return_url: process.env.APP_URL, //URL to return to after user accepts payment
             trial_days: freeTrialLeft, //If merchant doesn't uninstall the app within these days, Shopify charges the merchant
-            test: true //The Billing API also has a test property that simulates successful charges.
+            test: (process.env.NODE_ENV != 'production') //The Billing API also has a test property that simulates successful charges.
         }
     })    
     

@@ -1,13 +1,15 @@
 {
     "development" : {
+        "PORT": 3000,
         "APP_URL": "https://kroco.ngrok.io",
         "SHOPIFY_API_KEY": "8122a5f860129de28286622343c24c46",
-        "GMAIL_API_CLIENT_ID": "373824479147-4cmj2oo2t38lnr4jmudp2o7hgu1sdki1.apps.googleusercontent.com"
+        "GMAIL_API_CLIENT_ID": "895577245016-8vr0luj4t92h4uud7crlptmotluk37ss.apps.googleusercontent.com"
     },
     "test": {
+        "PORT": 3000,
         "APP_URL": "https://kroco.ngrok.io",
         "SHOPIFY_API_KEY": "8122a5f860129de28286622343c24c46",
-        "GMAIL_API_CLIENT_ID": "373824479147-4cmj2oo2t38lnr4jmudp2o7hgu1sdki1.apps.googleusercontent.com"
+        "GMAIL_API_CLIENT_ID": "895577245016-8vr0luj4t92h4uud7crlptmotluk37ss.apps.googleusercontent.com"
     },
     "production": {
         "APP_URL": "https://koa.kroco.io",

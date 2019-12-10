@@ -22,11 +22,8 @@
 // code splitting
 
 // koa uses async/await. Using the original promises will not work
-
 if (process.env.NODE_ENV != 'production') {
-    require('dotenv').config()
-    // process.env.PORT = 3000
-    // console.log('Running on environment: ', process.env.NODE_ENV)
+    require('dotenv').config({path: __dirname + '/.env'})
 }
 require('isomorphic-fetch');
 require('./config/config');
@@ -59,12 +56,7 @@ const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
 const {dataRequest, customerRedact, shopRedact} = require('./server/webhooks/gdpr');
 
-console.log('port: ', process.env.PORT)
-
 const port = parseInt(process.env.PORT, 10) || 3000;
-
-console.log('port: ', port)
-
 
 const dev = process.env.NODE_ENV !== 'production';
 //app refers to the Next.js app, which is the react build

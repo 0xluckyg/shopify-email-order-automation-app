@@ -16,6 +16,7 @@ import {bindActionCreators} from 'redux';
 import {showToastAction, showPaymentPlanAction} from '../redux/actions';
 import pageHeader from '../components/page-header';
 import AddEmail from '../components/add-email';
+import React from 'react';
 
 class AddRule extends React.Component {
     mounted = false
@@ -132,7 +133,7 @@ class AddRule extends React.Component {
         this.setState({buttonIsLoading: true})
         if (showProductSelect) {
             this.setState({buttonIsLoading: false})
-            return this.props.showToastAction(true, 'Please select products')
+            return this.props.showToastAction(true, 'Please finish selecting products')
         }        
         if (!email) {
             this.setState({buttonIsLoading: false})
@@ -249,6 +250,17 @@ class AddRule extends React.Component {
                 }}                                
             />
         );
+        
+        let productSelectionButtonText = 'Select All Products From the Store'
+        
+        if (this.state.filters.length > 0) {
+            productSelectionButtonText = 'Select All Filtered Products'
+        }
+        
+        if (this.state.selectedItems.length > 0) {
+            productSelectionButtonText = 'Select All Checked Products'
+        }
+        
         if (this.state.showProductSelect) {
             return (
                 <Card>
@@ -282,7 +294,7 @@ class AddRule extends React.Component {
                             }
                             this.setState({showProductSelect:false})                        
                         }                        
-                    }> {(this.state.filters.length > 0) ? 'Select All Filtered Products' : 'Select All Products From Store'}</Button>
+                    }>{productSelectionButtonText}</Button>
                 </div>   
                 </Card>
             )

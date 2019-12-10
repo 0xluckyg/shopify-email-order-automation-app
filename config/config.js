@@ -10,7 +10,7 @@
 const config = require('./config.json');
 const env = process.env.NODE_ENV || 'development';
 
-console.log('env ********', env);
+console.log('Running on env: ', env);
 
 const envConfig = config[env];
 
