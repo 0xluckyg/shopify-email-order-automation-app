@@ -2,7 +2,7 @@ const PDFKit = require('pdfkit')
 const fs = require('fs')
 const UUIDv4 = require('uuid/v4')
 const { User } = require('./db/user');
-const { createOrderText, getTemplateTexts } = require('../helper/template')
+const { createOrderText, createPreviewText } = require('../helper/template')
 const { 
 	fetchAllOrdersForDay, 
 	formatOrders
@@ -48,6 +48,9 @@ async function createPDFContent(shop, pdfData) {
 		productTemplateText,
 		footerTemplateText
 	} = await getUserSettings(shop)
+	
+	console.log('pdfData: ', pdfData)
+	
 	return createOrderText(
 		pdfData,
 		shop,
@@ -131,6 +134,7 @@ async function getOrderPDF(ctx, pdfData) {
 }
 
 async function getOrderPDFPreview(ctx) {
+	console.log('get! ', ctx)
 	const { pdfBase64 } = await getOrderPDF(ctx)
 	ctx.type = 'application/pdf';
 	ctx.body = pdfBase64;
@@ -151,14 +155,7 @@ async function getPDFPreview(ctx) {
 			footerTemplateText
 		} = await getUserSettings(shop)
 
-		const { headerTemplate, orderTemplate, productTemplate, footerTemplate } =
-			getTemplateTexts(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText)
-
-		const pdfText =
-			headerTemplate +
-			orderTemplate +
-			productTemplate +
-			footerTemplate
+		const pdfText = createPreviewText(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText)
 
 		await writePDF(tempFileName, pdfText)
 

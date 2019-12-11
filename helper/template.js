@@ -92,6 +92,22 @@ function getTemplateTexts(headerTemplateText, orderTemplateText, productTemplate
     return {headerTemplate, orderTemplate, productTemplate, footerTemplate}
 }
 
+function createPreviewText(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText) {
+
+	const { headerTemplate, orderTemplate, productTemplate, footerTemplate } =
+		getTemplateTexts(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText)
+    
+    const pdfText =
+			headerTemplate +
+			orderTemplate +
+			PRODUCT_TEMPLATE_HEADER +
+			productTemplate +
+			productTemplate +
+			footerTemplate
+			
+	return pdfText
+}
+
 function createOrderText(data, shop, headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText) {        
     let orderText = ''
     let shopName = shop ? createShopName(shop) : 'our store'
@@ -145,6 +161,9 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         orderText = orderText + orderTemplateTemporary
 
         let productText = PRODUCT_TEMPLATE_HEADER
+        
+        console.log('data: ', data)
+        console.log('product text: ', productText)
         Object.keys(order.items).map(itemID => {                     
             let item = order.items[itemID]
             
@@ -163,6 +182,8 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
 
             productText = productText + productTemplateTemporary
         })        
+        
+        console.log('product text 2: ', productText)
 
         orderText = orderText + productText
     })
@@ -184,5 +205,6 @@ module.exports = {
     FOOTER_TEMPLATE_TEXT,
     createSubjectText,
     createOrderText,
-    getTemplateTexts
+    getTemplateTexts,
+    createPreviewText
 }

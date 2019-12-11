@@ -14,7 +14,8 @@ import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import pageHeader from '../components/page-header'
 import GmailCard from '../components/gmail-auth'
-import keys from '../helper/template'
+import keys, {createPreviewText} from '../helper/template'
+import React from 'react'
 
 class Settings extends React.Component {
     mounted = false
@@ -77,7 +78,7 @@ class Settings extends React.Component {
                 previousPDFOrderLimit: PDFSettings.PDFOrderLimit,
                 PDFOrderLimit: PDFSettings.PDFOrderLimit
             })
-        }).catch(err => {               
+        }).catch(() => {               
             if (!this.mounted) return            
             this.props.showToastAction(true, "Couldn't get settings. Please try again later.")
         })  
@@ -171,6 +172,11 @@ class Settings extends React.Component {
                 </Card>
     }
     
+    renderPreviewText() {
+        const {headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText} = this.state
+        return createPreviewText(headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText)
+    }
+    
     setPDFOrderLimit(PDFOrderLimit) {
         if (isNaN(PDFOrderLimit)) return
         if (PDFOrderLimit < 0 || PDFOrderLimit > 500) return
@@ -258,11 +264,7 @@ class Settings extends React.Component {
                 >
                     <div style={modalContentStyle}>
                         <div style={{width: '90%', margin: '20px', maxHeight:'700px', overflowY: 'auto', whiteSpace: "pre-wrap"}}>
-                            {keys.SUBJECT_TEMPLATE_TEXT + `\n\n\n` +
-                            keys.HEADER_TEMPLATE_TEXT +
-                            keys.ORDER_TEMPLATE_TEXT +
-                            keys.PRODUCT_TEMPLATE_TEXT +
-                            keys.FOOTER_TEMPLATE_TEXT}
+                            {this.renderPreviewText()}
                         </div>                    
                     </div>
                 </Modal>

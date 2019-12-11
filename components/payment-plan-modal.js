@@ -11,6 +11,7 @@ import Cookies from 'js-cookie'
 import { Redirect } from '@shopify/app-bridge/actions';
 import * as PropTypes from 'prop-types';
 import * as keys from '../config/keys';
+import React from 'react'
 
 //A pop up to ask users to write a review
 class PaymentPlanModal extends React.Component {
@@ -99,7 +100,7 @@ class PaymentPlanModal extends React.Component {
         return(
             <Modal 
                 styles={modalStyle}
-                open={this.props.showPaymentPlanReducer && !paymentLock}
+                open={this.props.showPaymentPlanReducer.show && !paymentLock}
                 onClose={() => {
                     this.props.showPaymentPlanAction(false)
                 }}
