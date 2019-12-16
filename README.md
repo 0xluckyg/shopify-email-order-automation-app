@@ -187,7 +187,6 @@ A registered webhook on Shopify (There's a code snippet to register this inside 
 ```
 contact-us.js
 Logic for the contact-us page for users to send email inquiries. 
-Has nothing to do with our Gmail API, and uses nodemailer
 ```
 ```
 edit-rule.js

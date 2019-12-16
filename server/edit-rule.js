@@ -1,5 +1,5 @@
 const {Rule} = require('./db/rule');
-const {needsUpgradeForAddRule} = require('./auth/shopify-payment')
+const {needsUpgradeForAddRule} = require('./payment/shopify-payment')
 
 function convertFiltersIntoParams(filters, selectedProducts) { 
     //params are ignored if there are product ids in selectedProducts

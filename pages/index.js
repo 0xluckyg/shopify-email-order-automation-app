@@ -21,6 +21,7 @@ import Toast from '../components/toast';
 import ReviewModal from "../components/review-modal";
 import PaymentPlanModal from "../components/payment-plan-modal";
 import GmailAuth from "../components/gmail-auth";
+import EmailRegister from "../components/email-register";
 import AddRule from './add-rule';
 import Rules from './rules';
 import Orders from './orders';
@@ -99,6 +100,11 @@ class Index extends React.Component {
         if (!this.props.getUserReducer || !this.props.getUserReducer.gmail) return false        
         return this.props.getUserReducer.gmail.isActive
     }
+    
+    isEmailRegistered() {
+        if (!this.props.getUserReducer || !this.props.getUserReducer.email) return false        
+        return this.props.getUserReducer.email
+    }
 
     render() {
         
@@ -164,11 +170,11 @@ class Index extends React.Component {
             {contextualSaveBarMarkup}
             {loadingMarkup}
             <div style={pageWrapper}>
-                {(this.isGmailAuthorized()) 
+                {(this.isEmailRegistered()) 
                 ?                
                     pages[this.props.routerReducer]                
                 :
-                    <GmailAuth/>
+                    <EmailRegister/>
                 }            
             </div>
             {toastMarkup}

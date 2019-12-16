@@ -77,7 +77,6 @@ class ContactUs extends React.Component {
         )
     }
 
-    //Sends a post request to our server and uses nodemailer from backend to send the email.
     submitEmail() {
         if (this.validator()) {
             const headers = {

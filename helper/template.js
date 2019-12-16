@@ -67,7 +67,7 @@ let PRODUCT_TEMPLATE_TEXT =
 Variant Title: {{${keys.VARIANT_TITLE}}}
 Quantity: {{${keys.QUANTITY}}}
 SKU: {{${keys.SKU}}}
-Vendor: {{${keys.VENDOR}}}\n\n`
+Vendor: {{${keys.VENDOR}}}\n`
 
 let FOOTER_TEMPLATE_TEXT = `
 Thank you!`
@@ -162,8 +162,6 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
 
         let productText = PRODUCT_TEMPLATE_HEADER
         
-        console.log('data: ', data)
-        console.log('product text: ', productText)
         Object.keys(order.items).map(itemID => {                     
             let item = order.items[itemID]
             
@@ -183,8 +181,6 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
             productText = productText + productTemplateTemporary
         })        
         
-        console.log('product text 2: ', productText)
-
         orderText = orderText + productText
     })
 

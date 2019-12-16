@@ -14,6 +14,7 @@ import {bindActionCreators} from 'redux';
 import {showToastAction} from '../redux/actions';
 import pageHeader from '../components/page-header'
 import GmailCard from '../components/gmail-auth'
+import EmailRegister from '../components/email-register'
 import keys, {createPreviewText} from '../helper/template'
 import React from 'react'
 
@@ -38,6 +39,9 @@ class Settings extends React.Component {
             sendMethod: 'manual',  
             sendMethodLoading: false,
             
+            selfEmailCopy: true,
+            selfEmailCopyLoading: false,
+            
             PDFOrderLimit: 100,
             previousPDFOrderLimit: 100,
             PDFOrderLimitLoading: false,
@@ -58,8 +62,9 @@ class Settings extends React.Component {
                 footerTemplateText, 
 
                 sendMethod,
-
-                PDFSettings,
+                selfEmailCopy,
+                
+                PDFSettings
             } = res.data
             this.setState({
                 previousSubjectTemplateText: (subjectTemplateText) ? subjectTemplateText : keys.SUBJECT_TEMPLATE_TEXT,
@@ -74,6 +79,7 @@ class Settings extends React.Component {
                 footerTemplateText: (footerTemplateText) ? footerTemplateText : keys.FOOTER_TEMPLATE_TEXT,
                 
                 sendMethod: sendMethod.method,
+                selfEmailCopy,
                 
                 previousPDFOrderLimit: PDFSettings.PDFOrderLimit,
                 PDFOrderLimit: PDFSettings.PDFOrderLimit
@@ -131,6 +137,20 @@ class Settings extends React.Component {
             this.props.showToastAction(true, "Couldn't save. Please try again later.")
         })   
     }
+    
+    setSelfEmailCopy(enabled) {
+        this.setState({selfEmailCopyLoading: true})
+        axios.post(process.env.APP_URL + '/self-email-copy', {enabled})
+        .then(() => {            
+            if (!this.mounted) return            
+            this.setState({selfEmailCopy: enabled, selfEmailCopyLoading: false});
+            this.props.showToastAction(true, 'Saved settings!')
+        }).catch(() => {   
+            if (!this.mounted) return            
+            this.setState({selfEmailCopyLoading: false})
+            this.props.showToastAction(true, "Couldn't save. Please try again later.")
+        })  
+    }
 
     templateIsDefaultMode() {
         return (this.state.subjectTemplateText == keys.SUBJECT_TEMPLATE_TEXT 
@@ -166,6 +186,30 @@ class Settings extends React.Component {
                             loading={this.state.sendMethodLoading}
                         >
                             Automatic
+                        </Button>
+                    </ButtonGroup>
+                    </div>
+                </Card>
+    }
+    
+    renderSelfEmailCopy() {
+        return <Card sectioned title="Self Receipt">
+                    <div style={{display:'flex', justifyContent:'space-between'}}>
+                    <p style={{lineHeight:'35px'}}>Send a fulfillment email copy to yourself as well when sending out emails</p>
+                    <ButtonGroup segmented>
+                        <Button 
+                            disabled={(this.state.selfEmailCopy == true)}
+                            onClick={() => this.setSelfEmailCopy(true)}
+                            loading={this.state.selfEmailCopyLoading}
+                        >
+                            Send
+                        </Button>
+                        <Button 
+                            disabled={(this.state.selfEmailCopy == false)}
+                            onClick={() => this.setSelfEmailCopy(false)}
+                            loading={this.state.selfEmailCopyLoading}
+                        >
+                            Don't Send
                         </Button>
                     </ButtonGroup>
                     </div>
@@ -374,7 +418,8 @@ class Settings extends React.Component {
                     </Card>                    
                     {this.renderOrderMethod()}
                     {this.renderPDFSettings()}
-                    <GmailCard/>           
+                    {this.renderSelfEmailCopy()}
+                    <EmailRegister/>           
                 </Layout.Section>
             </Layout>            
         )

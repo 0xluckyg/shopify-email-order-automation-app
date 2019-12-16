@@ -1,6 +1,6 @@
 const {validateWebhook} = require('./index');
 const User = require('../db/user')
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 
 async function deleteUserData(shop) {
     try {
@@ -37,24 +37,17 @@ async function sendEmail(shop, to, subject, body) {
     try {
         const bodyText = 'Shop: ' + shop + '\n\n' + body
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.APP_EMAIL,
-                pass: process.env.APP_EMAIL_PW
-            }
-        });
-    
-        const mailOptions = {
-            from: process.env.APP_EMAIL,
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        const msg = {
             to,
+            from: process.env.APP_EMAIL,
             subject,
             text: bodyText
         };
-    
-        await transporter.sendMail(mailOptions, function(error, info){
-            if (error) return error
-        });   
+        sgMail.send(msg).catch(err => {
+            if (err) console.log('Failed to send contactUs email using Sendgrid: ', err)
+        });
+        
     } catch(err) {
         console.log('Failed sendEmails for webhooks: ',err)
     }

@@ -2,7 +2,7 @@
 const crypto = require('crypto');
 const safeCompare = require('safe-compare');
 const { default: createShopifyAuth } = require('@shopify/koa-shopify-auth');
-const {initiatePayment} = require('./shopify-payment');
+const {initiatePayment} = require('../payment/shopify-payment');
 const {registerWebhook} = require('../webhooks');
 const {User} = require('../db/user');
 //app refers to the Next.js app, which is the react build

@@ -5,7 +5,6 @@ const {
     combineOrdersAndEmailRules,
     combineOrdersAndSentHistory,
     reformatOrdersByEmail,
-    markLongOrdersAsPdf,
     formatOrders
 } = require('../server/orders-helper')
 

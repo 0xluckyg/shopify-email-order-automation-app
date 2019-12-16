@@ -1,13 +1,13 @@
 const axios = require('axios');
 const {User} = require('./db/user');
-const {needsUpgradeForSendOrders} = require('./auth/shopify-payment')
+const {needsUpgradeForSendOrders} = require('./payment/shopify-payment')
 const {
     getHeaders, 
     asyncForEach, 
     fetchAllOrdersForDay,
     formatOrders
 } = require('./orders-helper')
-const { sendEmails } = require('./orders-helper')
+const { sendEmails } = require('./send-orders')
 const keys = require('../config/keys')
 const schedule = require('node-schedule');
 const moment = require('moment');
@@ -77,14 +77,10 @@ async function sendShopOrder(shop, accessToken) {
     
     let allOrders = await fetchAllOrdersForDay(shop, accessToken, today)
     
-    console.log('All Orders: ', allOrders)
-    
     const needsUpgrade = await checkStoreNeedsUpgrade(shop, allOrders)
     if (needsUpgrade) return
     
     const reformattedOrders = await formatOrders(shop, allOrders)
-    
-    console.log('Reformatted orders: ', reformattedOrders)
     
     await sendEmails(shop, reformattedOrders, today)
     
@@ -98,7 +94,6 @@ async function sendOrdersForShops() {
         const {shop, accessToken} = user
         if (!shop || !accessToken) return
         try {
-            console.log('User: ', user)
             await sendShopOrder(shop, accessToken)
         } catch(err) {
             console.log('Failed cron orders: ', err)

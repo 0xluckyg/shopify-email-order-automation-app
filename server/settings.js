@@ -80,4 +80,38 @@ async function setPDFOrderLimit(ctx) {
     }
 }
 
-module.exports = {getSettings, setSendMethod, setTemplateText, setPDFOrderLimit}
+async function setEmail(ctx) {
+    const shop = ctx.session.shop       
+    const body = JSON.parse(ctx.request.rawBody)    
+    if (shop) {
+        try {
+            const user = await User.findOneAndUpdate({shop}, { 
+                $set: { email: body.email } 
+            }, {new: true})
+            ctx.body = user
+        } catch (err) {
+            ctx.status = 400
+        }
+    } else {
+        ctx.status = 400
+    }
+}
+
+async function setSelfEmailCopy(ctx) {
+    const shop = ctx.session.shop       
+    const body = JSON.parse(ctx.request.rawBody)    
+    if (shop) {
+        try {
+            await User.findOneAndUpdate({shop}, { 
+                $set: { "settings.selfEmailCopy": body.enabled } 
+            })
+            ctx.body = 'saved PDF order limit'
+        } catch (err) {
+            ctx.status = 400
+        }
+    } else {
+        ctx.status = 400
+    }
+}
+
+module.exports = {getSettings, setSendMethod, setTemplateText, setPDFOrderLimit, setEmail, setSelfEmailCopy}

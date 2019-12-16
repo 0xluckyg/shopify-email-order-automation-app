@@ -4,9 +4,6 @@ const {User} = require('./db/user');
 const {ProcessedOrder} = require('./db/processed-order')
 const keys = require('../config/keys')
 const _ = require('lodash')
-const {createOrderText, createSubjectText} = require('../helper/template');
-const {getPDFName, getOrderPDF} = require('./pdf')
-const {sendGmail, formatAttachment} = require('./auth/gmail-auth');
 
 function getHeaders(accessToken) {
     return {
@@ -263,117 +260,14 @@ async function reformatOrdersByEmail(orders) {
 }
 
 //TODO: TEST
-async function markLongOrdersAsPdf(shop, emails) {
-    const user = await User.findOne({shop}, { settings: 1 })
-    const { PDFSettings } = user.settings
-
-    await asyncForEach(Object.keys(emails), async (email) => {
-        const {PDFOrderLimit} = PDFSettings
-        const tooLong = Object.keys(emails[email]).length
-        if (tooLong >= PDFOrderLimit) {
-            const pdfName = getPDFName(emails[email])
-            console.log('toolong')
-            emails[email] = {
-                type: 'pdf',
-                name: pdfName,
-                count: tooLong,
-                email,
-
-            }
-        }
-    })
-
-    return emails
-}
-
-//TODO: TEST
 async function formatOrders(shop, allOrders) {
     allOrders = await cleanOrders(allOrders)
     allOrders = await combineOrdersAndEmailRules(shop, allOrders)
     allOrders = await combineOrdersAndSentHistory(allOrders)
     allOrders = await reformatOrdersByEmail(allOrders)
-    
+
     return allOrders
 }
-
-async function sendEmails(shop, emails) {
-    try {
-        const user = await User.findOne({shop}, {
-            gmail: 1, settings: 1
-        })
-        const {
-            headerTemplateText, 
-            orderTemplateText, 
-            productTemplateText, 
-            footerTemplateText, 
-            subjectTemplateText,
-            PDFSettings
-        } = user.settings
-
-        await asyncForEach(Object.keys(emails), async (email) => {
-            const emailData = emails[email]
-            const {PDFOrderLimit} = PDFSettings
-            const tooLong = Object.keys(emailData).length
-            let sent = false
-            const subjectText = createSubjectText(shop, subjectTemplateText)
-            let bodyText = ''
-            let attachments = []
-            if (tooLong >= PDFOrderLimit) {
-                bodyText = 'Please see the attached PDF for orders.'
-                const {pdfName, pdfBase64} = await getOrderPDF(shop, emailData)
-                attachments.push(formatAttachment(pdfName, pdfBase64))
-            } else {
-                bodyText = createOrderText(
-                    emailData, 
-                    shop, 
-                    headerTemplateText,
-                    orderTemplateText,
-                    productTemplateText,
-                    footerTemplateText
-                )
-            }
-
-            //send email through the gmail lapi
-            sent = await sendGmail(                
-                user.gmail.googleRefreshToken, 
-                email,
-                subjectText,
-                bodyText,
-                attachments
-            )
-
-            if (!sent) return            
-
-            let processedOrders = []        
-            await asyncForEach(Object.keys(emailData), async (orderNumber) => {                  
-                const order = emailData[orderNumber]             
-                await asyncForEach(Object.keys(order.items), async (itemId) => {
-                    const product = order.items[itemId]
-                    let processedOrder = {}
-
-                    processedOrder.shop = shop
-                    processedOrder.email = email
-                    processedOrder.order_id = order.id
-                    processedOrder.order_number = orderNumber
-                    processedOrder.order_date = new Date(order.created_at)
-                    processedOrder.title = product.title
-                    processedOrder.product_id = product.product_id
-                    processedOrder.variant_id = product.variant_id                    
-
-                    processedOrders.push(processedOrder)
-                })
-            })
-
-            await ProcessedOrder.insertMany(processedOrders)
-        })
-
-        return true
-    } catch (err) {
-        console.log('Failed sending emails: ', err)
-        return false
-    }
-}
-
 
 module.exports = {
     getHeaders, 
@@ -383,9 +277,7 @@ module.exports = {
     combineOrdersAndEmailRules, 
     combineOrdersAndSentHistory, 
     reformatOrdersByEmail,
-    markLongOrdersAsPdf,
-    sendEmails,
-    
+
     //FINAL FORMAT
     formatOrders
 }

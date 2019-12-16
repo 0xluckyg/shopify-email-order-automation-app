@@ -4,23 +4,32 @@ const UUIDv4 = require('uuid/v4')
 const { User } = require('./db/user');
 const { createOrderText, createPreviewText } = require('../helper/template')
 const { 
-	fetchAllOrdersForDay, 
+	asyncForEach,
+	fetchAllOrdersForDay,
 	formatOrders
 } = require('./orders-helper')
 
-//For previewing send
-async function getAllOrdersForDay(ctx) {
-	try {
-		const { shop, accessToken } = ctx.session
-		const { date } = ctx.query
+//TODO: TEST
+async function markLongOrdersAsPdf(shop, emails) {
+    const user = await User.findOne({shop}, { settings: 1 })
+    const { PDFSettings } = user.settings
 
-		let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
-		const reformattedOrders = formatOrders(shop, allOrders)
+    await asyncForEach(Object.keys(emails), async (email) => {
+        const {PDFOrderLimit} = PDFSettings
+        const tooLong = Object.keys(emails[email]).length
+        if (tooLong >= PDFOrderLimit) {
+            const pdfName = getPDFName(emails[email])
+            emails[email] = {
+                type: 'pdf',
+                name: pdfName,
+                count: tooLong,
+                email,
 
-		return reformattedOrders
-	} catch (err) {
-		console.log('Failed getting all orders for day: ', err)
-	}
+            }
+        }
+    })
+
+    return emails
 }
 
 async function getUserSettings(shop) {
@@ -49,8 +58,6 @@ async function createPDFContent(shop, pdfData) {
 		footerTemplateText
 	} = await getUserSettings(shop)
 	
-	console.log('pdfData: ', pdfData)
-	
 	return createOrderText(
 		pdfData,
 		shop,
@@ -63,9 +70,12 @@ async function createPDFContent(shop, pdfData) {
 
 //when order data isnt available and must refetch all orders again from shop
 async function createPDFContentFromScratch(ctx) {
-	const { pdfInfo } = ctx.query
-	const formattedOrders = await getAllOrdersForDay(ctx)
-	return formattedOrders[JSON.parse(pdfInfo).email]
+	const { shop, accessToken } = ctx.session
+	const { date, pdfInfo } = ctx.query
+	let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
+	// console.log('allOrders: ', allOrders)
+	const reformattedOrders = await formatOrders(shop, allOrders)
+	return reformattedOrders[JSON.parse(pdfInfo).email]
 }
 
 async function writePDF(tempFileName, pdfData) {
@@ -182,4 +192,4 @@ async function getPDFPreview(ctx) {
 	}
 }
 
-module.exports = { getOrderPDF, getOrderPDFPreview, getPDFPreview }
+module.exports = { getOrderPDF, getOrderPDFPreview, getPDFPreview, markLongOrdersAsPdf }

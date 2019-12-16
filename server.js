@@ -39,14 +39,14 @@ const next = require('next');
 const compression = require('compression')
 const koaConnect = require('koa-connect');
 
-const {processPayment, changeSubscription} = require('./server/auth/shopify-payment');
+const {processPayment, changeSubscription} = require('./server/payment/shopify-payment');
 const getUser = require('./server/get-user');
 const contactUs = require('./server/contact-us');
 const getProducts = require('./server/get-products');
 const getRules = require('./server/get-rules');
 const {getOrders} = require('./server/get-orders');
 const {getOrderPDFPreview, getPDFPreview} = require ('./server/pdf')
-const {getSettings, setSendMethod, setTemplateText, setPDFOrderLimit} = require('./server/settings');
+const {getSettings, setSendMethod, setTemplateText, setPDFOrderLimit, setEmail, setSelfEmailCopy} = require('./server/settings');
 const {sendOrders, getAllOrdersForDay} = require('./server/send-orders');
 const {sendOrdersForShops, sendOrdersCron} = require('./server/cron-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
@@ -151,6 +151,8 @@ app.prepare().then(async () => {
     router.post('/set-pdf-order-limit', setPDFOrderLimit);
     router.post('/send-orders', sendOrders);    
     router.post('/gmail-logout', gmailLogout);
+    router.post('/set-email', setEmail);
+    router.post('/self-email-copy', setSelfEmailCopy);
     
     //validates webhook and listens for events in the store
     router.post('/webhooks/app/uninstalled', appUninstalled) 

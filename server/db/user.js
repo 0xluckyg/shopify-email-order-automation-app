@@ -17,6 +17,9 @@ const UserSchema = new mongoose.Schema({
         sparse: true,
         type: String,
     },
+    email: {
+            type: String
+    },
     //unique access token for each store from Shopify.
     //When access mode is set to "offline", Shopify returns the same accessToken until uninstalled
     accessToken: {        
@@ -72,6 +75,10 @@ const UserSchema = new mongoose.Schema({
                 type: Number,
                 default: 100
             }
+        },
+        selfEmailCopy: {
+            type: Boolean,
+            default: true
         },
         subjectTemplateText: {
             type: String
