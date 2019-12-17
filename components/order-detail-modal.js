@@ -210,7 +210,7 @@ class OrderDetailModal extends React.Component {
         if (!emails[email.email][order.order_number].items[item.variant_id]) {
             emails[email.email][order.order_number].items[item.variant_id] = item
         } else {                
-            emails[email.email][order.order_number].items[item.variant_id][quantity] += 1
+            emails[email.email][order.order_number].items[item.variant_id].quantity += 1
         }
         return emails
     }
@@ -227,16 +227,16 @@ class OrderDetailModal extends React.Component {
         return emails
     }    
 
-    sendEmails() {
+    sendEmail() {
         this.setState({isSending: true})
         axios.post(process.env.APP_URL + '/send-orders', {
             orders: this.reformatOrdersByEmail()
         })
         .then(() => {
-            this.props.showToastAction(true, 'Orders sent!')
+            this.props.showToastAction(true, 'Order sent!')
             this.setState({isSending: false, showEmailPreview: false})
             this.props.reload()
-        }).catch(err => {
+        }).catch(() => {
             this.props.showToastAction(true, "Couldn't send. Please Try Again Later.")
             this.setState({isSending: false})
         })
@@ -280,7 +280,7 @@ class OrderDetailModal extends React.Component {
                                     </div>
                                     <div style={rowButtonStyle}>
                                         <Button 
-                                            primary onClick={() => this.sendEmails()}
+                                            primary onClick={() => this.sendEmail()}
                                             loading={this.state.isSending}
                                             disabled={this.hasNothingToSend()}
                                         >

@@ -15,10 +15,6 @@ const {getPDFName, getOrderPDF} = require('./pdf')
 const {sendGmail, formatAttachment} = require('./api/gmail-api');
 const {sendEmailUsingSendgrid, formatTextToHtmlForSendgrid} = require('./api/sendgrid-api');
 
-async function sendOrder(ctx) {
-    
-}
-
 async function sendEmails(shop, emails) {
     try {
         const user = await User.findOne({shop}, {
@@ -119,23 +115,27 @@ async function sendEmails(shop, emails) {
     }
 }
 
+//For bulk order send and automatic order send
 async function sendOrders(ctx) {
     try {
         const {shop, accessToken} = ctx.session
-        const {date} = JSON.parse(ctx.request.rawBody)
-        let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
+        let {date, orders} = JSON.parse(ctx.request.rawBody)
+        
+        //If bulk order send, fetch all orders from shop first with date provided
+        if (!orders) {
+            orders =  await fetchAllOrdersForDay(shop, accessToken, date)
+            orders = await formatOrders(shop, orders)
+        } 
 
         //if user needs to upgrade subscription plan
-        const needsUpgrade = await needsUpgradeForSendOrders(shop, allOrders)
+        const needsUpgrade = await needsUpgradeForSendOrders(shop, orders)
         if (needsUpgrade) {
             ctx.status = 400
             ctx.body = 'needs upgrade'
             return
         }
         
-        const reformattedOrders = await formatOrders(shop, allOrders)
-
-        const sent = await sendEmails(shop, reformattedOrders, date)
+        const sent = await sendEmails(shop, orders)
         ctx.status = 200
         ctx.body = sent
     } catch (err) {

@@ -261,12 +261,16 @@ async function reformatOrdersByEmail(orders) {
 
 //TODO: TEST
 async function formatOrders(shop, allOrders) {
-    allOrders = await cleanOrders(allOrders)
-    allOrders = await combineOrdersAndEmailRules(shop, allOrders)
-    allOrders = await combineOrdersAndSentHistory(allOrders)
-    allOrders = await reformatOrdersByEmail(allOrders)
+    try {
+        allOrders = await cleanOrders(allOrders)
+        allOrders = await combineOrdersAndEmailRules(shop, allOrders)
+        allOrders = await combineOrdersAndSentHistory(allOrders)
+        allOrders = await reformatOrdersByEmail(allOrders)
 
-    return allOrders
+        return allOrders
+    } catch(err) {
+        console.log('Failed formatOrders: ', err)
+    }
 }
 
 module.exports = {

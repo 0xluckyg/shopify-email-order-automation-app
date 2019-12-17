@@ -416,8 +416,8 @@ class Settings extends React.Component {
                         </Button>
                         </div>
                     </Card>                    
-                    {this.renderOrderMethod()}
                     {this.renderPDFSettings()}
+                    {this.renderOrderMethod()}
                     {this.renderSelfEmailCopy()}
                     <EmailRegister/>           
                 </Layout.Section>
