@@ -13,6 +13,7 @@ import {bindActionCreators} from 'redux';
 import {showToastAction, isLoadingAction} from '../redux/actions';
 import emailValidator from "email-validator";
 import EmailPreview from './email-preview'
+import React from 'react'
 
 //A pop up to ask users to write a review
 class OrderDetailModal extends React.Component {    

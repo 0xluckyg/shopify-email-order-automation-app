@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { showToastAction } from '../redux/actions';
 import axios from 'axios';
+import React from 'react'
 const emailValidator = require("email-validator");
 
 //Lets users email the admin through a form.
@@ -68,7 +69,7 @@ class ContactUs extends React.Component {
                         multiline
                     />
                     <div style={buttomWrapper}>
-                        <Button onClick={this.submitEmail} size="large" primary>Add product</Button>
+                        <Button onClick={this.submitEmail} size="large" primary>Send</Button>
                     </div>
                     </FormLayout>
                 </Card>
