@@ -22,9 +22,9 @@ const SET_USER = 'SET_USER';
 const SET_SETTINGS = 'SET_SETTINGS';
 const ROUTE = 'ROUTE';
 
-const FEE_0 = 14.95;
-const FEE_1 = 49.95;
-const FEE_2 = 99.95;
+const FEE_0 = 9.95;
+const FEE_1 = 29.95;
+const FEE_2 = 39.95;
 const FREE_TRIAL = 14;
 
 module.exports = {
