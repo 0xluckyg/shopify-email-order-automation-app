@@ -21,7 +21,7 @@ const sgMail = require('@sendgrid/mail');
 
 function formatTextToHtmlForSendgrid(text) {
     text = text.replace(new RegExp(`\n`,"g"), '<br>')
-    return `<p>${text}</p>`
+    return `<html><body>${text}</body></html>`
 }
 
 async function sendEmailUsingSendgrid(msg) {

@@ -52,7 +52,7 @@ const {sendOrdersForShops, sendOrdersCron} = require('./server/cron-orders');
 const {addRule, editRule, removeRule} = require('./server/edit-rule');
 const {shopifyAuth, switchSession} = require('./server/auth/shopify-auth');
 const {getTokens, gmailLogout} = require('./server/auth/gmail-auth');
-
+const {getProductUrl, getProductImageUrl} = require('./server/custom-data')
 const {appUninstalled} = require('./server/webhooks/app-uninstalled');
 const {dataRequest, customerRedact, shopRedact} = require('./server/webhooks/gdpr');
 
@@ -94,6 +94,8 @@ app.prepare().then(async () => {
     
     server.use(routerUnauthorized.routes());
     routerUnauthorized.get('/', switchSession)
+    routerUnauthorized.get('/product-url', getProductUrl)
+    routerUnauthorized.get('/product-image-url', getProductImageUrl)
     //Allows routes that do not require authentication to be handled    
     server.use(async (ctx, next) => {
         let noAuth = false

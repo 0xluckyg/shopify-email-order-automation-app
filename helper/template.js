@@ -24,6 +24,8 @@ const keys = {
     VARIANT_ID: 'COMPANY',
     PRODUCT_ID: 'PRODUCT_ID',
     PRICE: 'PRICE',
+    PRODUCT_URL: 'PRODUCT_URL',
+    IMAGE_URL: 'IMAGE_URL'
     // PRODUCT_TYPE: 'PRODUCT_TYPE',
     // TOTAL_TAX: 'TOTAL_TAX',
 }
@@ -108,6 +110,14 @@ function createPreviewText(headerTemplateText, orderTemplateText, productTemplat
 	return pdfText
 }
 
+function createProductRedirectUrl(shop, id) {
+    return `${process.env.APP_URL}/product-url/?shop=${shop}&product_id=${id}`
+}
+
+function createProductImageUrl(shop, id) {
+    return `${process.env.APP_URL}/product-image-url/?shop=${shop}&product_id=${id}`
+}
+
 function createOrderText(data, shop, headerTemplateText, orderTemplateText, productTemplateText, footerTemplateText) {        
     let orderText = ''
     let shopName = shop ? createShopName(shop) : 'our store'
@@ -155,8 +165,7 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.PROVINCE}}}`,"g"), province)
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.COUNTRY}}}`,"g"), country)
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.ADDRESS2}}}`,"g"), address2)
-        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.COMPANY}}}`,"g"), company)
-        
+
         if (orderText != '') orderText = orderText + `\n\n`
         orderText = orderText + orderTemplateTemporary
 
@@ -169,14 +178,22 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
             let variantTitle = item.variant_title ? item.variant_title : 'Not provided' 
             let productQuantity = item.quantity ? item.quantity : 'Not provided'
             let sku = item.sku ? item.sku : 'Not provided'
-            let vendor = item.vendor ? item.vendor : 'Not provided'            
+            let vendor = item.vendor ? item.vendor : 'Not provided'    
+            let productId = item.product_id
 
             let productTemplateTemporary = productTemplate
             productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.TITLE}}}`,"g"), productTitle)
             productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.VARIANT_TITLE}}}`,"g"), variantTitle)
             productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.QUANTITY}}}`,"g"), productQuantity)
             productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.SKU}}}`,"g"), sku)
+            productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.VENDOR}}}`,"g"), vendor)    
             productTemplateTemporary = productTemplateTemporary.replace(new RegExp(`{{${keys.VENDOR}}}`,"g"), vendor)            
+            productTemplateTemporary = productTemplateTemporary.replace(new RegExp(
+                `{{${keys.PRODUCT_URL}}}`,"g"), createProductRedirectUrl(shop, productId)
+            )
+            productTemplateTemporary = productTemplateTemporary.replace(new RegExp(
+                `{{${keys.IMAGE_URL}}}`,"g"), createProductImageUrl(shop, productId)
+            )
 
             productText = productText + productTemplateTemporary
         })        

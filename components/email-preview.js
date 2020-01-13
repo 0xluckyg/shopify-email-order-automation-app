@@ -138,6 +138,9 @@ class EmailPreview extends React.Component {
             orderCount++
             Object.keys(data[order].items).map(() => { productCount++ })
         })        
+        
+        const emailText =  this.state.previewTexts[index]
+        const emailHtml = (emailText) ? emailText.replace(new RegExp(`\n`,"g"), '<br>') : false
         return <Card key={key}>            
             <div style={{width: '90%', margin: '20px', display:"flex", justifyContent: "space-between"}}>                                      
                 <div style={{width:"40%"}}><Badge>{key}</Badge></div>
@@ -153,10 +156,8 @@ class EmailPreview extends React.Component {
                 </div>                
             </div>  
             <div style={{width: '90%', margin: '20px', maxHeight:'700px', overflowY: 'auto'}}>
-                <Collapsible open={(this.state.previewTexts[index])} id="basic-collapsible">
-                    <div style={{whiteSpace: "pre-wrap"}}>
-                        {this.state.previewTexts[index]}
-                    </div>
+                <Collapsible open={(emailText)} id="basic-collapsible">
+                    <div dangerouslySetInnerHTML={{ __html: emailHtml }} />
                 </Collapsible>
             </div>
         </Card>

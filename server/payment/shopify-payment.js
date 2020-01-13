@@ -104,7 +104,6 @@ async function processPayment (ctx, next) {
         
         const res = await axios.get(`https://${shop}/${chargeUrl}/${chargeId}.json`, options)
         const {price, status, updated_at} = res.data.recurring_application_charge
-        console.log('payment status: ', status)
         if (status === 'accepted') { 
             const stringifyData = JSON.stringify(res.data)
             await axios.post(

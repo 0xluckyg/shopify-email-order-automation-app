@@ -73,7 +73,6 @@ async function createPDFContentFromScratch(ctx) {
 	const { shop, accessToken } = ctx.session
 	const { date, pdfInfo } = ctx.query
 	let allOrders = await fetchAllOrdersForDay(shop, accessToken, date)
-	// console.log('allOrders: ', allOrders)
 	const reformattedOrders = await formatOrders(shop, allOrders)
 	return reformattedOrders[JSON.parse(pdfInfo).email]
 }
@@ -144,7 +143,6 @@ async function getOrderPDF(ctx, pdfData) {
 }
 
 async function getOrderPDFPreview(ctx) {
-	console.log('get! ', ctx)
 	const { pdfBase64 } = await getOrderPDF(ctx)
 	ctx.type = 'application/pdf';
 	ctx.body = pdfBase64;

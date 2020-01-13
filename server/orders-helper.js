@@ -1,3 +1,4 @@
+const {GraphQLClient} = require('graphql-request')
 const axios = require('axios');
 const {Rule} = require('./db/rule')
 const {User} = require('./db/user');
@@ -285,3 +286,73 @@ module.exports = {
     //FINAL FORMAT
     formatOrders
 }
+
+
+// async function fetchAllOrdersForDayQL(shop, accessToken, queryDate) {
+    
+//     const uri = `https://${shop}/admin/api/graphql.json`       
+//     const client = new GraphQLClient(uri, {
+//         headers: {
+//             'X-Shopify-Access-Token': accessToken,
+//         },
+//     })     
+    
+//     let page = 1; let hasNext = true
+//     const date = returnStartAndEndDate(queryDate)
+    
+//     const query = `query($query: String, $cursor: String) {
+//                       orders(first:200, query:$query, after:$cursor) {
+//                         pageInfo {
+//                             hasNextPage
+//                         }
+//                         edges {
+//                           cursor
+//                           node {
+//                             id
+//                             lineItems {
+//                               edges {
+//                                 node {
+//                                   id
+//                                   sku
+//                                   product {
+//                                     title
+//                                     storefrontId
+//                                     featuredImage {
+//                                       originalSrc
+//                                     }
+//                                     handle
+//                                   }
+//                                   image {
+//                                     originalSrc
+//                                   }
+//                                 }
+//                               }
+//                             }
+//                           }
+//                         }
+//                       }
+//                     }`
+    
+//     let variables = {
+//         query: `created_at:=>'${date.created_at_min}'`,
+//         cursor: undefined
+//     }
+//     let hasNextPage = true
+//     let orders = []
+//     while (hasNextPage) {   
+//         try {                 
+//             const res = await client.request(query, variables)
+//             // { "data": { "orders": { "pageInfo": { "hasNextPage": Boolean }, "edges": [ { "cursor": String, "node": { "id": String, "description": String } ]                        
+//             const edges = res.orders.edges
+
+//             hasNextPage = res.orders.pageInfo.hasNextPage
+//             variables.cursor = edges[edges.length - 1].cursor
+//             const fetchedOrders = await edges.map(p => p.node)
+//             orders = [...orders, ...fetchedOrders]
+//         } catch (err) {                
+//             console.log('Failed queryFilteredProducts: ', err)
+//             hasNextPage = false; break;
+//         }
+//     }
+
+// }    

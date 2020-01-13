@@ -323,8 +323,10 @@ class Settings extends React.Component {
                                 </p>
                                 <p style={{lineHeight:'35px'}}>Available subject tag:</p>
                                 <Badge status="success">{`{{${keys.SHOP}}}`}</Badge>
+                                
                                 <p style={{lineHeight:'35px'}}>Available header tag:</p>
                                 <Badge status="success">{`{{${keys.SHOP}}}`}</Badge>
+                                
                                 <p style={{lineHeight:'35px'}}>List of tags you can use:</p>
                                 <Badge status="success">{`{{${keys.SHOP}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.ORDER_NUMBER}}}`}</Badge>
@@ -340,16 +342,31 @@ class Settings extends React.Component {
                                 <Badge status="success">{`{{${keys.COUNTRY}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.ADDRESS2}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.COMPANY}}}`}</Badge>                                                                
-                                <Badge status="success">{`{{${keys.PRICE}}}`}</Badge>     
+                                <Badge status="success">{`{{${keys.PRICE}}}`}</Badge>    
+                                
                                 <p style={{lineHeight:'35px'}}>List of product tags you can use:</p>
                                 <Badge status="success">{`{{${keys.TITLE}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.VARIANT_TITLE}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.QUANTITY}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.SKU}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.VENDOR}}}`}</Badge>      
+                                <Badge status="success">{`{{${keys.PRODUCT_URL}}}`}</Badge>      
+                                <Badge status="success">{`{{${keys.IMAGE_URL}}}`}</Badge>     
+                            
                                 <p style={{lineHeight:'35px'}}>Available footer tag:</p>
                                 <Badge status="success">{`{{${keys.SHOP}}}`}</Badge>
+                                <br/>
+                                
+                                <p style={{lineHeight:'35px'}}>Tip:</p>
+                                <p>
+                                    For <Badge status="success">{`{{${keys.PRODUCT_URL}}}`}</Badge> and 
+                                     <Badge status="success">{`{{${keys.IMAGE_URL}}}`}</Badge> , you can use Html formats such as <br/>
+                                    <Badge status="success">{`<a href="{{PRODUCT_URL}}">Product Link</a>`}</Badge> <br/> and <br/>
+                                    <Badge status="success">{'<img src="{{IMAGE_URL}}"/>'}</Badge> <br/>
+                                    to decorate the email 
+                                </p>
                                 <br/><br/>
+                                
                                 <p>
                                     Because an order may have more than one products, the order template will be combined with one or more product templates in the email. 
                                 </p>                                                     
