@@ -48,7 +48,12 @@ async function changeSubscription(ctx) {
 
 //creates a shopify URL that the user will be redirected to to accept payments
 function initiatePayment (ctx, user, plan) {            
-    const { shop, accessToken } = ctx.session;    
+    const { shop, accessToken } = ctx.session;   
+    const isTest = (shop == process.env.ADMIN_URL || process.env.NODE_ENV == 'development')
+    console.log('Payment Store: ', shop)
+    console.log('Payment Env: ', process.env.NODE_ENV)
+    console.log('Payment Testmode: ', isTest)
+    
     const freeTrialLeft = calculateTrialDays(user.payment.date, new Date())    
     //Shopify billing API requires 3 variables: price, name, return_url     
     const price = (plan) ? plan : keys.FEE_0
@@ -58,8 +63,7 @@ function initiatePayment (ctx, user, plan) {
             price: `$${price}`,
             return_url: process.env.APP_URL, //URL to return to after user accepts payment
             trial_days: freeTrialLeft, //If merchant doesn't uninstall the app within these days, Shopify charges the merchant
-            test: (shop == process.env.ADMIN_URL || 
-                process.env.NODE_ENV != 'production') //The Billing API also has a test property that simulates successful charges.
+            test: isTest //The Billing API also has a test property that simulates successful charges.
         }
     })    
     
