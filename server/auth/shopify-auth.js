@@ -9,7 +9,7 @@ const {User} = require('../db/user');
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY } = process.env;
 
 //List of Shopify access permissions available
-const shopifyScopes = [
+let shopifyScopes = [
     "read_products",
     // "write_products",
     // "read_product_listings",
@@ -36,6 +36,9 @@ const shopifyScopes = [
     // "read_users", //Only for Shopify Plus
     // "write_users", //Only for Shopify Plus
 ]
+if (process.env.NODE_ENV == 'development') {
+    shopifyScopes.pop()
+}
 
 function shopifyAuth() {
     // Returns an authentication middleware taking up (by default) the routes /auth and /auth/callback.

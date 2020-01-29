@@ -13,7 +13,7 @@ const _ = require('lodash')
 const {createOrderText, createSubjectText} = require('../helper/template');
 const {getPDFName, getOrderPDF} = require('./pdf')
 const {sendGmail, formatAttachment} = require('./api/gmail-api');
-const {sendEmailUsingSendgrid, formatTextToHtmlForSendgrid} = require('./api/sendgrid-api');
+const {sendEmailUsingSendgrid, formatTextToHtml} = require('./api/sendgrid-api');
 
 async function sendEmails(shop, emails) {
     try {
@@ -58,7 +58,7 @@ async function sendEmails(shop, emails) {
                 to: email,
                 from: user.email,
                 subject: subjectText,
-                html: formatTextToHtmlForSendgrid(bodyText),
+                html: formatTextToHtml(bodyText),
                 attachments
             })
             
@@ -67,7 +67,7 @@ async function sendEmails(shop, emails) {
                     to: user.email,
                     from: process.env.APP_EMAIL,
                     subject: 'Receipt: '+subjectText,
-                    html: formatTextToHtmlForSendgrid(`The following email has been sent to: ${email}\n\n` + bodyText),
+                    html: formatTextToHtml(`The following email has been sent to: ${email}\n\n` + bodyText),
                     attachments
                 })
             }

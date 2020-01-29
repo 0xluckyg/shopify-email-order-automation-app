@@ -19,7 +19,7 @@ const sgMail = require('@sendgrid/mail');
 //     }
 // ]
 
-function formatTextToHtmlForSendgrid(text) {
+function formatTextToHtml(text) {
     text = text.replace(new RegExp(`\n`,"g"), '<br>')
     return `<html><body>${text}</body></html>`
 }
@@ -36,4 +36,4 @@ async function sendEmailUsingSendgrid(msg) {
     })
 }
 
-module.exports = {sendEmailUsingSendgrid, formatTextToHtmlForSendgrid}
+module.exports = {sendEmailUsingSendgrid, formatTextToHtml}

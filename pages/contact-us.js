@@ -123,7 +123,7 @@ class ContactUs extends React.Component {
             this.setState({bodyError:""})
         }
 
-        if (!emailValidator.validate(this.state.emailValue)) {
+        if (!emailValidator.url(this.state.emailValue)) {
             this.setState({emailError:"Please enter a valid email address"})            
             valid = false
         } else {

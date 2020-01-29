@@ -1,3 +1,5 @@
+require('../config/config');
+require('../server/db/mongoose'); //If using DB
 const {
     getStartAndEndDateForOrderQueryTest,
     cleanOrdersTest,
@@ -14,8 +16,6 @@ const {
     getShopTimezoneTest
 } = require('./cron-orders.test');
 const {User} = require('../server/db/user')
-require('../config/config');
-require('../server/db/mongoose'); //If using DB
 
 
 cronJobTest()

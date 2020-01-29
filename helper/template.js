@@ -165,6 +165,7 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.PROVINCE}}}`,"g"), province)
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.COUNTRY}}}`,"g"), country)
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.ADDRESS2}}}`,"g"), address2)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.COMPANY}}}`,"g"), company)
 
         if (orderText != '') orderText = orderText + `\n\n`
         orderText = orderText + orderTemplateTemporary

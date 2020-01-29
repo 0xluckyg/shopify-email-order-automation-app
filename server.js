@@ -36,7 +36,7 @@ const session = require('koa-session');
 //package exposes "shopifyAuth" by default. We're changing that to "createShopifyAuth"
 const { verifyRequest } = require('@shopify/koa-shopify-auth');
 const next = require('next');
-const compression = require('compression')
+const compression = require('compression');
 const koaConnect = require('koa-connect');
 
 const {processPayment, changeSubscription} = require('./server/payment/shopify-payment');

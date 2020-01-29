@@ -1,4 +1,5 @@
 const PDFKit = require('pdfkit')
+var PDFHtml = require('html-pdf');
 const fs = require('fs')
 const UUIDv4 = require('uuid/v4')
 const { User } = require('./db/user');
@@ -8,6 +9,7 @@ const {
 	fetchAllOrdersForDay,
 	formatOrders
 } = require('./orders-helper')
+const {formatTextToHtml} = require('./api/sendgrid-api');
 
 //TODO: TEST
 async function markLongOrdersAsPdf(shop, emails) {
@@ -79,15 +81,15 @@ async function createPDFContentFromScratch(ctx) {
 
 async function writePDF(tempFileName, pdfData) {
 	return new Promise((resolve, reject) => {
-
-		// Create the PDF using PDFKit
-		let doc = new PDFKit();
-		let writeStream = fs.createWriteStream(tempFileName);
-
-		doc.pipe(writeStream);
-		doc.fontSize(12).text(pdfData, 100, 80)
-		doc.end();
-
+		
+		//Create the PDF using PDFhtml
+		let writeStream = fs.createWriteStream(tempFileName)
+		pdfData = formatTextToHtml(pdfData)
+		
+		PDFHtml.create(pdfData).toStream(function(err, stream){
+			if (!err) stream.pipe(writeStream);
+		});
+		
 		writeStream.addListener('finish', resolve);
 		writeStream.addListener('error', reject)
 	})

@@ -49,9 +49,6 @@ class AddEmail extends React.Component {
                 </div>
                 <div style={{width:'15%'}}>
                     <Button primary fullWidth onClick={() => {
-                        if (!emailValidator.validate(this.state.email)) {
-                            return this.setState({emailFieldError: "Please provide a valid email"})                            
-                        }                                       
                         this.props.setEmail(this.state.email)
                         this.setState({email:'', emailFieldError: ''})
                     }}>
