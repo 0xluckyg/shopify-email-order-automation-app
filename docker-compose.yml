@@ -2,5 +2,5 @@
 version: '3'
 services:
   koa:
-    image: 838823345115.dkr.ecr.us-east-1.amazonaws.com/festfunnel-ecr
+    image: 838823345115.dkr.ecr.us-east-1.amazonaws.com/koa-ecr
     build: .
