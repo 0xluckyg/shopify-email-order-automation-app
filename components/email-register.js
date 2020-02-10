@@ -52,7 +52,7 @@ class EmailRegister extends React.Component {
     }
     
     async saveEmail(email) {
-        if (!emailValidator.url(email)) {
+        if (!emailValidator.validate(email)) {
             this.props.showToastAction(true, "Please enter a valid email")
             return
         }

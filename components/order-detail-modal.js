@@ -88,7 +88,7 @@ class OrderDetailModal extends React.Component {
                 </div>
                 <div style={{width:'15%'}}>
                     <Button primary fullWidth onClick={() => {
-                        if (!emailValidator.url(this.state.additionalEmails[index])) {                            
+                        if (!emailValidator.validate(this.state.additionalEmails[index])) {                            
                             let emailErrors = this.state.emailErrors
                             emailErrors[index] = "Please provide a valid email"
                             return this.setState({emailErrors})                                                        

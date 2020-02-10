@@ -33,7 +33,7 @@ class KoeaDocument extends Document {
                 <meta name="description" content="" />
                 <meta name="keywords" content="" />
                 <meta name="author" content="Themesbrand" />   
-                <link rel="shortcut icon" href="static/landing-page/images/favicon.ico"/>
+                <link rel="shortcut icon" href="static/logo-small.png"/>
             
                 <link rel="manifest" href="static/landing-page/manifest" />
                 {/* Google Font */}

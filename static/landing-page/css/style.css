@@ -459,12 +459,12 @@ iframe {
           5.HOME 
   =====================================*/
 
-.bg-home {
-    background: url("../images/bg-home.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-}
+/*.bg-home {*/
+/*    background: url("../images/bg-home.jpg");*/
+/*    background-repeat: no-repeat;*/
+/*    background-size: cover;*/
+/*    background-position: center;*/
+/*}*/
 
 .home-title {
     font-size: 46px;
