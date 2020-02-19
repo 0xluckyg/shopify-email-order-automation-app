@@ -1,7 +1,7 @@
 const keys = {
     SHOP: 'SHOP',
     ORDER_NUMBER: 'ORDER_NUMBER',
-    PROCESSED_AT: 'PROCESSED_AT',
+    CREATED_AT: 'CREATED_AT',
     NOTE: 'NOTE',
     TITLE: 'TITLE',
     VARIANT_TITLE: 'VARIANT_TITLE',
@@ -41,7 +41,7 @@ let ORDER_TEMPLATE_TEXT =
 --------------------
 Shop: {{${keys.SHOP}}}
 Order Number: {{${keys.ORDER_NUMBER}}}
-Date: {{${keys.PROCESSED_AT}}}
+Date: {{${keys.CREATED_AT}}}
 Note: {{${keys.NOTE}}}\n
 CUSTOMER INFORMATION
 --------------------
@@ -132,15 +132,18 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         let order = data[orderID]
         let customer = order.customer
         let shippingAddress = order.shipping_address
-
+        
+        console.log('order" ', order)
         let orderNumber = orderID ? orderID : 'Not provided'        
-        let date = order.processed_at ? order.processed_at : 'Not provided'
+        let date = order.created_at ? new Date(order.created_at) : 'Not provided'
         let note = order.note ? order.note : 'None'
 
+        console.log('customer: ', customer)
         let customerName = `${customer.first_name} ${customer.last_name}` 
         let customerEmail = customer.email ? customer.email : 'Not provided'
         let customerPhone = customer.phone ? customer.phone : 'Not provided'
 
+        console.log('shipping address: ', shippingAddress)
         let address1 = shippingAddress.address1 ? shippingAddress.address1 : 'Not provided'
         let city = shippingAddress.city ? shippingAddress.city : 'Not provided'
         let zip = shippingAddress.zip ? shippingAddress.zip : 'Not provided'
@@ -152,7 +155,7 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         let orderTemplateTemporary = orderTemplate
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.ORDER_NUMBER}}}`,"g"), orderNumber)
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.SHOP}}}`,"g"), shopName)        
-        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.PROCESSED_AT}}}`,"g"), date)
+        orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.CREATED_AT}}}`,"g"), date)
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.NOTE}}}`,"g"), note)
 
         orderTemplateTemporary = orderTemplateTemporary.replace(new RegExp(`{{${keys.NAME}}}`,"g"), customerName)

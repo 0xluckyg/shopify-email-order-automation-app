@@ -330,7 +330,7 @@ class Settings extends React.Component {
                                 <p style={{lineHeight:'35px'}}>List of tags you can use:</p>
                                 <Badge status="success">{`{{${keys.SHOP}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.ORDER_NUMBER}}}`}</Badge>
-                                <Badge status="success">{`{{${keys.PROCESSED_AT}}}`}</Badge>
+                                <Badge status="success">{`{{${keys.CREATED_AT}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.NOTE}}}`}</Badge>                                
                                 <Badge status="success">{`{{${keys.NAME}}}`}</Badge>
                                 <Badge status="success">{`{{${keys.EMAIL}}}`}</Badge>
