@@ -133,17 +133,14 @@ function createOrderText(data, shop, headerTemplateText, orderTemplateText, prod
         let customer = order.customer
         let shippingAddress = order.shipping_address
         
-        console.log('order" ', order)
         let orderNumber = orderID ? orderID : 'Not provided'        
         let date = order.created_at ? new Date(order.created_at) : 'Not provided'
         let note = order.note ? order.note : 'None'
 
-        console.log('customer: ', customer)
         let customerName = `${customer.first_name} ${customer.last_name}` 
         let customerEmail = customer.email ? customer.email : 'Not provided'
         let customerPhone = customer.phone ? customer.phone : 'Not provided'
 
-        console.log('shipping address: ', shippingAddress)
         let address1 = shippingAddress.address1 ? shippingAddress.address1 : 'Not provided'
         let city = shippingAddress.city ? shippingAddress.city : 'Not provided'
         let zip = shippingAddress.zip ? shippingAddress.zip : 'Not provided'

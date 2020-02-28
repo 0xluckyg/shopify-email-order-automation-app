@@ -50,9 +50,6 @@ async function changeSubscription(ctx) {
 function initiatePayment (ctx, user, plan) {            
     const { shop, accessToken } = ctx.session;   
     const isTest = (shop == process.env.ADMIN_URL || process.env.NODE_ENV == 'development')
-    console.log('Payment Store: ', shop)
-    console.log('Payment Env: ', process.env.NODE_ENV)
-    console.log('Payment Testmode: ', isTest)
     
     const freeTrialLeft = calculateTrialDays(user.payment.date, new Date())    
     //Shopify billing API requires 3 variables: price, name, return_url     
